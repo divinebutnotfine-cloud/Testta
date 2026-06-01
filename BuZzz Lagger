@@ -220,7 +220,7 @@ local function MakeDraggable(frame,handle)
 end
 local function SectionHeader(parent,text,yPos)
     New("Frame",{Size=UDim2.new(0,3,0,14),Position=UDim2.new(0,10,0,yPos+2),BackgroundColor3=ACCENT,BorderSizePixel=0,Parent=parent})
-    New("TextLabel",{Size=UDim2.new(1,-28,0,18),Position=UDim2.new(0,18,0,yPos),Text=text:upper(),TextColor3=Color3.fromRGB(255,230,242),Font=Enum.Font.GothamBold,TextSize=14,BackgroundTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,Parent=parent})
+    New("TextLabel",{Size=UDim2.new(1,-28,0,18),Position=UDim2.new(0,18,0,yPos),Text=text:upper(),TextColor3=Color3.fromRGB(255,230,242),Font=Enum.Font.FredokaOne,TextSize=14,BackgroundTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,Parent=parent})
 end
 
 local _lockedPlot = nil
@@ -3056,7 +3056,7 @@ for i, icon in ipairs(NAV_ICONS) do
         Position=UDim2.new(0.5,-23,0,68 + (i-1)*54),
         BackgroundColor3=Color3.fromRGB(65,16,44),
         Text=icon, TextColor3=Color3.fromRGB(255,175,210),
-        Font=Enum.Font.GothamBold, TextSize=20,
+        Font=Enum.Font.FredokaOne, TextSize=20,
         AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
     })
     Corner(btn, 14)
@@ -3113,7 +3113,7 @@ New("Frame", {
 local cpTitle = New("TextLabel", {
     Size=UDim2.new(1,-70,0,28), Position=UDim2.new(0,16,0,8),
     Text="🐾  Brainrots",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
     TextSize=16, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
 })
@@ -3130,7 +3130,7 @@ Corner(headerLogo, 19)
 New("TextLabel", {
     Size=UDim2.new(1,-16,0,16), Position=UDim2.new(0,16,0,34),
     Text="Mikka Hub  ✦  Blossom 2026",
-    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.Gotham,
+    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.Nunito,
     TextSize=11, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
 })
@@ -3400,14 +3400,14 @@ Corner(selectedHeader:GetChildren()[2] or selectedHeader, 1)
 local rarityTag = New("TextLabel", {
     Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,14,0,8),
     BackgroundTransparency=1, Text="✿  BRAINROTS",
-    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.FredokaOne,
     TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
 })
 -- Selected animal name
 local selectedName = New("TextLabel", {
     Size=UDim2.new(0.6,0,0,28), Position=UDim2.new(0,14,0,30),
     BackgroundTransparency=1, Text="Select an animal...",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=15, TextXAlignment=Enum.TextXAlignment.Left,
     TextTruncate=Enum.TextTruncate.AtEnd, Parent=selectedHeader,
 })
@@ -3415,7 +3415,7 @@ local selectedName = New("TextLabel", {
 local selectedPrice = New("TextLabel", {
     Size=UDim2.new(0.42,-10,0,28), Position=UDim2.new(0.58,0,0,30),
     BackgroundTransparency=1, Text="",
-    TextColor3=Color3.fromRGB(60,240,130), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(60,240,130), Font=Enum.Font.FredokaOne,
     TextSize=15, TextXAlignment=Enum.TextXAlignment.Right, Parent=selectedHeader,
 })
 
@@ -3451,7 +3451,7 @@ local listVisible = false
 local animalToggleBtn = New("TextButton", {
     Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(55,14,38),
     BorderSizePixel=0, Text="",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
     TextSize=14, AutoButtonColor=false, LayoutOrder=2, Parent=brainrotsPage,
 })
 Corner(animalToggleBtn, 12)
@@ -3459,13 +3459,13 @@ Stroke(animalToggleBtn, Color3.fromRGB(255,105,170), 1.5, 0.35)
 New("TextLabel", {
     Size=UDim2.new(0,30,1,0), Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.GothamBold, TextSize=18,
+    Font=Enum.Font.FredokaOne, TextSize=18,
     TextXAlignment=Enum.TextXAlignment.Center, Parent=animalToggleBtn,
 })
 local _animalToggleLbl = New("TextLabel", {
     Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,30,0,0),
     BackgroundTransparency=1, Text="▾  Select Animal",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
     TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=animalToggleBtn,
 })
 animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(75,18,52) end)
@@ -3484,7 +3484,7 @@ local multiToggle = New("TextButton", {
     Size=UDim2.new(1,-8,0,24), Position=UDim2.new(0,4,0,4),
     BackgroundColor3=Color3.fromRGB(65,16,44),
     Text="Select Multiple: OFF",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=listContainer,
 })
 Corner(multiToggle, 5)
@@ -3514,7 +3514,7 @@ New("TextLabel", {
     Size=UDim2.new(0,22,1,0), Position=UDim2.new(0,8,0,0),
     BackgroundTransparency=1, Text="🔍",
     TextColor3=Color3.fromRGB(150,140,200),
-    Font=Enum.Font.GothamBold, TextSize=14,
+    Font=Enum.Font.FredokaOne, TextSize=14,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=searchRow,
 })
 
@@ -3523,7 +3523,7 @@ local searchBox = New("TextBox", {
     BackgroundTransparency=1, BorderSizePixel=0,
     Text="", PlaceholderText="Search...",
     PlaceholderColor3=Color3.fromRGB(150,140,200),
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=14, ClearTextOnFocus=false, Parent=searchRow,
 })
 
@@ -3572,6 +3572,14 @@ animalToggleBtn.MouseButton1Click:Connect(function()
     listVisible = not listVisible
     _animalToggleLbl.Text = listVisible and "▲  Select Animal" or "▾  Select Animal"
     listContainer.Visible = listVisible
+    -- Resize page when section toggles
+    if brainrotsPage.Visible and contentVisible then
+        task.defer(function()
+            task.wait(0.05)
+            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        end)
+    end
 end)
 
 local animalBtns = {}
@@ -3624,7 +3632,7 @@ local function BuildAnimalList(filter)
                     Size=UDim2.new(0.6,-36,1,0), Position=UDim2.new(0,36,0,0),
                     BackgroundTransparency=1, Text=name,
                     TextColor3=Color3.fromRGB(255,230,242),
-                    Font=Enum.Font.GothamBold, TextSize=13,
+                    Font=Enum.Font.FredokaOne, TextSize=13,
                     TextXAlignment=Enum.TextXAlignment.Left,
                     TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
                 })
@@ -3641,7 +3649,7 @@ local function BuildAnimalList(filter)
                         Size=UDim2.new(0.4,-8,1,0), Position=UDim2.new(0.6,0,0,0),
                         BackgroundTransparency=1, Text=fmt(info.price),
                         TextColor3=Color3.fromRGB(30,160,30),
-                        Font=Enum.Font.GothamBold, TextSize=13,
+                        Font=Enum.Font.FredokaOne, TextSize=13,
                         TextXAlignment=Enum.TextXAlignment.Right, Parent=b,
                     })
                 end
@@ -3708,7 +3716,7 @@ _refreshMultiToggle()
 local traitsBtn = New("TextButton", {
     Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(48,12,32),
     BorderSizePixel=0, Text="▼  Traits",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=14, AutoButtonColor=false, LayoutOrder=4, Parent=brainrotsPage,
 })
 Corner(traitsBtn, 6)
@@ -3729,7 +3737,7 @@ local minusBtn = New("TextButton", {
     Size=UDim2.new(0,44,1,-6), Position=UDim2.new(0,3,0,3),
     BackgroundColor3=Color3.fromRGB(90,20,55),
     BorderSizePixel=0, Text="−", TextColor3=Color3.fromRGB(255,180,215),
-    Font=Enum.Font.GothamBold, TextSize=20,
+    Font=Enum.Font.FredokaOne, TextSize=20,
     AutoButtonColor=false, Parent=qtyRow,
 })
 Corner(minusBtn, 8)
@@ -3737,7 +3745,7 @@ Corner(minusBtn, 8)
 local qtyLbl = New("TextLabel", {
     Size=UDim2.new(1,-100,1,0), Position=UDim2.new(0,50,0,0),
     BackgroundTransparency=1, Text="× 1",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=14, Parent=qtyRow,
 })
 
@@ -3745,7 +3753,7 @@ local plusBtn = New("TextButton", {
     Size=UDim2.new(0,44,1,-6), Position=UDim2.new(1,-47,0,3),
     BackgroundColor3=Color3.fromRGB(90,20,55),
     BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(255,180,215),
-    Font=Enum.Font.GothamBold, TextSize=20,
+    Font=Enum.Font.FredokaOne, TextSize=20,
     AutoButtonColor=false, Parent=qtyRow,
 })
 Corner(plusBtn, 8)
@@ -3764,7 +3772,7 @@ plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(90
 local spawnBtn = New("TextButton", {
     Size=UDim2.new(1,0,0,46), BackgroundColor3=Color3.fromRGB(30,160,80),
     BorderSizePixel=0, Text="",
-    TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.new(1,1,1), Font=Enum.Font.FredokaOne,
     TextSize=15, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
 })
 Corner(spawnBtn, 10)
@@ -3779,14 +3787,14 @@ New("Frame", {
 New("TextLabel", {
     Size=UDim2.new(0,36,1,0), Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.GothamBold, TextSize=20,
+    Font=Enum.Font.FredokaOne, TextSize=20,
     TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
 -- Label
 New("TextLabel", {
     Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
     BackgroundTransparency=1, Text="SPAWN ONTO PODIUM",
-    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
     TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
 
@@ -3819,7 +3827,7 @@ end)
 local statusLbl = New("TextLabel", {
     Size=UDim2.new(1,-26,1,0), Position=UDim2.new(0,22,0,0),
     BackgroundTransparency=1, Text="Ready — select an animal to spawn",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=12, TextXAlignment=Enum.TextXAlignment.Left,
     TextTruncate=Enum.TextTruncate.AtEnd, Parent=statusCard,
 })
@@ -3839,7 +3847,7 @@ New("Frame", {
 local countLbl = New("TextLabel", {
     Size=UDim2.new(1,-16,1,0), Position=UDim2.new(0,10,0,0),
     BackgroundTransparency=1, Text="Spawned: 0",
-    TextColor3=Color3.fromRGB(255,175,210), Font=Enum.Font.GothamSemibold,
+    TextColor3=Color3.fromRGB(255,175,210), Font=Enum.Font.Nunito,
     TextSize=12, TextXAlignment=Enum.TextXAlignment.Center, Parent=countCard,
 })
 
@@ -3857,6 +3865,14 @@ traitsBtn.MouseButton1Click:Connect(function()
     traitsVisible = not traitsVisible
     tmPopup.Visible = traitsVisible
     _updateTraitsBtnText()
+    -- Resize page when section toggles
+    if brainrotsPage.Visible and contentVisible then
+        task.defer(function()
+            task.wait(0.05)
+            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        end)
+    end
 end)
 
 local traitsGrid = New("ScrollingFrame", {
@@ -3915,7 +3931,7 @@ for _,trait in ipairs(TRAITS) do
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
         BackgroundTransparency=1, Text=trait,
         TextColor3=Color3.fromRGB(255,230,242),
-        Font=Enum.Font.GothamBold, TextSize=13,
+        Font=Enum.Font.FredokaOne, TextSize=13,
         TextXAlignment=Enum.TextXAlignment.Left,
         TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
     })
@@ -3938,7 +3954,7 @@ end
 local mutationsBtn = New("TextButton", {
     Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(48,12,32),
     BorderSizePixel=0, Text="▼  Mutation",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=14, AutoButtonColor=false, LayoutOrder=6, Parent=brainrotsPage,
 })
 Corner(mutationsBtn, 6)
@@ -3969,6 +3985,14 @@ mutationsBtn.MouseButton1Click:Connect(function()
     mutationsVisible = not mutationsVisible
     mutPopup.Visible = mutationsVisible
     _updateMutationsBtnText()
+    -- Resize page when section toggles
+    if brainrotsPage.Visible and contentVisible then
+        task.defer(function()
+            task.wait(0.05)
+            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        end)
+    end
 end)
 
 local mutGrid = New("ScrollingFrame", {
@@ -4012,7 +4036,7 @@ for _,mut in ipairs(MUTATIONS) do
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
         BackgroundTransparency=1, Text=(mut=="None") and "Normal" or mut,
         TextColor3=Color3.fromRGB(255,230,242),
-        Font=Enum.Font.GothamBold, TextSize=13,
+        Font=Enum.Font.FredokaOne, TextSize=13,
         TextXAlignment=Enum.TextXAlignment.Left,
         TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
     })
@@ -4713,7 +4737,7 @@ do
     New("TextLabel", {
         Size=UDim2.new(1,0,0,14), BackgroundTransparency=1,
         Text="BASE SKIN CHANGER", TextColor3=ACCENT,
-        Font=Enum.Font.GothamBold, TextSize=14,
+        Font=Enum.Font.FredokaOne, TextSize=14,
         TextXAlignment=Enum.TextXAlignment.Left,
         LayoutOrder=1, Parent=basePage,
     })
@@ -4722,7 +4746,7 @@ do
     local skinToggleBtn = New("TextButton", {
         Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(48,12,32),
         BorderSizePixel=0, Text="▼  Select Base Skin",
-        TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+        TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
         TextSize=14, AutoButtonColor=false, LayoutOrder=2, Parent=basePage,
     })
     Corner(skinToggleBtn, 6)
@@ -4742,7 +4766,7 @@ do
     local skinApplyBtn = New("TextButton", {
         Size=UDim2.new(1,0,0,32), BackgroundColor3=BTNGRN,
         Text="Apply Skin", TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=14, AutoButtonColor=false,
+        Font=Enum.Font.FredokaOne, TextSize=14, AutoButtonColor=false,
         BorderSizePixel=0, LayoutOrder=4, Parent=basePage,
     })
     Corner(skinApplyBtn, 5)
@@ -4752,7 +4776,7 @@ do
     local skinRemoveBtn = New("TextButton", {
         Size=UDim2.new(1,0,0,32), BackgroundColor3=BTNRED,
         Text="Reset Base", TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=14, AutoButtonColor=false,
+        Font=Enum.Font.FredokaOne, TextSize=14, AutoButtonColor=false,
         BorderSizePixel=0, LayoutOrder=5, Parent=basePage,
     })
     Corner(skinRemoveBtn, 5)
@@ -4784,7 +4808,7 @@ do
             local lbl = New("TextLabel", {
                 Size=UDim2.new(1,0,0,30), BackgroundTransparency=1,
                 Text="No skins available — try spawning a brainrot!",
-                TextColor3=Color3.fromRGB(150,140,180), Font=Enum.Font.Gotham,
+                TextColor3=Color3.fromRGB(150,140,180), Font=Enum.Font.Nunito,
                 TextSize=13, Parent=skinListFrame,
             })
             table.insert(skinBtns, lbl)
@@ -4803,7 +4827,7 @@ do
                 Size=UDim2.new(1,-16,1,0), Position=UDim2.new(0,12,0,0),
                 BackgroundTransparency=1, Text=skin.name,
                 TextColor3=Color3.fromRGB(255,230,242),
-                Font=Enum.Font.GothamBold, TextSize=13,
+                Font=Enum.Font.FredokaOne, TextSize=13,
                 TextXAlignment=Enum.TextXAlignment.Left, Parent=b,
             })
             b.MouseEnter:Connect(function()
@@ -4833,6 +4857,14 @@ do
             end
         end
         skinListPanel.Visible = skinListVisible
+        -- Resize page when section toggles
+        if basePage.Visible and contentVisible then
+            task.defer(function()
+                task.wait(0.05)
+                local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            end)
+        end
     end)
 
     skinApplyBtn.Activated:Connect(function()
@@ -6102,34 +6134,59 @@ do
         secLayout.Padding = UDim.new(0, 6)
 
         local hdrBtn = New("TextButton", {
-            Size=UDim2.new(1,0,0,32),
+            Size=UDim2.new(1,0,0,36),
             BackgroundColor3=Color3.fromRGB(48,12,32),
             BorderSizePixel=0, AutoButtonColor=false, Text="",
             LayoutOrder=1, Parent=section,
         })
-        Corner(hdrBtn, 6); Stroke(hdrBtn, Color3.fromRGB(65,16,44), 1, 0.2)
+        Corner(hdrBtn, 8); Stroke(hdrBtn, Color3.fromRGB(65,16,44), 1, 0.2)
         local arrowLbl = New("TextLabel", {
-            Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,10,0,0),
+            Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,14,0,0),
             BackgroundTransparency=1, Text=(openByDefault and "▼  " or "▶  ") .. title,
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
-            TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=hdrBtn,
+            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
+            TextSize=15, TextXAlignment=Enum.TextXAlignment.Left, Parent=hdrBtn,
         })
 
         local content = New("Frame", {
             Size=UDim2.new(1,0,0,0),
             AutomaticSize=Enum.AutomaticSize.Y,
-            BackgroundTransparency=1, BorderSizePixel=0, ClipsDescendants=true,
+            BackgroundTransparency=1, BorderSizePixel=0, ClipsDescendants=false,
             Visible=openByDefault, LayoutOrder=2, Parent=section,
         })
         local cLayout = Instance.new("UIListLayout", content)
         cLayout.SortOrder = Enum.SortOrder.LayoutOrder
         cLayout.Padding = UDim.new(0, 6)
 
+        -- Ensure section resizes when content visibility changes
+        local function updateSectionSize()
+            task.defer(function()
+                if content.Visible then
+                    section.Size = UDim2.new(1,0,0,0)
+                else
+                    section.Size = UDim2.new(1,0,0,hdrBtn.Size.Y.Offset)
+                end
+                -- Trigger page resize
+                if miscPage.Visible and contentVisible then
+                    task.defer(function()
+                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                    end)
+                end
+            end)
+        end
+
+        cLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            if content.Visible then
+                updateSectionSize()
+            end
+        end)
+
         local visible = openByDefault
         hdrBtn.Activated:Connect(function()
             visible = not visible
             content.Visible = visible
             arrowLbl.Text = (visible and "▼  " or "▶  ") .. title
+            updateSectionSize()
         end)
         return content
     end
@@ -6147,7 +6204,7 @@ do
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Auto-Restore Spawns on Rejoin",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row,
     })
     local toggleBtn = New("TextButton", {
@@ -6156,7 +6213,7 @@ do
         BorderSizePixel=0, AutoButtonColor=false,
         Text=autoRestoreEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row,
     })
     Corner(toggleBtn, 5)
     toggleBtn.Activated:Connect(function()
@@ -6175,7 +6232,7 @@ do
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Auto-Save Base Changes",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row2,
     })
     local saveToggleBtn = New("TextButton", {
@@ -6184,7 +6241,7 @@ do
         BorderSizePixel=0, AutoButtonColor=false,
         Text=autoSaveEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row2,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row2,
     })
     Corner(saveToggleBtn, 5)
     saveToggleBtn.Activated:Connect(function()
@@ -6204,7 +6261,7 @@ do
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Share Pulls to Community Feed",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row3,
     })
     local hookToggleBtn = New("TextButton", {
@@ -6213,7 +6270,7 @@ do
         BorderSizePixel=0, AutoButtonColor=false,
         Text=webhookEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row3,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row3,
     })
     Corner(hookToggleBtn, 5)
     hookToggleBtn.Activated:Connect(function()
@@ -6232,7 +6289,7 @@ do
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Hide UI on Rejoin",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row3b,
     })
     local hideToggleBtn = New("TextButton", {
@@ -6241,7 +6298,7 @@ do
         BorderSizePixel=0, AutoButtonColor=false,
         Text=hideOnRejoinEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row3b,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row3b,
     })
     Corner(hideToggleBtn, 5)
     hideToggleBtn.Activated:Connect(function()
@@ -6267,7 +6324,7 @@ do
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="UI Toggle Key",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row4,
     })
     local keyBtn = New("TextButton", {
@@ -6275,7 +6332,7 @@ do
         BackgroundColor3=Color3.fromRGB(65,16,44), BorderSizePixel=0,
         AutoButtonColor=false, Text=toggleKeyName,
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row4,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row4,
     })
     Corner(keyBtn, 5)
 
@@ -6356,7 +6413,7 @@ do
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Rejoin Key",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row5,
     })
     local rejoinBtn = New("TextButton", {
@@ -6365,7 +6422,7 @@ do
         AutoButtonColor=false,
         Text=(rejoinKeyName ~= "" and rejoinKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row5,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row5,
     })
     Corner(rejoinBtn, 5)
 
@@ -6442,7 +6499,7 @@ do
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Dupe Item Key",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row6,
     })
     local dupeKeyBtn = New("TextButton", {
@@ -6451,7 +6508,7 @@ do
         AutoButtonColor=false,
         Text=(_debugDupeKeyName ~= "" and _debugDupeKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row6,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row6,
     })
     Corner(dupeKeyBtn, 5)
 
@@ -6504,7 +6561,7 @@ do
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
         Text="Trade Last Player",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row7,
     })
     local afKeyBtn = New("TextButton", {
@@ -6513,7 +6570,7 @@ do
         AutoButtonColor=false,
         Text=(_debugAutoFillKeyName ~= "" and _debugAutoFillKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row7,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row7,
     })
     Corner(afKeyBtn, 5)
 
@@ -6565,7 +6622,7 @@ do
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1, Text="Trade Notification",
-        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Gotham,
+        TextColor3=Color3.fromRGB(220,220,230), Font=Enum.Font.Nunito,
         TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=row8,
     })
     local tnKeyBtn = New("TextButton", {
@@ -6574,7 +6631,7 @@ do
         AutoButtonColor=false,
         Text=(_debugTradeNotifKeyName ~= "" and _debugTradeNotifKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, Parent=row8,
+        Font=Enum.Font.FredokaOne, TextSize=13, Parent=row8,
     })
     Corner(tnKeyBtn, 5)
     local tnListening, tnPending, tnConn = false, nil, nil
@@ -6623,7 +6680,7 @@ do
     local statusLbl2 = New("TextLabel", {
         Size=UDim2.new(1,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1, Text="",
-        TextColor3=SUBTEXT, Font=Enum.Font.Gotham,
+        TextColor3=SUBTEXT, Font=Enum.Font.Nunito,
         TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=statusRow,
     })
     local function RefreshStatus()
@@ -6647,7 +6704,7 @@ do
         Size=UDim2.new(1,0,1,0), BackgroundColor3=Color3.fromRGB(70,40,40),
         BorderSizePixel=0, AutoButtonColor=false, Text="Clear Spawned",
         TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.GothamBold, TextSize=13, LayoutOrder=1, Parent=btnRow,
+        Font=Enum.Font.FredokaOne, TextSize=13, LayoutOrder=1, Parent=btnRow,
     })
     Corner(clearBtn, 5)
 
@@ -6917,13 +6974,13 @@ do
             Size = UDim2.new(1,-40,0,28), Position = UDim2.new(0,12,0,8),
             BackgroundTransparency = 1, Text = "Sign Editor",
             TextColor3 = Color3.fromRGB(255,230,242),
-            Font = Enum.Font.GothamBold, TextSize = 14,
+            Font = Enum.Font.FredokaOne, TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local closeBtn = New("TextButton", {
             Size = UDim2.new(0,24,0,24), Position = UDim2.new(1,-32,0,10),
             BackgroundColor3 = Color3.fromRGB(180,60,60), Text = "X",
-            TextColor3 = Color3.fromRGB(255,255,255), Font = Enum.Font.GothamBold,
+            TextColor3 = Color3.fromRGB(255,255,255), Font = Enum.Font.FredokaOne,
             TextSize = 12, AutoButtonColor = false, BorderSizePixel = 0, Parent = panel,
         })
         Corner(closeBtn, 4)
@@ -6935,7 +6992,7 @@ do
             Size = UDim2.new(1,-24,0,14), Position = UDim2.new(0,12,0,44),
             BackgroundTransparency = 1, Text = "MANUAL SIGN MESSAGE",
             TextColor3 = Color3.fromRGB(150,140,200),
-            Font = Enum.Font.GothamBold, TextSize = 9,
+            Font = Enum.Font.FredokaOne, TextSize = 9,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local manualBox = New("TextBox", {
@@ -6944,7 +7001,7 @@ do
             Text = _signState.manual, PlaceholderText = "What your sign should say...",
             PlaceholderColor3 = Color3.fromRGB(150,140,180),
             TextColor3 = Color3.fromRGB(255,230,242),
-            Font = Enum.Font.Gotham, TextSize = 12,
+            Font = Enum.Font.Nunito, TextSize = 12,
             ClearTextOnFocus = false, BorderSizePixel = 0, Parent = panel,
         })
         Corner(manualBox, 5); Stroke(manualBox, Color3.fromRGB(180,60,120), 1, 0.2)
@@ -6958,7 +7015,7 @@ do
             Size = UDim2.new(1,-80,1,0),
             BackgroundTransparency = 1, Text = "Cycle Random Messages",
             TextColor3 = Color3.fromRGB(220,220,230),
-            Font = Enum.Font.Gotham, TextSize = 12,
+            Font = Enum.Font.Nunito, TextSize = 12,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = randomRow,
         })
         local randToggle = New("TextButton", {
@@ -6967,7 +7024,7 @@ do
             BorderSizePixel = 0, AutoButtonColor = false,
             Text = _signState.randomEnabled and "ON" or "OFF",
             TextColor3 = Color3.fromRGB(255,255,255),
-            Font = Enum.Font.GothamBold, TextSize = 11, Parent = randomRow,
+            Font = Enum.Font.FredokaOne, TextSize = 11, Parent = randomRow,
         })
         Corner(randToggle, 5)
         randToggle.Activated:Connect(function()
@@ -6981,7 +7038,7 @@ do
             Size = UDim2.new(0,140,0,20), Position = UDim2.new(0,12,0,138),
             BackgroundTransparency = 1, Text = "Cycle every (sec):",
             TextColor3 = Color3.fromRGB(220,220,230),
-            Font = Enum.Font.Gotham, TextSize = 11,
+            Font = Enum.Font.Nunito, TextSize = 11,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local cycleBox = New("TextBox", {
@@ -6989,7 +7046,7 @@ do
             BackgroundColor3 = Color3.fromRGB(48,12,32),
             Text = tostring(_signState.cycleSec or 5),
             TextColor3 = Color3.fromRGB(255,230,242),
-            Font = Enum.Font.Gotham, TextSize = 12,
+            Font = Enum.Font.Nunito, TextSize = 12,
             ClearTextOnFocus = false, BorderSizePixel = 0, Parent = panel,
         })
         Corner(cycleBox, 5); Stroke(cycleBox, Color3.fromRGB(180,60,120), 1, 0.2)
@@ -6998,7 +7055,7 @@ do
             Size = UDim2.new(1,-24,0,14), Position = UDim2.new(0,12,0,170),
             BackgroundTransparency = 1, Text = "RANDOM MESSAGE POOL (one per line)",
             TextColor3 = Color3.fromRGB(150,140,200),
-            Font = Enum.Font.GothamBold, TextSize = 9,
+            Font = Enum.Font.FredokaOne, TextSize = 9,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local listBox = New("TextBox", {
@@ -7008,7 +7065,7 @@ do
             PlaceholderText = "yo\nDeal?\nL Trade\nAdd more please",
             PlaceholderColor3 = Color3.fromRGB(150,140,180),
             TextColor3 = Color3.fromRGB(255,230,242),
-            Font = Enum.Font.Gotham, TextSize = 12,
+            Font = Enum.Font.Nunito, TextSize = 12,
             MultiLine = true, ClearTextOnFocus = false,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
@@ -7022,7 +7079,7 @@ do
             BackgroundColor3 = Color3.fromRGB(40,160,70),
             Text = "Save & Apply",
             TextColor3 = Color3.fromRGB(255,255,255),
-            Font = Enum.Font.GothamBold, TextSize = 12,
+            Font = Enum.Font.FredokaOne, TextSize = 12,
             AutoButtonColor = false, BorderSizePixel = 0, Parent = panel,
         })
         Corner(saveBtn, 6)
@@ -8168,7 +8225,7 @@ do
         New("TextLabel", {
             Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
             Text="🔴 STREAM MODE", TextColor3=Color3.fromRGB(255,80,80),
-            Font=Enum.Font.GothamBold, TextSize=24,
+            Font=Enum.Font.FredokaOne, TextSize=24,
             TextXAlignment=Enum.TextXAlignment.Center,
             Visible=false, ZIndex=201, Parent=streamOverlay,
         })
@@ -8228,7 +8285,7 @@ do
             Size=UDim2.new(0.6, -pad*1.5, 0, 22), Position=UDim2.new(0, pad, 0, 8),
             BackgroundColor3=Color3.fromRGB(108,92,231),
             Text="Pop Out",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(popBtn, 5)
@@ -8240,7 +8297,7 @@ do
             Position=UDim2.new(0.6, pad*0.5, 0, 8),
             BackgroundColor3 = Color3.fromRGB(40,160,70),
             Text="Show on Hide: ON",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(ignoreBtn, 5)
@@ -8300,7 +8357,7 @@ do
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
             BackgroundTransparency=1, Text="TARGET USERNAME",
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
             TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
@@ -8310,7 +8367,7 @@ do
             BackgroundColor3=Color3.fromRGB(48,12,32),
             Text="", PlaceholderText="Enter username...",
             PlaceholderColor3=Color3.fromRGB(150,140,180),
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.Gotham,
+            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.Nunito,
             TextSize=13, ClearTextOnFocus=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(usernameBox, 5)
@@ -8324,7 +8381,7 @@ do
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
             BackgroundTransparency=1, Text="ADD BRAINROTS TO THEIR SIDE",
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
             TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
@@ -8341,7 +8398,7 @@ do
             BackgroundColor3=Color3.fromRGB(48,12,32),
             Text="▼  " .. selAnimal,
             TextColor3=Color3.fromRGB(255,230,242),
-            Font=Enum.Font.GothamBold, TextSize=13, AutoButtonColor=false,
+            Font=Enum.Font.FredokaOne, TextSize=13, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
             TextTruncate=Enum.TextTruncate.AtEnd,
@@ -8355,7 +8412,7 @@ do
             BackgroundColor3=Color3.fromRGB(48,12,32),
             Text="▼  Mutations  •  Normal",
             TextColor3=Color3.fromRGB(255,230,242),
-            Font=Enum.Font.GothamBold, TextSize=13, AutoButtonColor=false,
+            Font=Enum.Font.FredokaOne, TextSize=13, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
             TextTruncate=Enum.TextTruncate.AtEnd,
@@ -8478,7 +8535,7 @@ do
                             Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
                             BackgroundTransparency=1, Text=it,
                             TextColor3=Color3.fromRGB(255,230,242),
-                            Font=Enum.Font.GothamBold, TextSize=13,
+                            Font=Enum.Font.FredokaOne, TextSize=13,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
                         })
@@ -8503,7 +8560,7 @@ do
                             Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
                             BackgroundTransparency=1, Text=(it=="None") and "Normal" or it,
                             TextColor3=Color3.fromRGB(255,230,242),
-                            Font=Enum.Font.GothamBold, TextSize=13,
+                            Font=Enum.Font.FredokaOne, TextSize=13,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
                         })
@@ -8512,7 +8569,7 @@ do
                             Size=UDim2.new(1,-12,1,0), Position=UDim2.new(0,8,0,0),
                             BackgroundTransparency=1, Text=it,
                             TextColor3=Color3.fromRGB(255,230,242),
-                            Font=Enum.Font.GothamBold, TextSize=13,
+                            Font=Enum.Font.FredokaOne, TextSize=13,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
                         })
@@ -8544,7 +8601,7 @@ do
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
             BackgroundColor3=Color3.fromRGB(48,12,32),
             Text="▼  Traits", TextColor3=Color3.fromRGB(255,230,242),
-            Font=Enum.Font.GothamBold, TextSize=13, AutoButtonColor=false,
+            Font=Enum.Font.FredokaOne, TextSize=13, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
             TextTruncate=Enum.TextTruncate.AtEnd,
@@ -8653,7 +8710,7 @@ do
                         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
                         BackgroundTransparency=1, Text=tname,
                         TextColor3=Color3.fromRGB(255,230,242),
-                        Font=Enum.Font.GothamBold, TextSize=13,
+                        Font=Enum.Font.FredokaOne, TextSize=13,
                         TextXAlignment=Enum.TextXAlignment.Left, ZIndex=63, Parent=row,
                     })
 
@@ -8692,7 +8749,7 @@ do
         local addBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,28), Position=UDim2.new(0,pad,0,y),
             BackgroundColor3=Color3.fromRGB(40,160,70), Text="+ ADD",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(addBtn, 5)
@@ -8819,7 +8876,7 @@ do
         local launchBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,36), Position=UDim2.new(0,pad,0,y),
             BackgroundColor3=Color3.fromRGB(108,92,231), Text="LAUNCH",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(launchBtn, 6)
@@ -8830,7 +8887,7 @@ do
         local notifBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
             BackgroundColor3=Color3.fromRGB(70,140,210), Text="Trade Notification",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(notifBtn, 6)
@@ -8849,7 +8906,7 @@ do
         local forceBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
             BackgroundColor3=Color3.fromRGB(40,160,70), Text="Force Accept",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
             TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(forceBtn, 6)
