@@ -3082,7 +3082,7 @@ New("ImageLabel", {
     Position=UDim2.new(0.5,-30,0.5,-30),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.95,
+    ImageTransparency=0.97,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=-1, Active=false, Parent=sidebar,
 })
@@ -3275,7 +3275,7 @@ local function _syncWinHeight(h)
     -- sidebar and contentPanel grow to match content height
     local total = 52 + h + 16
     -- Minimum height must fit all nav buttons (navBtn[4] at y=230 + height 46 = 276, plus toggle btn)
-    local MIN_HEIGHT = 380
+    local MIN_HEIGHT = 400
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
     -- Cap max height to 80% of screen so it doesn't go off-screen
     local screenH = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.Y or 800
@@ -3333,7 +3333,7 @@ _guiToggleBtn.Activated:Connect(function()
         toggleGlow.BackgroundColor3 = Color3.fromRGB(60,12,35)
         toggleGlow.BackgroundTransparency = 0.8
         -- Collapsed: fixed minimum height
-        local MIN_HEIGHT = 380
+        local MIN_HEIGHT = 400
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
@@ -3370,11 +3370,11 @@ local brainrotsPage = New("Frame", {
 })
 -- Background logo watermark
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(0,120,0,120),
+    Position=UDim2.new(0.5,-60,0.5,-60),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
+    ImageTransparency=0.97,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=-1, Active=false, Parent=brainrotsPage,
 })
@@ -3402,11 +3402,11 @@ local tradingPage = New("Frame", {
 })
 -- Background logo watermark
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(0,120,0,120),
+    Position=UDim2.new(0.5,-60,0.5,-60),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
+    ImageTransparency=0.97,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=-1, Active=false, Parent=tradingPage,
 })
@@ -3438,11 +3438,11 @@ local miscPage = New("Frame", {
 })
 -- Background logo watermark
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(0,120,0,120),
+    Position=UDim2.new(0.5,-60,0.5,-60),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
+    ImageTransparency=0.97,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=-1, Active=false, Parent=miscPage,
 })
@@ -3474,11 +3474,11 @@ local basePage = New("Frame", {
 })
 -- Background logo watermark
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(0,120,0,120),
+    Position=UDim2.new(0.5,-60,0.5,-60),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
+    ImageTransparency=0.97,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=-1, Active=false, Parent=basePage,
 })
@@ -3530,8 +3530,8 @@ local function SetTab(tab)
             _forceResize()
         end)
     end
-    -- Ensure toggle button stays at fixed bottom position
-    _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
+    -- Force toggle button to stay at bottom of sidebar
+    _guiToggleBtn.Position = UDim2.new(0.5, -28, 1, -62)
 end
 SetTab("Brainrots")
 navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
