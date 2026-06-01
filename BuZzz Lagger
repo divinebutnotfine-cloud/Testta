@@ -3667,8 +3667,55 @@ Corner(spawnBtn, 6)
 spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(50,180,80) end)
 spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(40,160,70) end)
 
-local statusLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold, TextSize=13, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
-local countLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamSemibold, TextSize=13, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
+-- ── Status label (pill card style) ──────────────────────
+local statusCard = New("Frame", {
+    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(40,12,28),
+    BorderSizePixel=0, LayoutOrder=10, Parent=brainrotsPage,
+})
+Corner(statusCard, 8)
+Stroke(statusCard, Color3.fromRGB(255,105,170), 1, 0.4)
+-- Accent left bar
+New("Frame", {
+    Size=UDim2.new(0,3,0.7,0), Position=UDim2.new(0,0,0.15,0),
+    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=statusCard,
+})
+-- Dot indicator
+New("Frame", {
+    Size=UDim2.new(0,7,0,7), Position=UDim2.new(0,10,0.5,-3.5),
+    BackgroundColor3=Color3.fromRGB(50,220,110), BorderSizePixel=0, Parent=statusCard,
+})
+pcall(function()
+    local dot = statusCard:GetChildren()[3]
+    if dot and dot:IsA("Frame") then
+        local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(1,0); c.Parent = dot
+    end
+end)
+local statusLbl = New("TextLabel", {
+    Size=UDim2.new(1,-26,1,0), Position=UDim2.new(0,22,0,0),
+    BackgroundTransparency=1, Text="Ready — select an animal to spawn",
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextSize=12, TextXAlignment=Enum.TextXAlignment.Left,
+    TextTruncate=Enum.TextTruncate.AtEnd, Parent=statusCard,
+})
+
+-- ── Count label (pill card style) ───────────────────────
+local countCard = New("Frame", {
+    Size=UDim2.new(1,0,0,28), BackgroundColor3=Color3.fromRGB(36,10,24),
+    BorderSizePixel=0, LayoutOrder=11, Parent=brainrotsPage,
+})
+Corner(countCard, 8)
+Stroke(countCard, Color3.fromRGB(255,140,190), 1, 0.45)
+-- Accent left bar
+New("Frame", {
+    Size=UDim2.new(0,3,0.7,0), Position=UDim2.new(0,0,0.15,0),
+    BackgroundColor3=Color3.fromRGB(108,92,231), BorderSizePixel=0, Parent=countCard,
+})
+local countLbl = New("TextLabel", {
+    Size=UDim2.new(1,-16,1,0), Position=UDim2.new(0,10,0,0),
+    BackgroundTransparency=1, Text="Spawned: 0",
+    TextColor3=Color3.fromRGB(255,175,210), Font=Enum.Font.GothamSemibold,
+    TextSize=12, TextXAlignment=Enum.TextXAlignment.Center, Parent=countCard,
+})
 
 local traitsVisible = false
 local tmPopup = New("Frame", {
@@ -3863,9 +3910,19 @@ end
 local function SetStatus(msg,col,dur)
     pcall(function()
         statusLbl.Text=msg; statusLbl.TextColor3=col or Color3.fromRGB(255,230,242)
+        -- Update dot color to match status
+        local dot = statusCard:GetChildren()[3]
+        if dot and dot:IsA("Frame") then
+            dot.BackgroundColor3 = col or Color3.fromRGB(50,220,110)
+        end
     end)
     if dur then task.delay(dur,function() pcall(function()
-        statusLbl.Text="Ready"; statusLbl.TextColor3=Color3.fromRGB(255,230,242)
+        statusLbl.Text="Ready — select an animal to spawn"
+        statusLbl.TextColor3=Color3.fromRGB(255,230,242)
+        local dot2 = statusCard:GetChildren()[3]
+        if dot2 and dot2:IsA("Frame") then
+            dot2.BackgroundColor3 = Color3.fromRGB(50,220,110)
+        end
     end) end) end
 end
 local function UpdateCount()
@@ -3874,7 +3931,7 @@ local function UpdateCount()
         if m and m.Parent then table.insert(alive, m) end
     end
     spawnedModels=alive
-    pcall(function() countLbl.Text="Spawned: "..#spawnedModels end)
+    pcall(function() countLbl.Text="🐾  Spawned: "..#spawnedModels end)
     if LocalPlayer:GetAttribute("IsTrading") then
         task.defer(UpdateTradeCounts)
     end
@@ -5877,7 +5934,6 @@ spawnBtn.MouseButton1Click:Connect(function()
         if #picks == 0 then
             DoSpawn(); return
         end
-
         local savedAnimal = selectedAnimal
         for _, n in ipairs(picks) do
             selectedAnimal = n
@@ -5889,8 +5945,6 @@ spawnBtn.MouseButton1Click:Connect(function()
         DoSpawn()
     end
 end)
-spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(60,190,100) end)
-spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=BTNGRN end)
 
 task.defer(function()
     for _, lbl in sg:GetDescendants() do
