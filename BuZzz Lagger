@@ -3030,17 +3030,19 @@ local sidebar = New("Frame", {
 Corner(sidebar, 20)
 Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
 
--- Logo flower at top of sidebar
-New("TextLabel", {
-    Size=UDim2.new(1,0,0,44), Position=UDim2.new(0,0,0,8),
-    Text="🌸", Font=Enum.Font.GothamBold, TextSize=26,
-    BackgroundTransparency=1, TextXAlignment=Enum.TextXAlignment.Center,
+-- Logo image at top of sidebar (Mikka Hub logo)
+local logoImg = New("ImageLabel", {
+    Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
+    BackgroundTransparency=1,
+    Image="rbxassetid://1780326942542",
+    ScaleType=Enum.ScaleType.Fit,
     Parent=sidebar,
 })
+Corner(logoImg, 26)
 
 -- Thin divider under logo
 New("Frame", {
-    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,0,54),
+    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,0,62),
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
 })
 
@@ -3051,7 +3053,7 @@ local navBtns = {}
 for i, icon in ipairs(NAV_ICONS) do
     local btn = New("TextButton", {
         Size=UDim2.new(0,46,0,46),
-        Position=UDim2.new(0.5,-23,0,60 + (i-1)*54),
+        Position=UDim2.new(0.5,-23,0,68 + (i-1)*54),
         BackgroundColor3=Color3.fromRGB(65,16,44),
         Text=icon, TextColor3=Color3.fromRGB(255,175,210),
         Font=Enum.Font.GothamBold, TextSize=20,
@@ -3061,17 +3063,17 @@ for i, icon in ipairs(NAV_ICONS) do
     navBtns[i] = btn
 end
 
--- Collapse button at bottom of sidebar
+-- Collapse button at bottom of sidebar — BIGGER
 local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,40,0,32),
-    Position=UDim2.new(0.5,-20,1,-40),
-    BackgroundColor3=Color3.fromRGB(255,105,170),
+    Size=UDim2.new(0,52,0,44),
+    Position=UDim2.new(0.5,-26,1,-52),
+    BackgroundColor3=Color3.fromRGB(255,80,150),
     Text="✕", TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=15,
+    Font=Enum.Font.GothamBold, TextSize=20,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 10)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,180,215), 1, 0.4)
+Corner(_guiToggleBtn, 14)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.2)
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
@@ -3080,7 +3082,7 @@ local contentPanel = New("Frame", {
     Position=UDim2.new(0,SIDEBAR_W+8,0,0),
     BackgroundColor3=Color3.fromRGB(30,8,20),
     BorderSizePixel=0, Parent=win,
-    ClipsDescendants=false,
+    ClipsDescendants=true,
 })
 Corner(contentPanel, 18)
 Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
@@ -3099,16 +3101,25 @@ New("Frame", {
 })
 -- Header title label (changes with tab)
 local cpTitle = New("TextLabel", {
-    Size=UDim2.new(1,-16,0,28), Position=UDim2.new(0,16,0,8),
-    Text="🌸  Brainrots",
+    Size=UDim2.new(1,-70,0,28), Position=UDim2.new(0,16,0,8),
+    Text="🐾  Brainrots",
     TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
     TextSize=16, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
 })
+-- Logo in header top-right
+local headerLogo = New("ImageLabel", {
+    Size=UDim2.new(0,38,0,38), Position=UDim2.new(1,-46,0,7),
+    BackgroundTransparency=1,
+    Image="rbxassetid://1780326942542",
+    ScaleType=Enum.ScaleType.Fit,
+    Parent=cpHeader,
+})
+Corner(headerLogo, 19)
 -- Subtitle
 New("TextLabel", {
     Size=UDim2.new(1,-16,0,16), Position=UDim2.new(0,16,0,34),
-    Text="KingScripts  ✦  Blossom 2026",
+    Text="Mikka Hub  ✦  Blossom 2026",
     TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.Gotham,
     TextSize=11, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
@@ -3158,10 +3169,10 @@ local function _syncWinHeight(h)
     sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
     win.Size          = UDim2.new(0,WIN_W,0,total)
     -- reposition collapse button
-    _guiToggleBtn.Position = UDim2.new(0.5,-20,1,-40)
+    _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-52)
     -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
-        btn.Position = UDim2.new(0.5,-23,0,60+(i-1)*54)
+        btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
     end
 end
 
@@ -3189,24 +3200,30 @@ _guiToggleBtn.Activated:Connect(function()
     contentVisible = not contentVisible
     mainContent.Visible = contentVisible
     cpHeader.Visible    = contentVisible
+    contentPanel.Visible = contentVisible
     _guiToggleBtn.Text  = contentVisible and "✕" or "▸"
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(90,18,55)
     if contentVisible then
         local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
         if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
     else
+        -- Collapsed: only sidebar pill visible, compact size
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,60)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,60)
         win.Size          = UDim2.new(0,WIN_W,0,60)
+        -- Keep nav buttons at collapsed position
+        for i, btn in ipairs(navBtns) do
+            btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
+        end
     end
 end)
 
 -- ── Tab switching with sidebar buttons ────────────────
 local CP_TITLES = {
-    Brainrots="🌸  Brainrots",
+    Brainrots="🐾  Brainrots",
     Trading  ="💸  Trading",
     Base     ="🏡  Base",
-    Misc     ="⚙️  Misc",
+    Misc     ="⚙️  Settings",
 }
 -- tabBar is a dummy invisible frame — pages use it as parent via LayoutOrder
 -- We keep the variable so all downstream code that references tabBar still works
@@ -3302,28 +3319,38 @@ navBtns[3].Activated:Connect(function() SetTab("Base")      end)
 navBtns[4].Activated:Connect(function() SetTab("Misc")      end)
 
 local selectedHeader = New("Frame", {
-    Size=UDim2.new(1,0,0,62), BackgroundColor3=Color3.fromRGB(48,12,32),
+    Size=UDim2.new(1,0,0,68), BackgroundColor3=Color3.fromRGB(40,10,28),
     BorderSizePixel=0, LayoutOrder=1, Parent=brainrotsPage,
 })
-Corner(selectedHeader, 12)
-Stroke(selectedHeader, Color3.fromRGB(255,140,190), 1, 0.35)
+Corner(selectedHeader, 14)
+Stroke(selectedHeader, Color3.fromRGB(255,105,170), 1.5, 0.25)
+-- Top glow bar
+New("Frame", {
+    Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=selectedHeader,
+})
+Corner(selectedHeader:GetChildren()[2] or selectedHeader, 1)
+-- Section label
 local rarityTag = New("TextLabel", {
-    Size=UDim2.new(1,0,0,18), Position=UDim2.new(0,14,0,8),
+    Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,14,0,8),
     BackgroundTransparency=1, Text="✿  BRAINROTS",
     TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.GothamBold,
-    TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
+    TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
 })
+-- Selected animal name
 local selectedName = New("TextLabel", {
-    Size=UDim2.new(0.65,0,0,26), Position=UDim2.new(0,14,0,28),
+    Size=UDim2.new(0.6,0,0,28), Position=UDim2.new(0,14,0,30),
     BackgroundTransparency=1, Text="Select an animal...",
     TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
-    TextSize=16, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
+    TextSize=15, TextXAlignment=Enum.TextXAlignment.Left,
+    TextTruncate=Enum.TextTruncate.AtEnd, Parent=selectedHeader,
 })
+-- Price label (right side)
 local selectedPrice = New("TextLabel", {
-    Size=UDim2.new(0.4,-10,0,26), Position=UDim2.new(0.6,0,0,28),
+    Size=UDim2.new(0.42,-10,0,28), Position=UDim2.new(0.58,0,0,30),
     BackgroundTransparency=1, Text="",
-    TextColor3=Color3.fromRGB(60,220,120), Font=Enum.Font.GothamBold,
-    TextSize=16, TextXAlignment=Enum.TextXAlignment.Right, Parent=selectedHeader,
+    TextColor3=Color3.fromRGB(60,240,130), Font=Enum.Font.GothamBold,
+    TextSize=15, TextXAlignment=Enum.TextXAlignment.Right, Parent=selectedHeader,
 })
 
 local function _fmtCash(n)
@@ -3356,15 +3383,27 @@ local _triggerTradeNotif
 
 local listVisible = false
 local animalToggleBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(48,12,32),
-    BorderSizePixel=0, Text="🌸  Select Animal  ▾",
+    Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(55,14,38),
+    BorderSizePixel=0, Text="",
     TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
     TextSize=14, AutoButtonColor=false, LayoutOrder=2, Parent=brainrotsPage,
 })
-Corner(animalToggleBtn, 10)
-Stroke(animalToggleBtn, Color3.fromRGB(255,105,170), 1, 0.4)
-animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(65,16,44) end)
-animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
+Corner(animalToggleBtn, 12)
+Stroke(animalToggleBtn, Color3.fromRGB(255,105,170), 1.5, 0.35)
+New("TextLabel", {
+    Size=UDim2.new(0,30,1,0), Position=UDim2.new(0,0,0,0),
+    BackgroundTransparency=1, Text="🐾",
+    Font=Enum.Font.GothamBold, TextSize=18,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=animalToggleBtn,
+})
+local _animalToggleLbl = New("TextLabel", {
+    Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,30,0,0),
+    BackgroundTransparency=1, Text="▾  Select Animal",
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=animalToggleBtn,
+})
+animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(75,18,52) end)
+animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(55,14,38) end)
 
 local listContainer = New("Frame", {
     Size=UDim2.new(1,0,0,276),
@@ -3465,7 +3504,7 @@ end
 
 animalToggleBtn.MouseButton1Click:Connect(function()
     listVisible = not listVisible
-    animalToggleBtn.Text = listVisible and "▲  Select Animal" or "▼  Select Animal"
+    _animalToggleLbl.Text = listVisible and "▲  Select Animal" or "▾  Select Animal"
     listContainer.Visible = listVisible
 end)
 
@@ -3579,7 +3618,7 @@ local function BuildAnimalList(filter)
 
                     listVisible = false
                     listContainer.Visible = false
-                    animalToggleBtn.Text = "▼  Select Animal"
+                    _animalToggleLbl.Text = "▾  Select Animal"
                     BuildAnimalList(searchBox.Text)
                 end)
                 table.insert(animalBtns, b)
@@ -3614,58 +3653,79 @@ local tmBtn = traitsBtn
 
 local spawnCount = 1
 local qtyRow = New("Frame", {
-    Size=UDim2.new(1,0,0,34), BackgroundColor3=Color3.fromRGB(65,16,44),
+    Size=UDim2.new(1,0,0,38), BackgroundColor3=Color3.fromRGB(40,10,28),
     BorderSizePixel=0, LayoutOrder=8, Parent=brainrotsPage,
 })
-Corner(qtyRow, 6)
-Stroke(qtyRow, Color3.fromRGB(50,50,70), 1, 0.3)
+Corner(qtyRow, 10)
+Stroke(qtyRow, Color3.fromRGB(180,60,120), 1.5, 0.3)
 
 local minusBtn = New("TextButton", {
-    Size=UDim2.new(0,40,1,0), Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(48,12,32),
-    BorderSizePixel=0, Text="-", TextColor3=Color3.fromRGB(255,230,242),
-    Font=Enum.Font.GothamBold, TextSize=18,
+    Size=UDim2.new(0,44,1,-6), Position=UDim2.new(0,3,0,3),
+    BackgroundColor3=Color3.fromRGB(90,20,55),
+    BorderSizePixel=0, Text="−", TextColor3=Color3.fromRGB(255,180,215),
+    Font=Enum.Font.GothamBold, TextSize=20,
     AutoButtonColor=false, Parent=qtyRow,
 })
-Corner(minusBtn, 6)
+Corner(minusBtn, 8)
 
 local qtyLbl = New("TextLabel", {
-    Size=UDim2.new(1,-80,1,0), Position=UDim2.new(0,40,0,0),
-    BackgroundTransparency=1, Text="x1",
+    Size=UDim2.new(1,-100,1,0), Position=UDim2.new(0,50,0,0),
+    BackgroundTransparency=1, Text="× 1",
     TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
-    TextSize=13, Parent=qtyRow,
+    TextSize=14, Parent=qtyRow,
 })
 
 local plusBtn = New("TextButton", {
-    Size=UDim2.new(0,40,1,0), Position=UDim2.new(1,-40,0,0),
-    BackgroundColor3=Color3.fromRGB(48,12,32),
-    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(255,230,242),
-    Font=Enum.Font.GothamBold, TextSize=18,
+    Size=UDim2.new(0,44,1,-6), Position=UDim2.new(1,-47,0,3),
+    BackgroundColor3=Color3.fromRGB(90,20,55),
+    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(255,180,215),
+    Font=Enum.Font.GothamBold, TextSize=20,
     AutoButtonColor=false, Parent=qtyRow,
 })
-Corner(plusBtn, 6)
+Corner(plusBtn, 8)
 
 minusBtn.MouseButton1Click:Connect(function()
-    spawnCount = math.max(1, spawnCount - 1); qtyLbl.Text = "x"..spawnCount
+    spawnCount = math.max(1, spawnCount - 1); qtyLbl.Text = "× "..spawnCount
 end)
 plusBtn.MouseButton1Click:Connect(function()
-    spawnCount = math.min(10, spawnCount + 1); qtyLbl.Text = "x"..spawnCount
+    spawnCount = math.min(10, spawnCount + 1); qtyLbl.Text = "× "..spawnCount
 end)
-minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(100,30,70) end)
-minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
-plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(100,30,70) end)
-plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
+minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(130,30,75) end)
+minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(90,20,55) end)
+plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(130,30,75) end)
+plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(90,20,55) end)
 
 local spawnBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(40,160,70),
-    BorderSizePixel=0, Text="Spawn onto Podium",
+    Size=UDim2.new(1,0,0,46), BackgroundColor3=Color3.fromRGB(30,160,80),
+    BorderSizePixel=0, Text="",
     TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold,
-    TextSize=14, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
+    TextSize=15, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
 })
-Corner(spawnBtn, 6)
+Corner(spawnBtn, 10)
+Stroke(spawnBtn, Color3.fromRGB(100,255,160), 1.5, 0.3)
+-- Gradient shine overlay
+New("Frame", {
+    Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.88,
+    BorderSizePixel=0, Parent=spawnBtn,
+})
+-- Icon
+New("TextLabel", {
+    Size=UDim2.new(0,36,1,0), Position=UDim2.new(0,0,0,0),
+    BackgroundTransparency=1, Text="🐾",
+    Font=Enum.Font.GothamBold, TextSize=20,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
+})
+-- Label
+New("TextLabel", {
+    Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
+    BackgroundTransparency=1, Text="SPAWN ONTO PODIUM",
+    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+    TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
+})
 
-spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(50,180,80) end)
-spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(40,160,70) end)
+spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(40,190,100) end)
+spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(30,160,80) end)
 
 -- ── Status label (pill card style) ──────────────────────
 local statusCard = New("Frame", {
