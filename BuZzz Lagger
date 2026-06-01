@@ -3357,15 +3357,15 @@ local brainrotsPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=true, Parent=mainContent,
 })
--- Full background watermark covering entire content area
+-- Full background watermark (behind all content at ZIndex -1)
 New("ImageLabel", {
     Size=UDim2.new(1,0,1,0),
     Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.90,
+    ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Active=false, Parent=brainrotsPage,
+    ZIndex=-1, Active=false, Parent=brainrotsPage,
 })
 do
     local ul = Instance.new("UIListLayout", brainrotsPage)
@@ -3389,15 +3389,15 @@ local tradingPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Full background watermark covering entire content area
+-- Full background watermark (behind all content at ZIndex -1)
 New("ImageLabel", {
     Size=UDim2.new(1,0,1,0),
     Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.90,
+    ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Active=false, Parent=tradingPage,
+    ZIndex=-1, Active=false, Parent=tradingPage,
 })
 do
     local ul = Instance.new("UIListLayout", tradingPage)
@@ -3425,15 +3425,15 @@ local miscPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Full background watermark covering entire content area
+-- Full background watermark (behind all content at ZIndex -1)
 New("ImageLabel", {
     Size=UDim2.new(1,0,1,0),
     Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.90,
+    ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Active=false, Parent=miscPage,
+    ZIndex=-1, Active=false, Parent=miscPage,
 })
 do
     local ul = Instance.new("UIListLayout", miscPage)
@@ -3461,15 +3461,15 @@ local basePage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Full background watermark covering entire content area
+-- Full background watermark (behind all content at ZIndex -1)
 New("ImageLabel", {
     Size=UDim2.new(1,0,1,0),
     Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.90,
+    ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Active=false, Parent=basePage,
+    ZIndex=-1, Active=false, Parent=basePage,
 })
 do
     local ul = Instance.new("UIListLayout", basePage)
