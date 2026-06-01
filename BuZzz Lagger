@@ -3357,13 +3357,13 @@ local brainrotsPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=true, Parent=mainContent,
 })
--- Background logo watermark (visible behind content)
+-- Full background watermark covering entire content area
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(1,0,1,0),
+    Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.85,
+    ImageTransparency=0.90,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=0, Active=false, Parent=brainrotsPage,
 })
@@ -3389,13 +3389,13 @@ local tradingPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark (visible behind content)
+-- Full background watermark covering entire content area
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(1,0,1,0),
+    Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.85,
+    ImageTransparency=0.90,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=0, Active=false, Parent=tradingPage,
 })
@@ -3425,13 +3425,13 @@ local miscPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark (visible behind content)
+-- Full background watermark covering entire content area
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(1,0,1,0),
+    Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.85,
+    ImageTransparency=0.90,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=0, Active=false, Parent=miscPage,
 })
@@ -3461,13 +3461,13 @@ local basePage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark (visible behind content)
+-- Full background watermark covering entire content area
 New("ImageLabel", {
-    Size=UDim2.new(0,180,0,180),
-    Position=UDim2.new(0.5,-90,0.5,-90),
+    Size=UDim2.new(1,0,1,0),
+    Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.85,
+    ImageTransparency=0.90,
     ScaleType=Enum.ScaleType.Fit,
     ZIndex=0, Active=false, Parent=basePage,
 })
@@ -6301,22 +6301,17 @@ do
         cLayout.SortOrder = Enum.SortOrder.LayoutOrder
         cLayout.Padding = UDim.new(0, 6)
 
-        -- Fix: Properly handle section open/close with AutomaticSize
+        -- Ensure section resizes when content visibility changes
         local function updateSectionSize()
             task.defer(function()
                 if content.Visible then
-                    -- Expanding: let AutomaticSize calculate full height
-                    section.AutomaticSize = Enum.AutomaticSize.Y
                     section.Size = UDim2.new(1,0,0,0)
                 else
-                    -- Collapsing: disable AutomaticSize and set fixed height for header only
-                    section.AutomaticSize = Enum.AutomaticSize.None
-                    section.Size = UDim2.new(1,0,0,36)
+                    section.Size = UDim2.new(1,0,0,hdrBtn.Size.Y.Offset)
                 end
                 -- Trigger page resize
                 if miscPage.Visible and contentVisible then
                     task.defer(function()
-                        task.wait(0.05)
                         local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
                         if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
                     end)
