@@ -3063,27 +3063,49 @@ for i, icon in ipairs(NAV_ICONS) do
     navBtns[i] = btn
 end
 
--- Collapse button at bottom of sidebar — BIGGER
+-- Collapse button at bottom of sidebar — Logo Toggle
 local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,52,0,52),
-    Position=UDim2.new(0.5,-26,1,-58),
+    Size=UDim2.new(0,56,0,56),
+    Position=UDim2.new(0.5,-28,1,-62),
     BackgroundColor3=Color3.fromRGB(255,80,150),
     Text="", 
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 26)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.2)
+Corner(_guiToggleBtn, 28)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 2, 0.15)
 
--- Mikka logo on toggle button
+-- Mikka logo fills the toggle button
 local toggleLogo = New("ImageLabel", {
-    Size=UDim2.new(0,40,0,40),
-    Position=UDim2.new(0.5,-20,0.5,-20),
+    Size=UDim2.new(0,48,0,48),
+    Position=UDim2.new(0.5,-24,0.5,-24),
     BackgroundTransparency=1,
     Image="rbxassetid://1780326942542",
     ScaleType=Enum.ScaleType.Fit,
     Parent=_guiToggleBtn,
 })
-Corner(toggleLogo, 20)
+Corner(toggleLogo, 24)
+
+-- Glow effect behind logo
+local toggleGlow = New("Frame", {
+    Size=UDim2.new(1,4,1,4),
+    Position=UDim2.new(0,-2,0,-2),
+    BackgroundColor3=Color3.fromRGB(255,105,170),
+    BackgroundTransparency=0.6,
+    BorderSizePixel=0, Parent=_guiToggleBtn,
+})
+Corner(toggleGlow, 30)
+-- Send glow behind the logo
+pcall(function() toggleGlow.ZIndex = _guiToggleBtn.ZIndex - 1 end)
+
+-- Hover effects for toggle
+_guiToggleBtn.MouseEnter:Connect(function()
+    _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,120,180)
+    toggleGlow.BackgroundTransparency = 0.3
+end)
+_guiToggleBtn.MouseLeave:Connect(function()
+    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
+    toggleGlow.BackgroundTransparency = 0.6
+end)
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
@@ -3212,7 +3234,8 @@ _guiToggleBtn.Activated:Connect(function()
     contentVisible = not contentVisible
     contentPanel.Visible = contentVisible
     -- Logo button color change for collapsed state
-    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(90,18,55)
+    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
+    toggleGlow.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(60,12,35)
     if contentVisible then
         local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
         if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
@@ -3222,7 +3245,7 @@ _guiToggleBtn.Activated:Connect(function()
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-58)
+        _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
         for i, btn in ipairs(navBtns) do
             btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
         end
@@ -8441,6 +8464,14 @@ do
                     win2.Size = UDim2.new(win2.Size.X.Scale, win2.Size.X.Offset, 0, origWinH)
                     origWinH = nil
                 end
+                -- Resize main window after dropdown closes
+                if tradingPage.Visible and contentVisible then
+                    task.defer(function()
+                        task.wait(0.05)
+                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                    end)
+                end
             end
 
             btn.Activated:Connect(function()
@@ -8475,6 +8506,14 @@ do
                     BackgroundColor3=Color3.fromRGB(65,16,44),
                     BorderSizePixel=0, ZIndex=60, ClipsDescendants=true, Parent=win2,
                 })
+                -- Resize main window after dropdown opens
+                if tradingPage.Visible and contentVisible then
+                    task.defer(function()
+                        task.wait(0.05)
+                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                    end)
+                end
                 Corner(dd,6); Stroke(dd,Color3.fromRGB(180,60,120),1,0.2)
                 local sf = New("ScrollingFrame",{
                     Size=UDim2.new(1,-8,1,-8), Position=UDim2.new(0,4,0,4),
@@ -8642,6 +8681,14 @@ do
                     win2.Size = UDim2.new(win2.Size.X.Scale, win2.Size.X.Offset, 0, origWinH)
                     origWinH = nil
                 end
+                -- Resize main window after dropdown closes
+                if tradingPage.Visible and contentVisible then
+                    task.defer(function()
+                        task.wait(0.05)
+                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                    end)
+                end
             end
 
             traitsBtn.Activated:Connect(function()
@@ -8677,6 +8724,14 @@ do
                     BackgroundColor3=Color3.fromRGB(65,16,44),
                     BorderSizePixel=0, ZIndex=60, ClipsDescendants=true, Parent=win2,
                 })
+                -- Resize main window after dropdown opens
+                if tradingPage.Visible and contentVisible then
+                    task.defer(function()
+                        task.wait(0.05)
+                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                    end)
+                end
                 Corner(dd,6); Stroke(dd,Color3.fromRGB(180,60,120),1,0.2)
                 local sf = New("ScrollingFrame", {
                     Size=UDim2.new(1,-8,1,-8), Position=UDim2.new(0,4,0,4),
