@@ -3022,7 +3022,7 @@ Corner(tbar, 8)
 New("Frame", {Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0.5,0), BackgroundColor3=Color3.fromRGB(30,28,42), BorderSizePixel=0, Parent=tbar})
 New("TextLabel", {
     Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,10,0,0),
-    Text="@KingScripts  2026 Visuals",
+    Text="Mikka Dupe and Spawner",
     TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamSemibold,
     TextSize=10, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=tbar,
