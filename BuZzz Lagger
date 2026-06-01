@@ -3064,57 +3064,47 @@ for i, icon in ipairs(NAV_ICONS) do
 end
 
 -- Collapse button at bottom of sidebar — Logo Toggle
-local _guiToggleBtn = New("TextButton", {
+local _guiToggleBtn = New("ImageButton", {
     Size=UDim2.new(0,56,0,56),
     Position=UDim2.new(0.5,-28,1,-62),
     BackgroundColor3=Color3.fromRGB(255,80,150),
-    Text="", 
+    Image="rbxassetid://1780326942542",
+    ScaleType=Enum.ScaleType.Fit,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
 Corner(_guiToggleBtn, 28)
 Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 2, 0.15)
 
--- Mikka logo fills the toggle button
-local toggleLogo = New("ImageLabel", {
-    Size=UDim2.new(0,48,0,48),
-    Position=UDim2.new(0.5,-24,0.5,-24),
-    BackgroundTransparency=1,
-    Image="rbxassetid://1780326942542",
-    ScaleType=Enum.ScaleType.Fit,
-    Parent=_guiToggleBtn,
-})
-Corner(toggleLogo, 24)
-
 -- Glow effect behind logo
 local toggleGlow = New("Frame", {
-    Size=UDim2.new(1,4,1,4),
-    Position=UDim2.new(0,-2,0,-2),
+    Size=UDim2.new(1,6,1,6),
+    Position=UDim2.new(0,-3,0,-3),
     BackgroundColor3=Color3.fromRGB(255,105,170),
-    BackgroundTransparency=0.6,
+    BackgroundTransparency=0.5,
     BorderSizePixel=0, Parent=_guiToggleBtn,
 })
 Corner(toggleGlow, 30)
--- Send glow behind the logo
-pcall(function() toggleGlow.ZIndex = _guiToggleBtn.ZIndex - 1 end)
+toggleGlow.ZIndex = _guiToggleBtn.ZIndex - 1
 
 -- Hover effects for toggle
 _guiToggleBtn.MouseEnter:Connect(function()
     _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,120,180)
-    toggleGlow.BackgroundTransparency = 0.3
+    toggleGlow.BackgroundTransparency = 0.2
 end)
 _guiToggleBtn.MouseLeave:Connect(function()
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
-    toggleGlow.BackgroundTransparency = 0.6
+    toggleGlow.BackgroundTransparency = 0.5
 end)
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
 local contentPanel = New("Frame", {
-    Size=UDim2.new(0,CONTENT_W,0,340),
+    Size=UDim2.new(0,CONTENT_W,0,0),
     Position=UDim2.new(0,SIDEBAR_W+8,0,0),
     BackgroundColor3=Color3.fromRGB(30,8,20),
     BorderSizePixel=0, Parent=win,
-    ClipsDescendants=true,
+    ClipsDescendants=false,
+    AutomaticSize=Enum.AutomaticSize.Y,
 })
 Corner(contentPanel, 18)
 Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
@@ -3193,17 +3183,43 @@ local mainContent = New("Frame", {
     AutomaticSize=Enum.AutomaticSize.Y,
 })
 
+-- Robust resize watcher: whenever ANY page layout changes, resize the window
+local function _forceResize()
+    if not contentVisible then return end
+    task.defer(function()
+        task.wait(0.05)
+        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+        if ul2 then
+            _syncWinHeight(ul2.AbsoluteContentSize.Y)
+        end
+    end)
+end
+
+-- Watch all pages for size changes
+for _, page in ipairs({brainrotsPage, tradingPage, miscPage, basePage}) do
+    if page then
+        local ul = page:FindFirstChildOfClass("UIListLayout")
+        if ul then
+            ul:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(_forceResize)
+        end
+    end
+end
+
 local function _syncWinHeight(h)
     -- sidebar and contentPanel grow to match content height
     local total = 52 + h + 16
     -- Minimum height must fit all nav buttons (navBtn[4] at y=230 + height 46 = 276, plus toggle btn)
     local MIN_HEIGHT = 340
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
+    -- Cap max height to 80% of screen so it doesn't go off-screen
+    local screenH = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.Y or 800
+    local MAX_HEIGHT = math.floor(screenH * 0.82)
+    if total > MAX_HEIGHT then total = MAX_HEIGHT end
     contentPanel.Size = UDim2.new(0,CONTENT_W,0,total)
     sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
     win.Size          = UDim2.new(0,WIN_W,0,total)
     -- reposition collapse button (logo button)
-    _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-58)
+    _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
     -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
         btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
@@ -3236,9 +3252,12 @@ _guiToggleBtn.Activated:Connect(function()
     -- Logo button color change for collapsed state
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
     toggleGlow.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(60,12,35)
+    toggleGlow.BackgroundTransparency = contentVisible and 0.5 or 0.8
     if contentVisible then
-        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        task.defer(function()
+            task.wait(0.05)
+            _forceResize()
+        end)
     else
         -- Collapsed: hide content panel, keep sidebar at minimum height with nav buttons visible
         local MIN_HEIGHT = 340
@@ -3385,19 +3404,17 @@ local function SetTab(tab)
     -- Recalculate window height for the newly visible tab
     if contentVisible then
         task.defer(function()
-            task.wait(0.05) -- Let layout update
-            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            task.wait(0.08) -- Let layout update fully
+            _forceResize()
         end)
     else
         -- If switching tabs while collapsed, auto-expand
         contentVisible = true
         contentPanel.Visible = true
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
+        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
         task.defer(function()
-            task.wait(0.05)
-            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            task.wait(0.08)
+            _forceResize()
         end)
     end
 end
@@ -3495,7 +3512,7 @@ animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=C
 animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(55,14,38) end)
 
 local listContainer = New("Frame", {
-    Size=UDim2.new(1,0,0,276),
+    Size=UDim2.new(1,0,0,320),
     BackgroundColor3=Color3.fromRGB(65,16,44),
     BorderSizePixel=0, ClipsDescendants=true,
     Visible=false, LayoutOrder=3, Parent=brainrotsPage,
@@ -3576,7 +3593,7 @@ searchBox.FocusLost:Connect(function()
 end)
 
 local listFrame = New("ScrollingFrame", {
-    Size=UDim2.new(1,0,0,206), Position=UDim2.new(0,0,0,66),
+    Size=UDim2.new(1,0,0,260), Position=UDim2.new(0,0,0,66),
     BackgroundColor3=BG, BorderSizePixel=0,
     ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(108,92,231),
     CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y,
@@ -3876,9 +3893,9 @@ local countLbl = New("TextLabel", {
 
 local traitsVisible = false
 local tmPopup = New("Frame", {
-    Size=UDim2.new(1,0,0,176),
+    Size=UDim2.new(1,0,0,240),
     BackgroundColor3=Color3.fromRGB(20,20,28),
-    BorderSizePixel=0, ClipsDescendants=true,
+    BorderSizePixel=0, ClipsDescendants=false,
     Visible=false, LayoutOrder=5, Parent=brainrotsPage,
 })
 Corner(tmPopup, 6)
@@ -3987,9 +4004,9 @@ mutationsBtn.MouseLeave:Connect(function() mutationsBtn.BackgroundColor3=Color3.
 
 local mutationsVisible = false
 local mutPopup = New("Frame", {
-    Size=UDim2.new(1,0,0,176),
+    Size=UDim2.new(1,0,0,240),
     BackgroundColor3=Color3.fromRGB(20,20,28),
-    BorderSizePixel=0, ClipsDescendants=true,
+    BorderSizePixel=0, ClipsDescendants=false,
     Visible=false, LayoutOrder=7, Parent=brainrotsPage,
 })
 Corner(mutPopup, 6)
@@ -4778,9 +4795,9 @@ do
     skinToggleBtn.MouseLeave:Connect(function() skinToggleBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
 
     local skinListPanel = New("Frame", {
-        Size=UDim2.new(1, 0, 0, 240),
+        Size=UDim2.new(1, 0, 0, 280),
         BackgroundColor3=Color3.fromRGB(65,16,44),
-        BorderSizePixel=0, ClipsDescendants=true,
+        BorderSizePixel=0, ClipsDescendants=false,
         Visible=false, LayoutOrder=3, Parent=basePage,
     })
     Corner(skinListPanel, 6)
@@ -9037,9 +9054,10 @@ else
         pcall(function()
             contentVisible = true
             contentPanel.Visible = true
-            _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
-            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
+            toggleGlow.BackgroundColor3 = Color3.fromRGB(255,105,170)
+            toggleGlow.BackgroundTransparency = 0.5
+            _forceResize()
         end)
     end)
 end
