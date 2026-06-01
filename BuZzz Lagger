@@ -3076,17 +3076,6 @@ local sidebar = New("Frame", {
 Corner(sidebar, 20)
 Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
 
--- Sidebar background watermark
-New("ImageLabel", {
-    Size=UDim2.new(0,60,0,60),
-    Position=UDim2.new(0.5,-30,0.5,-30),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.97,
-    ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=sidebar,
-})
-
 -- Logo image at top of sidebar (Mikka Hub logo)
 local logoImg = New("ImageLabel", {
     Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
@@ -3125,6 +3114,7 @@ end
 local _guiToggleBtn = New("ImageButton", {
     Size=UDim2.new(0,56,0,56),
     Position=UDim2.new(0.5,-28,1,-62),
+    AnchorPoint=Vector2.new(0,0),
     BackgroundColor3=Color3.fromRGB(255,80,150),
     Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
@@ -3284,8 +3274,8 @@ local function _syncWinHeight(h)
     contentPanel.Size = UDim2.new(0,CONTENT_W,0,total)
     sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
     win.Size          = UDim2.new(0,WIN_W,0,total)
-    -- reposition collapse button (logo button)
-    _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
+    -- Toggle button stays fixed at bottom of sidebar (absolute position)
+    -- Position is relative to sidebar bottom, so it auto-stays at bottom
     -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
         btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
@@ -3337,7 +3327,7 @@ _guiToggleBtn.Activated:Connect(function()
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
+
         for i, btn in ipairs(navBtns) do
             btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
         end
@@ -3368,15 +3358,15 @@ local brainrotsPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=true, Parent=mainContent,
 })
--- Background logo watermark
+-- Background logo watermark (overlay on content area)
 New("ImageLabel", {
-    Size=UDim2.new(0,120,0,120),
-    Position=UDim2.new(0.5,-60,0.5,-60),
+    Size=UDim2.new(0,200,0,200),
+    Position=UDim2.new(0.5,-100,0.5,-100),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.97,
+    ImageTransparency=0.93,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=brainrotsPage,
+    ZIndex=0, Active=false, Parent=brainrotsPage,
 })
 do
     local ul = Instance.new("UIListLayout", brainrotsPage)
@@ -3400,15 +3390,15 @@ local tradingPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark
+-- Background logo watermark (overlay on content area)
 New("ImageLabel", {
-    Size=UDim2.new(0,120,0,120),
-    Position=UDim2.new(0.5,-60,0.5,-60),
+    Size=UDim2.new(0,200,0,200),
+    Position=UDim2.new(0.5,-100,0.5,-100),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.97,
+    ImageTransparency=0.93,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=tradingPage,
+    ZIndex=0, Active=false, Parent=tradingPage,
 })
 do
     local ul = Instance.new("UIListLayout", tradingPage)
@@ -3436,15 +3426,15 @@ local miscPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark
+-- Background logo watermark (overlay on content area)
 New("ImageLabel", {
-    Size=UDim2.new(0,120,0,120),
-    Position=UDim2.new(0.5,-60,0.5,-60),
+    Size=UDim2.new(0,200,0,200),
+    Position=UDim2.new(0.5,-100,0.5,-100),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.97,
+    ImageTransparency=0.93,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=miscPage,
+    ZIndex=0, Active=false, Parent=miscPage,
 })
 do
     local ul = Instance.new("UIListLayout", miscPage)
@@ -3472,15 +3462,15 @@ local basePage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Background logo watermark
+-- Background logo watermark (overlay on content area)
 New("ImageLabel", {
-    Size=UDim2.new(0,120,0,120),
-    Position=UDim2.new(0.5,-60,0.5,-60),
+    Size=UDim2.new(0,200,0,200),
+    Position=UDim2.new(0.5,-100,0.5,-100),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.97,
+    ImageTransparency=0.93,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=basePage,
+    ZIndex=0, Active=false, Parent=basePage,
 })
 do
     local ul = Instance.new("UIListLayout", basePage)
@@ -3531,7 +3521,7 @@ local function SetTab(tab)
         end)
     end
     -- Force toggle button to stay at bottom of sidebar
-    _guiToggleBtn.Position = UDim2.new(0.5, -28, 1, -62)
+
 end
 SetTab("Brainrots")
 navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
