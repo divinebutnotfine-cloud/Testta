@@ -3084,7 +3084,7 @@ New("ImageLabel", {
     Image=_loadLogoAsset(),
     ImageTransparency=0.95,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Parent=sidebar,
+    ZIndex=-1, Active=false, Parent=sidebar,
 })
 
 -- Logo image at top of sidebar (Mikka Hub logo)
@@ -3275,7 +3275,7 @@ local function _syncWinHeight(h)
     -- sidebar and contentPanel grow to match content height
     local total = 52 + h + 16
     -- Minimum height must fit all nav buttons (navBtn[4] at y=230 + height 46 = 276, plus toggle btn)
-    local MIN_HEIGHT = 340
+    local MIN_HEIGHT = 380
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
     -- Cap max height to 80% of screen so it doesn't go off-screen
     local screenH = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.Y or 800
@@ -3333,7 +3333,7 @@ _guiToggleBtn.Activated:Connect(function()
         toggleGlow.BackgroundColor3 = Color3.fromRGB(60,12,35)
         toggleGlow.BackgroundTransparency = 0.8
         -- Collapsed: fixed minimum height
-        local MIN_HEIGHT = 340
+        local MIN_HEIGHT = 380
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
@@ -3376,7 +3376,7 @@ New("ImageLabel", {
     Image=_loadLogoAsset(),
     ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Parent=brainrotsPage,
+    ZIndex=-1, Active=false, Parent=brainrotsPage,
 })
 do
     local ul = Instance.new("UIListLayout", brainrotsPage)
@@ -3408,7 +3408,7 @@ New("ImageLabel", {
     Image=_loadLogoAsset(),
     ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Parent=tradingPage,
+    ZIndex=-1, Active=false, Parent=tradingPage,
 })
 do
     local ul = Instance.new("UIListLayout", tradingPage)
@@ -3444,7 +3444,7 @@ New("ImageLabel", {
     Image=_loadLogoAsset(),
     ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Parent=miscPage,
+    ZIndex=-1, Active=false, Parent=miscPage,
 })
 do
     local ul = Instance.new("UIListLayout", miscPage)
@@ -3480,7 +3480,7 @@ New("ImageLabel", {
     Image=_loadLogoAsset(),
     ImageTransparency=0.92,
     ScaleType=Enum.ScaleType.Fit,
-    ZIndex=0, Parent=basePage,
+    ZIndex=-1, Active=false, Parent=basePage,
 })
 do
     local ul = Instance.new("UIListLayout", basePage)
@@ -3530,6 +3530,8 @@ local function SetTab(tab)
             _forceResize()
         end)
     end
+    -- Ensure toggle button stays at fixed bottom position
+    _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
 end
 SetTab("Brainrots")
 navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
