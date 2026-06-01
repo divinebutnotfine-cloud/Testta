@@ -3002,79 +3002,124 @@ pcall(function()
     workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(_refreshScale)
 end)
 
-local WIN_W = 480
+-- ═══════════════════════════════════════════════════
+--  BLOSSOM REDESIGN  —  Sidebar pill + content panel
+-- ═══════════════════════════════════════════════════
+
+local WIN_W     = 520   -- total width (sidebar + content)
+local SIDEBAR_W = 72    -- narrow left pill
+local CONTENT_W = WIN_W - SIDEBAR_W - 8  -- right content area
+
+-- ── Outer wrapper (transparent, just holds children) ──
 local win = New("Frame", {
-    Size=UDim2.new(0,WIN_W,0,514),
-    Position=UDim2.new(0,20,0,200),
-    BackgroundColor3=BG,
+    Size=UDim2.new(0,WIN_W,0,60),
+    Position=UDim2.new(0,20,0,180),
+    BackgroundTransparency=1,
     BorderSizePixel=0, Active=true, Parent=sg,
     ClipsDescendants=false,
 })
-Corner(win, 16)
-Stroke(win, Color3.fromRGB(255,105,170), 2, 0.15)
 
-local tbar = New("Frame", {
-    Size=UDim2.new(1,0,0,50),
-    BackgroundColor3=Color3.fromRGB(55,12,36),
+-- ── Sidebar pill ──────────────────────────────────────
+local sidebar = New("Frame", {
+    Size=UDim2.new(0,SIDEBAR_W,0,60),
+    Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(45,10,30),
     BorderSizePixel=0, Parent=win,
+    ClipsDescendants=false,
 })
-Corner(tbar, 16)
-New("Frame", {Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0.5,0), BackgroundColor3=Color3.fromRGB(55,12,36), BorderSizePixel=0, Parent=tbar})
-Stroke(tbar, Color3.fromRGB(255,105,170), 1.5, 0.25)
--- Blossom accent stripe at bottom of tbar
+Corner(sidebar, 20)
+Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
+
+-- Logo flower at top of sidebar
+New("TextLabel", {
+    Size=UDim2.new(1,0,0,44), Position=UDim2.new(0,0,0,8),
+    Text="🌸", Font=Enum.Font.GothamBold, TextSize=26,
+    BackgroundTransparency=1, TextXAlignment=Enum.TextXAlignment.Center,
+    Parent=sidebar,
+})
+
+-- Thin divider under logo
 New("Frame", {
-    Size=UDim2.new(0.6,0,0,2), Position=UDim2.new(0.2,0,1,-2),
-    BackgroundColor3=Color3.fromRGB(255,150,200), BorderSizePixel=0, Parent=tbar,
+    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,0,54),
+    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
 })
--- Blossom flower icon  🌸
-New("TextLabel", {
-    Size=UDim2.new(0,30,0,30), Position=UDim2.new(0,12,0.5,-15),
-    Text="🌸", Font=Enum.Font.GothamBold, TextSize=22,
-    BackgroundTransparency=1, TextXAlignment=Enum.TextXAlignment.Center, Parent=tbar,
+
+-- Nav icon buttons (vertical stack)
+local NAV_ICONS = {"🐾","💸","🏡","⚙️"}
+local NAV_NAMES = {"Brainrots","Trading","Base","Misc"}
+local navBtns = {}
+for i, icon in ipairs(NAV_ICONS) do
+    local btn = New("TextButton", {
+        Size=UDim2.new(0,46,0,46),
+        Position=UDim2.new(0.5,-23,0,60 + (i-1)*54),
+        BackgroundColor3=Color3.fromRGB(65,16,44),
+        Text=icon, TextColor3=Color3.fromRGB(255,175,210),
+        Font=Enum.Font.GothamBold, TextSize=20,
+        AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
+    })
+    Corner(btn, 14)
+    navBtns[i] = btn
+end
+
+-- Collapse button at bottom of sidebar
+local _guiToggleBtn = New("TextButton", {
+    Size=UDim2.new(0,40,0,32),
+    Position=UDim2.new(0.5,-20,1,-40),
+    BackgroundColor3=Color3.fromRGB(255,105,170),
+    Text="✕", TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold, TextSize=15,
+    AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
--- Main title
-New("TextLabel", {
-    Size=UDim2.new(1,-120,0,22), Position=UDim2.new(0,48,0,6),
-    Text="KingScripts Visuals",
-    TextColor3=Color3.fromRGB(255,200,230), Font=Enum.Font.GothamBold,
-    TextSize=15, BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=tbar,
+Corner(_guiToggleBtn, 10)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,180,215), 1, 0.4)
+MakeDraggable(win, sidebar)
+
+-- ── Content panel ─────────────────────────────────────
+local contentPanel = New("Frame", {
+    Size=UDim2.new(0,CONTENT_W,0,60),
+    Position=UDim2.new(0,SIDEBAR_W+8,0,0),
+    BackgroundColor3=Color3.fromRGB(30,8,20),
+    BorderSizePixel=0, Parent=win,
+    ClipsDescendants=false,
+})
+Corner(contentPanel, 18)
+Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
+
+-- Content panel header bar
+local cpHeader = New("Frame", {
+    Size=UDim2.new(1,0,0,52),
+    BackgroundColor3=Color3.fromRGB(55,12,36),
+    BorderSizePixel=0, Parent=contentPanel,
+})
+Corner(cpHeader, 18)
+-- Cover bottom corners of header
+New("Frame", {
+    Size=UDim2.new(1,0,0,18), Position=UDim2.new(0,0,1,-18),
+    BackgroundColor3=Color3.fromRGB(55,12,36), BorderSizePixel=0, Parent=cpHeader,
+})
+-- Header title label (changes with tab)
+local cpTitle = New("TextLabel", {
+    Size=UDim2.new(1,-16,0,28), Position=UDim2.new(0,16,0,8),
+    Text="🌸  Brainrots",
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextSize=16, BackgroundTransparency=1,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
 })
 -- Subtitle
 New("TextLabel", {
-    Size=UDim2.new(1,-120,0,16), Position=UDim2.new(0,48,0,28),
-    Text="✿  Blossom Edition  2026  ✿",
+    Size=UDim2.new(1,-16,0,16), Position=UDim2.new(0,16,0,34),
+    Text="KingScripts  ✦  Blossom 2026",
     TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.Gotham,
-    TextSize=13, BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=tbar,
+    TextSize=11, BackgroundTransparency=1,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
 })
--- Collapse/expand button
-local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,34,0,26),
-    Position=UDim2.new(1,-42,0.5,-13),
-    BackgroundColor3=Color3.fromRGB(255,105,170),
-    Text="╴╴", TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=13,
-    AutoButtonColor=false, BorderSizePixel=0, Parent=tbar,
+-- Pink glow line under header
+New("Frame", {
+    Size=UDim2.new(0.8,0,0,2), Position=UDim2.new(0.1,0,1,-1),
+    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=cpHeader,
 })
-Corner(_guiToggleBtn, 8)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,180,215), 1, 0.4)
-MakeDraggable(win, tbar)
-_guiToggleBtn.Activated:Connect(function()
-    contentVisible = not contentVisible
-    mainContent.Visible = contentVisible
-    _guiToggleBtn.Text = contentVisible and "╴╴" or "▸"
-    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(90,18,55)
-    if contentVisible then
-        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-        if ul2 then
-            win.Size = UDim2.new(0,WIN_W,0,50+ul2.AbsoluteContentSize.Y+24)
-        end
-    else
-        win.Size = UDim2.new(0,WIN_W,0,50)
-    end
-end)
 
+-- ── Save window position ───────────────────────────────
 if savedWindowPos then
     pcall(function()
         local screenSize = workspace.CurrentCamera.ViewportSize
@@ -3097,66 +3142,83 @@ do
     end)
 end
 
+-- ── mainContent lives inside contentPanel ─────────────
 local contentVisible = true
 local mainContent = New("Frame", {
-    Size=UDim2.new(1,0,0,0), Position=UDim2.new(0,0,0,50),
-    BackgroundTransparency=1, BorderSizePixel=0, Parent=win,
+    Size=UDim2.new(1,0,0,0), Position=UDim2.new(0,0,0,52),
+    BackgroundTransparency=1, BorderSizePixel=0, Parent=contentPanel,
     AutomaticSize=Enum.AutomaticSize.Y,
 })
-win.AutomaticSize = Enum.AutomaticSize.Y
-win.Size = UDim2.new(0,WIN_W,0,50)
+
+local function _syncWinHeight(h)
+    -- sidebar and contentPanel grow to match content height
+    local total = 52 + h + 16
+    if total < 60 then total = 60 end
+    contentPanel.Size = UDim2.new(0,CONTENT_W,0,total)
+    sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
+    win.Size          = UDim2.new(0,WIN_W,0,total)
+    -- reposition collapse button
+    _guiToggleBtn.Position = UDim2.new(0.5,-20,1,-40)
+    -- reposition nav buttons
+    for i, btn in ipairs(navBtns) do
+        btn.Position = UDim2.new(0.5,-23,0,60+(i-1)*54)
+    end
+end
 
 do
     local ul = Instance.new("UIListLayout", mainContent)
-    ul.Padding = UDim.new(0,6)
+    ul.Padding = UDim.new(0,7)
     ul.SortOrder = Enum.SortOrder.LayoutOrder
     ul.HorizontalAlignment = Enum.HorizontalAlignment.Center
     local up = Instance.new("UIPadding", mainContent)
-    up.PaddingLeft=UDim.new(0,10); up.PaddingRight=UDim.new(0,10)
-    up.PaddingTop=UDim.new(0,10); up.PaddingBottom=UDim.new(0,10)
+    up.PaddingLeft=UDim.new(0,12); up.PaddingRight=UDim.new(0,12)
+    up.PaddingTop=UDim.new(0,12); up.PaddingBottom=UDim.new(0,12)
 
     local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
     if ul2 then
         ul2:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             if contentVisible then
-                win.Size = UDim2.new(0,WIN_W,0,50+ul2.AbsoluteContentSize.Y+24)
+                _syncWinHeight(ul2.AbsoluteContentSize.Y)
             end
         end)
     end
 end
 
+-- Collapse toggle
+_guiToggleBtn.Activated:Connect(function()
+    contentVisible = not contentVisible
+    mainContent.Visible = contentVisible
+    cpHeader.Visible    = contentVisible
+    _guiToggleBtn.Text  = contentVisible and "✕" or "▸"
+    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(90,18,55)
+    if contentVisible then
+        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+    else
+        contentPanel.Size = UDim2.new(0,CONTENT_W,0,60)
+        sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,60)
+        win.Size          = UDim2.new(0,WIN_W,0,60)
+    end
+end)
+
+-- ── Tab switching with sidebar buttons ────────────────
+local CP_TITLES = {
+    Brainrots="🌸  Brainrots",
+    Trading  ="💸  Trading",
+    Base     ="🏡  Base",
+    Misc     ="⚙️  Misc",
+}
+-- tabBar is a dummy invisible frame — pages use it as parent via LayoutOrder
+-- We keep the variable so all downstream code that references tabBar still works
 local tabBar = New("Frame", {
-    Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(42,10,28),
-    BorderSizePixel=0, LayoutOrder=0, Parent=mainContent,
+    Size=UDim2.new(0,0,0,0), BackgroundTransparency=1,
+    BorderSizePixel=0, LayoutOrder=0, Visible=false, Parent=mainContent,
 })
-Corner(tabBar, 12)
-do
-    local ul = Instance.new("UIListLayout", tabBar)
-    ul.FillDirection = Enum.FillDirection.Horizontal
-    ul.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    ul.VerticalAlignment = Enum.VerticalAlignment.Center
-    ul.Padding = UDim.new(0, 4)
-    local pad = Instance.new("UIPadding", tabBar)
-    pad.PaddingLeft = UDim.new(0, 6)
-    pad.PaddingRight = UDim.new(0, 6)
-end
 
-local function MakeTab(label, order)
-    local btn = New("TextButton", {
-        Size=UDim2.new(0.25, -5, 0, 32),
-        BackgroundColor3=Color3.fromRGB(65,16,44),
-        Text=label, TextColor3=Color3.fromRGB(255,175,210),
-        Font=Enum.Font.GothamBold, TextSize=13,
-        AutoButtonColor=false, LayoutOrder=order, Parent=tabBar,
-    })
-    Corner(btn, 8)
-    return btn
-end
-
-local tabBrainrots = MakeTab("🌸 Brainrots", 1)
-local tabTrading   = MakeTab("💸 Trading",   2)
-local tabBase      = MakeTab("🏡 Base",      3)
-local tabMisc      = MakeTab("⚙️ Misc",      4)
+local tabBrainrots = navBtns[1]
+local tabTrading   = navBtns[2]
+local tabBase      = navBtns[3]
+local tabMisc      = navBtns[4]
 
 local brainrotsPage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
@@ -3226,20 +3288,18 @@ local function SetTab(tab)
     tradingPage.Visible   = tab == "Trading"
     basePage.Visible      = tab == "Base"
     miscPage.Visible      = tab == "Misc"
-    tabBrainrots.BackgroundColor3 = tab == "Brainrots" and ACCENT or Color3.fromRGB(65,16,44)
-    tabBrainrots.TextColor3       = tab == "Brainrots" and Color3.fromRGB(255,255,255) or Color3.fromRGB(255,175,210)
-    tabTrading.BackgroundColor3   = tab == "Trading"   and ACCENT or Color3.fromRGB(65,16,44)
-    tabTrading.TextColor3         = tab == "Trading"   and Color3.fromRGB(255,255,255) or Color3.fromRGB(255,175,210)
-    tabBase.BackgroundColor3      = tab == "Base"      and ACCENT or Color3.fromRGB(65,16,44)
-    tabBase.TextColor3            = tab == "Base"      and Color3.fromRGB(255,255,255) or Color3.fromRGB(255,175,210)
-    tabMisc.BackgroundColor3      = tab == "Misc"      and ACCENT or Color3.fromRGB(65,16,44)
-    tabMisc.TextColor3            = tab == "Misc"      and Color3.fromRGB(255,255,255) or Color3.fromRGB(255,175,210)
+    cpTitle.Text = CP_TITLES[tab] or tab
+    for i, btn in ipairs(navBtns) do
+        local active = NAV_NAMES[i] == tab
+        btn.BackgroundColor3 = active and Color3.fromRGB(255,105,170) or Color3.fromRGB(65,16,44)
+        btn.TextColor3       = active and Color3.fromRGB(255,255,255)  or Color3.fromRGB(255,175,210)
+    end
 end
 SetTab("Brainrots")
-tabBrainrots.Activated:Connect(function() SetTab("Brainrots") end)
-tabTrading.Activated:Connect(function()   SetTab("Trading")   end)
-tabBase.Activated:Connect(function()      SetTab("Base")      end)
-tabMisc.Activated:Connect(function()      SetTab("Misc")      end)
+navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
+navBtns[2].Activated:Connect(function() SetTab("Trading")   end)
+navBtns[3].Activated:Connect(function() SetTab("Base")      end)
+navBtns[4].Activated:Connect(function() SetTab("Misc")      end)
 
 local selectedHeader = New("Frame", {
     Size=UDim2.new(1,0,0,62), BackgroundColor3=Color3.fromRGB(48,12,32),
