@@ -3065,15 +3065,25 @@ end
 
 -- Collapse button at bottom of sidebar — BIGGER
 local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,52,0,44),
-    Position=UDim2.new(0.5,-26,1,-52),
+    Size=UDim2.new(0,52,0,52),
+    Position=UDim2.new(0.5,-26,1,-58),
     BackgroundColor3=Color3.fromRGB(255,80,150),
-    Text="✕", TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=20,
+    Text="", 
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 14)
+Corner(_guiToggleBtn, 26)
 Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.2)
+
+-- Mikka logo on toggle button
+local toggleLogo = New("ImageLabel", {
+    Size=UDim2.new(0,40,0,40),
+    Position=UDim2.new(0.5,-20,0.5,-20),
+    BackgroundTransparency=1,
+    Image="rbxassetid://1780326942542",
+    ScaleType=Enum.ScaleType.Fit,
+    Parent=_guiToggleBtn,
+})
+Corner(toggleLogo, 20)
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
@@ -3170,8 +3180,8 @@ local function _syncWinHeight(h)
     contentPanel.Size = UDim2.new(0,CONTENT_W,0,total)
     sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
     win.Size          = UDim2.new(0,WIN_W,0,total)
-    -- reposition collapse button
-    _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-52)
+    -- reposition collapse button (logo button)
+    _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-58)
     -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
         btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
@@ -3201,7 +3211,7 @@ end
 _guiToggleBtn.Activated:Connect(function()
     contentVisible = not contentVisible
     contentPanel.Visible = contentVisible
-    _guiToggleBtn.Text  = contentVisible and "✕" or "▸"
+    -- Logo button color change for collapsed state
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(90,18,55)
     if contentVisible then
         local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
@@ -3212,7 +3222,7 @@ _guiToggleBtn.Activated:Connect(function()
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-52)
+        _guiToggleBtn.Position = UDim2.new(0.5,-26,1,-58)
         for i, btn in ipairs(navBtns) do
             btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
         end
@@ -3250,6 +3260,13 @@ do
     ul.Padding = UDim.new(0, 6)
     ul:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         brainrotsPage.Size = UDim2.new(1,0,0,ul.AbsoluteContentSize.Y)
+        -- Also update main window height when brainrots content changes
+        if brainrotsPage.Visible and contentVisible then
+            task.defer(function()
+                local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            end)
+        end
     end)
 end
 
@@ -3267,6 +3284,16 @@ do
     pad.PaddingTop = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 6)
     pad.PaddingRight = UDim.new(0, 6)
+
+    -- Update window height when trading page content changes
+    ul:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        if tradingPage.Visible and contentVisible then
+            task.defer(function()
+                local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            end)
+        end
+    end)
 end
 
 local miscPage = New("Frame", {
@@ -3283,6 +3310,16 @@ do
     pad.PaddingTop = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 6)
     pad.PaddingRight = UDim.new(0, 6)
+
+    -- Update window height when misc page content changes
+    ul:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        if miscPage.Visible and contentVisible then
+            task.defer(function()
+                local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            end)
+        end
+    end)
 end
 
 local basePage = New("Frame", {
@@ -3299,6 +3336,16 @@ do
     pad.PaddingTop = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 6)
     pad.PaddingRight = UDim.new(0, 6)
+
+    -- Update window height when base page content changes
+    ul:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        if basePage.Visible and contentVisible then
+            task.defer(function()
+                local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            end)
+        end
+    end)
 end
 
 local function SetTab(tab)
@@ -3312,14 +3359,23 @@ local function SetTab(tab)
         btn.BackgroundColor3 = active and Color3.fromRGB(255,105,170) or Color3.fromRGB(65,16,44)
         btn.TextColor3       = active and Color3.fromRGB(255,255,255)  or Color3.fromRGB(255,175,210)
     end
-    -- If switching tabs while collapsed, auto-expand
-    if not contentVisible then
+    -- Recalculate window height for the newly visible tab
+    if contentVisible then
+        task.defer(function()
+            task.wait(0.05) -- Let layout update
+            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        end)
+    else
+        -- If switching tabs while collapsed, auto-expand
         contentVisible = true
         contentPanel.Visible = true
-        _guiToggleBtn.Text = "✕"
         _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
-        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        task.defer(function()
+            task.wait(0.05)
+            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+        end)
     end
 end
 SetTab("Brainrots")
@@ -8869,7 +8925,6 @@ else
         pcall(function()
             contentVisible = true
             contentPanel.Visible = true
-            _guiToggleBtn.Text = "✕"
             _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
             local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
             if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
@@ -8886,7 +8941,6 @@ UserInputService.InputBegan:Connect(function(input, processed)
             -- If GUI was hidden while collapsed, expand it when shown
             contentVisible = true
             contentPanel.Visible = true
-            _guiToggleBtn.Text = "✕"
             _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
             local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
             if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
