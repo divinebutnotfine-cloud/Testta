@@ -2978,6 +2978,52 @@ end
 
 local function _buildAndRun()
 
+-- ═══════════════════════════════════════════════════
+--  LOGO LOADER (HttpGet + getcustomasset)
+-- ═══════════════════════════════════════════════════
+local LOGO_URL = "https://files.catbox.moe/etlu5v.png"
+local LOGO_FILE = "MikkaHub_Logo_v2.png"
+local _logoAsset = nil
+
+local function _loadLogoAsset()
+    if _logoAsset then return _logoAsset end
+
+    -- Download if not saved locally
+    if type(isfile) == "function" and not isfile(LOGO_FILE) then
+        local ok, data = pcall(function()
+            return game:HttpGet(LOGO_URL)
+        end)
+        if ok and data and #data > 100 then
+            pcall(function() writefile(LOGO_FILE, data) end)
+        end
+    end
+
+    -- Try getcustomasset first (most reliable)
+    if type(getcustomasset) == "function" then
+        local ok, url = pcall(getcustomasset, LOGO_FILE)
+        if ok and type(url) == "string" then
+            _logoAsset = url
+            return url
+        end
+    end
+
+    -- Fallback to getsynasset
+    if type(getsynasset) == "function" then
+        local ok, url = pcall(getsynasset, LOGO_FILE)
+        if ok and type(url) == "string" then
+            _logoAsset = url
+            return url
+        end
+    end
+
+    -- Last resort: rbxasset path
+    _logoAsset = "rbxasset://" .. LOGO_FILE
+    return _logoAsset
+end
+
+-- Preload logo
+pcall(_loadLogoAsset)
+
 local sg = New("ScreenGui", {
     Name="KingVisualsSpawner", ResetOnSpawn=false, IgnoreGuiInset=true,
     ZIndexBehavior=Enum.ZIndexBehavior.Sibling, DisplayOrder=5000,
@@ -3030,6 +3076,17 @@ local sidebar = New("Frame", {
 Corner(sidebar, 20)
 Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
 
+-- Sidebar background watermark
+New("ImageLabel", {
+    Size=UDim2.new(0,60,0,60),
+    Position=UDim2.new(0.5,-30,0.5,-30),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.95,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=0, Parent=sidebar,
+})
+
 -- Logo image at top of sidebar (Mikka Hub logo)
 local logoImg = New("ImageLabel", {
     Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
@@ -3064,11 +3121,12 @@ for i, icon in ipairs(NAV_ICONS) do
 end
 
 -- Collapse button at bottom of sidebar — Logo Toggle
+-- Collapse button at bottom of sidebar — Logo Toggle
 local _guiToggleBtn = New("ImageButton", {
     Size=UDim2.new(0,56,0,56),
     Position=UDim2.new(0.5,-28,1,-62),
     BackgroundColor3=Color3.fromRGB(255,80,150),
-    Image="rbxassetid://1780326942542",
+    Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
@@ -3094,6 +3152,14 @@ end)
 _guiToggleBtn.MouseLeave:Connect(function()
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
     toggleGlow.BackgroundTransparency = 0.5
+end)
+
+-- Header logo also uses loaded asset
+pcall(function()
+    if headerLogo then headerLogo.Image = _loadLogoAsset() end
+end)
+pcall(function()
+    if logoImg then logoImg.Image = _loadLogoAsset() end
 end)
 MakeDraggable(win, sidebar)
 
@@ -3249,17 +3315,24 @@ end
 _guiToggleBtn.Activated:Connect(function()
     contentVisible = not contentVisible
     contentPanel.Visible = contentVisible
-    -- Logo button color change for collapsed state
-    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
-    toggleGlow.BackgroundColor3 = contentVisible and Color3.fromRGB(255,105,170) or Color3.fromRGB(60,12,35)
-    toggleGlow.BackgroundTransparency = contentVisible and 0.5 or 0.8
+
+    -- Update toggle appearance based on state
     if contentVisible then
+        -- OPEN state: bright pink with glow
+        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
+        toggleGlow.BackgroundColor3 = Color3.fromRGB(255,105,170)
+        toggleGlow.BackgroundTransparency = 0.5
+        -- Resize to fit content
         task.defer(function()
             task.wait(0.05)
             _forceResize()
         end)
     else
-        -- Collapsed: hide content panel, keep sidebar at minimum height with nav buttons visible
+        -- CLOSED state: dark muted with dim glow
+        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(90,18,55)
+        toggleGlow.BackgroundColor3 = Color3.fromRGB(60,12,35)
+        toggleGlow.BackgroundTransparency = 0.8
+        -- Collapsed: fixed minimum height
         local MIN_HEIGHT = 340
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
@@ -3295,6 +3368,16 @@ local brainrotsPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=true, Parent=mainContent,
 })
+-- Background logo watermark
+New("ImageLabel", {
+    Size=UDim2.new(0,180,0,180),
+    Position=UDim2.new(0.5,-90,0.5,-90),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.92,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=0, Parent=brainrotsPage,
+})
 do
     local ul = Instance.new("UIListLayout", brainrotsPage)
     ul.FillDirection = Enum.FillDirection.Vertical
@@ -3316,6 +3399,16 @@ local tradingPage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
+})
+-- Background logo watermark
+New("ImageLabel", {
+    Size=UDim2.new(0,180,0,180),
+    Position=UDim2.new(0.5,-90,0.5,-90),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.92,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=0, Parent=tradingPage,
 })
 do
     local ul = Instance.new("UIListLayout", tradingPage)
@@ -3343,6 +3436,16 @@ local miscPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
+-- Background logo watermark
+New("ImageLabel", {
+    Size=UDim2.new(0,180,0,180),
+    Position=UDim2.new(0.5,-90,0.5,-90),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.92,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=0, Parent=miscPage,
+})
 do
     local ul = Instance.new("UIListLayout", miscPage)
     ul.FillDirection = Enum.FillDirection.Vertical
@@ -3368,6 +3471,16 @@ local basePage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
+})
+-- Background logo watermark
+New("ImageLabel", {
+    Size=UDim2.new(0,180,0,180),
+    Position=UDim2.new(0.5,-90,0.5,-90),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.92,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=0, Parent=basePage,
 })
 do
     local ul = Instance.new("UIListLayout", basePage)
@@ -9057,6 +9170,8 @@ else
             _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
             toggleGlow.BackgroundColor3 = Color3.fromRGB(255,105,170)
             toggleGlow.BackgroundTransparency = 0.5
+            -- Force resize after everything loads
+            task.wait(0.3)
             _forceResize()
         end)
     end)
@@ -9071,9 +9186,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
             -- If GUI was hidden while collapsed, expand it when shown
             contentVisible = true
             contentPanel.Visible = true
-            _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,105,170)
-            local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-            if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+            _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
+            toggleGlow.BackgroundColor3 = Color3.fromRGB(255,105,170)
+            toggleGlow.BackgroundTransparency = 0.5
+            _forceResize()
         end
     end
 end)
