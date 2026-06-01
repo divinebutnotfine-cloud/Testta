@@ -1,950 +1,391 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
+-- [[ IF I FOUND OUT U LEAKING THIS OR RESELLING IT IMA BEAT YOUR ASS AND I HID A KEY WORD INTO THIS HAVE FUN USING IT JEW | √√ discord source hub 30k source √√ ]]
+
+local Players      = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local CoreGui      = game:GetService("CoreGui")
+local player       = Players.LocalPlayer
+local playerGui    = player:WaitForChild("PlayerGui")
 
-local Gradient = require(ReplicatedStorage.Packages.Gradients)
-local Rarities = require(ReplicatedStorage.Datas.Rarities)
-local Animals = require(ReplicatedStorage.Datas.Animals)
+local PlayerBalance = 492864
+local ROBUX_CHAR    = utf8.char(0xE002)
 
-local traitMap = {
-    ["rbxassetid://89041930759464"] = {name = "Taco", mult = 2},
-    ["rbxassetid://104229924295526"] = {name = "Nyan", mult = 5},
-    ["rbxassetid://99181785766598"] = {name = "Galactic", mult = 3},
-    ["rbxassetid://121100427764858"] = {name = "Fireworks", mult = 5},
-    ["rbxassetid://110723387483939"] = {name = "Zombie", mult = 4},
-    ["rbxassetid://104964195846833"] = {name = "Claws", mult = 4},
-    ["rbxassetid://121332433272976"] = {name = "Glitched", mult = 4},
-    ["rbxassetid://100601425541874"] = {name = "Bubblegum", mult = 3},
-    ["rbxassetid://118283346037788"] = {name = "Fire", mult = 5},
-    ["rbxassetid://78474194088770"] = {name = "Wet", mult = 1.5},
-    ["rbxassetid://83627475909869"] = {name = "Snowy", mult = 2},
-    ["rbxassetid://127455440418221"] = {name = "Cometstruck", mult = 2.5},
-    ["rbxassetid://97725744252608"] = {name = "Explosive", mult = 3},
-    ["rbxassetid://82620342632406"] = {name = "Disco", mult = 4},
-    ["rbxassetid://134655415681926"] = {name = "10B", mult = 3},
-    ["rbxassetid://104985313532149"] = {name = "Shark Fin", mult = 3},
-    ["rbxassetid://115664804212096"] = {name = "Matteo Hat", mult = 3.5},
-    ["rbxassetid://75650816341229"] = {name = "Brazil", mult = 5},
-    ["rbxassetid://115001117876534"] = {name = "Sleepy", mult = 0},
-    ["rbxassetid://139729696247144"] = {name = "Lightning", mult = 5},
-    ["rbxassetid://110910518481052"] = {name = "UFO", mult = 2},
-    ["rbxassetid://117478971325696"] = {name = "Spider", mult = 3.5},
-    ["rbxassetid://84731118566493"] = {name = "Strawberry", mult = 7},
-    ["rbxassetid://119591742504251"] = {name = "Paint", mult = 5},
-    ["rbxassetid://89591838221335"] = {name = "Skeleton", mult = 3},
-    ["rbxassetid://95128039793845"] = {name = "Sombrero", mult = 4},
-    ["rbxassetid://103610037004911"] = {name = "Tie", mult = 3.75},
-    ["rbxassetid://123964048606874"] = {name = "Witch Hat", mult = 3},
-    ["rbxassetid://93350414974589"] = {name = "Indonesia", mult = 4},
-    ["rbxassetid://114748221761549"] = {name = "Meowl", mult = 6},
-    ["rbxassetid://123115843719383"] = {name = "RIP Gravestone", mult = 3.5},
-    ["rbxassetid://97054765273857"] = {name = "Jackolantern Pet", mult = 4.5},
-    ["rbxassetid://88375043733582"] = {name = "Santa Hat", mult = 4}
-}
+local function createBuyUI(itemName, itemPrice, itemImageId, giftedTo)
+    local price        = tonumber((tostring(itemPrice):gsub("[^%d]", ""))) or 0
+    local balanceAfter = PlayerBalance - price
 
-local mutationMap = {
-    ["Gold"] = {
-        mult = 0.25,
-        displayText = "Gold",
-        richText = "<font color=\"#FFDE59\">Gold</font>",
-        color = Color3.fromRGB(255, 222, 89),
-        icon = "rbxassetid://136133057822407"
-    },
-    ["Diamond"] = {
-        mult = 0.5,
-        displayText = "Diamond",
-        richText = "<font color=\"#25C4FE\">Diamond</font>",
-        color = Color3.fromRGB(37, 196, 254),
-        icon = "rbxassetid://100875709547015"
-    },
-    ["Bloodrot"] = {
-        mult = 1,
-        displayText = "Bloodrot",
-        richText = "<font color=\"#8A3B3C\">Bloodrot</font>",
-        color = Color3.fromRGB(145, 0, 27),
-        icon = "rbxassetid://75212036784031"
-    },
-    ["Rainbow"] = {
-        mult = 9,
-        displayText = "Rainbow",
-        richText = "<font color=\"#ff00fb\">Rainbow</font>",
-        color = Color3.fromRGB(255, 0, 251),
-        icon = "rbxassetid://83078714090192"
-    },
-    ["Candy"] = {
-        mult = 3,
-        displayText = "Candy",
-        richText = "<font color=\"#ff46f6\">Candy</font>",
-        color = Color3.fromRGB(255, 70, 246),
-        icon = "rbxassetid://84797673698685"
-    },
-    ["Lava"] = {
-        mult = 5,
-        displayText = "Lava",
-        richText = "<font color=\"#ff7700\">Lava</font>",
-        color = Color3.fromRGB(255, 149, 0),
-        icon = "rbxassetid://70800471498231"
-    },
-    ["Galaxy"] = {
-        mult = 6,
-        displayText = "Galaxy",
-        richText = "<font color=\"#aa3cff\">Galaxy</font>",
-        color = Color3.fromRGB(170, 60, 255),
-        icon = "rbxassetid://139331671405138"
-    },
-    ["Yin Yang"] = {
-        mult = 6.5,
-        displayText = "Yin Yang",
-        richText = "<stroke color=\"#fff\" thickness=\"2\"><font color=\"#000\">Yin</font></stroke> <stroke color=\"#000\" thickness=\"2\"><font color=\"#fff\">Yang</font></stroke>",
-        useRichText = true,
-        color = Color3.fromRGB(255, 255, 255),
-        icon = "rbxassetid://112996178302302"
-    },
-    ["YinYang"] = {
-        mult = 6.5,
-        displayText = "Yin Yang",
-        richText = "<stroke color=\"#fff\" thickness=\"2\"><font color=\"#000\">Yin</font></stroke> <stroke color=\"#000\" thickness=\"2\"><font color=\"#fff\">Yang</font></stroke>",
-        useRichText = true,
-        color = Color3.fromRGB(255, 255, 255),
-        icon = "rbxassetid://112996178302302"
-    },
-    ["Radioactive"] = {
-        mult = 7.5,
-        displayText = "Radioactive",
-        richText = "<font color=\"#68f500\">Radioactive</font>",
-        useRichText = false,
-        color = Color3.fromRGB(104, 245, 0),
-        icon = "rbxassetid://134809510446754"
-    }
-}
-
-local traitList = {}
-for assetId, data in pairs(traitMap) do
-    table.insert(traitList, data.name)
-end
-table.sort(traitList)
-
-local function formatNumber(num)
-    local suffixes = {"", "K", "M", "B", "T", "Q"}
-    local tier = 1
-    
-    while num >= 1000 and tier < #suffixes do
-        num = num / 1000
-        tier = tier + 1
-    end
-    
-    if num % 1 == 0 then
-        return string.format("%d%s", num, suffixes[tier])
-    else
-        return string.format("%.1f%s", num, suffixes[tier])
-    end
-end
-
-local function parseCurrency(str)
-    str = str:gsub("<[^>]+>", "")
-    str = str:gsub("%$", "")
-    str = str:gsub(",", "")
-    str = str:gsub("[^%d%.%a]", "")
-    
-    local numStr, suffix = str:match("^(%d*%.?%d+)(%a*)")
-    local num = tonumber(numStr) or 0
-    
-    suffix = suffix:upper()
-    local multipliers = {
-        K = 1000,
-        M = 1000000,
-        B = 1000000000,
-        T = 1000000000000,
-        Q = 1000000000000000
-    }
-    
-    return num * (multipliers[suffix] or 1)
-end
-
-local Controllers = ReplicatedStorage:WaitForChild("Controllers")
-local Utils = ReplicatedStorage:WaitForChild("Utils")
-local SoundController = require(Controllers.SoundController)
-
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer.PlayerGui
-local LeftBottom = PlayerGui:WaitForChild("LeftBottom"):WaitForChild("LeftBottom")
-local CashoutFrame = LeftBottom:FindFirstChild("Cashout")
-
-local cashoutTweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear)
-
-local function showCashout(text, isGreen, playSound)
-    if not CashoutFrame or not CashoutFrame.Template or not CashoutFrame.Template:IsA("TextLabel") then
-        return
-    end
-    
-    local label = CashoutFrame.Template:Clone()
-    label.Text = text
-    
-    local color = isGreen and Color3.fromRGB(13, 255, 0) or Color3.fromRGB(255, 0, 0)
-    label.TextColor3 = color
-    label.Visible = true
-    label.Parent = CashoutFrame
-    
-    local textTween = TweenService:Create(label, cashoutTweenInfo, {TextTransparency = 1})
-    local strokeTween = TweenService:Create(label.UIStroke, cashoutTweenInfo, {Transparency = 1})
-    
-    textTween.Completed:Once(function()
-        label:Destroy()
-    end)
-    
-    textTween:Play()
-    strokeTween:Play()
-    
-    if playSound and isGreen then
-        SoundController:PlaySound("Sounds.Sfx.Cashout")
-    end
-end
-
-local function getAnimalData(animalName)
-    return Animals[animalName] or {}
-end
-
-local function getTraitIconByName(traitName)
-    for assetId, data in pairs(traitMap) do
-        if data.name == traitName then
-            return assetId
-        end
-    end
-    return nil
-end
-
-local function applyMutationVisuals(clonedAnimal, mutationName)
-    if not mutationName or mutationName == "None" then return end
-    
-    local mutationData = mutationMap[mutationName]
-    if not mutationData then return end
-    
-    local MutationsData = ReplicatedStorage.Datas:FindFirstChild("Mutations")
-    if MutationsData then
-        local success, mutationModule = pcall(function()
-            return require(MutationsData)
-        end)
-        
-        if success and mutationModule then
-            local mutationInfo = mutationModule[mutationName]
-            
-            if mutationInfo and mutationInfo.Palettes then
-                local palette = mutationInfo.Palettes[1]
-                if palette then
-                    local colorIndex = 1
-                    for _, part in ipairs(clonedAnimal:GetDescendants()) do
-                        if part:IsA("BasePart") or part:IsA("MeshPart") then
-                            part.Color = palette[colorIndex]
-                            colorIndex = (colorIndex % #palette) + 1
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-local function spawnAnimal(animalName, selectedTraits, selectedMutation)
-    local animalData = Animals[animalName]
-    if not animalData then
-        return false, "invalid brainrot"
-    end
-    
-    local animalModel = ReplicatedStorage.Models.Animals:FindFirstChild(animalName)
-    if not animalModel then
-        return false, "invalid brainrot"
-    end
-    
-    local foundPlot = false
-    local spawnCFrame = nil
-    local spawnAttachment = nil
-    local claimFrame = nil
-    local hitbox = nil
-    
-    for _, plot in ipairs(workspace.Plots:GetChildren()) do
-        local plotSign = plot:FindFirstChild("PlotSign")
-        if plotSign then
-            local surfaceGui = plotSign:FindFirstChild("SurfaceGui")
-            if surfaceGui then
-                local frame = surfaceGui:FindFirstChild("Frame")
-                if frame then
-                    local textLabel = frame:FindFirstChild("TextLabel")
-                    if textLabel then
-                        local ownerText = textLabel.Text:gsub("^%s*(.-)%s*$", "%1")
-                        
-                        if string.find(ownerText:lower(), LocalPlayer.Name:lower()) or 
-                           ownerText == LocalPlayer.Name or 
-                           string.find(ownerText, LocalPlayer.DisplayName) then
-                            
-                            local podiums = plot:FindFirstChild("AnimalPodiums")
-                            if podiums then
-                                local podiumList = {}
-                                
-                                for _, child in ipairs(podiums:GetChildren()) do
-                                    if child:IsA("Model") and tonumber(child.Name) then
-                                        table.insert(podiumList, child)
-                                    end
-                                end
-                                
-                                table.sort(podiumList, function(a, b)
-                                    return tonumber(a.Name) < tonumber(b.Name)
-                                end)
-                                
-                                for _, podium in ipairs(podiumList) do
-                                    local base = podium:FindFirstChild("Base")
-                                    if base then
-                                        local spawn = base:FindFirstChild("Spawn")
-                                        if spawn then
-                                            local attachment = spawn:FindFirstChild("Attachment")
-                                            local hasAnimal = false
-                                            
-                                            for _, obj in ipairs(spawn:GetChildren()) do
-                                                if obj:IsA("Model") and obj.Name ~= "Attachment" then
-                                                    hasAnimal = true
-                                                    break
-                                                end
-                                            end
-                                            
-                                            if not hasAnimal then
-                                                for _, obj in ipairs(podium:GetChildren()) do
-                                                    if obj:IsA("Model") and Animals[obj.Name] then
-                                                        hasAnimal = true
-                                                        break
-                                                    end
-                                                end
-                                            end
-                                            
-                                            if not attachment and not hasAnimal then
-                                                spawnCFrame = spawn.CFrame * CFrame.new(0, -1.5, 0)
-                                                spawnAttachment = spawn
-                                                
-                                                claimFrame = podium:FindFirstChild("Claim") and 
-                                                            podium.Claim:FindFirstChild("Main") and
-                                                            podium.Claim.Main:FindFirstChild("Collect")
-                                                
-                                                hitbox = podium:FindFirstChild("Claim") and
-                                                        podium.Claim:FindFirstChild("Hitbox")
-                                                
-                                                foundPlot = true
-                                                break
-                                            end
-                                        end
-                                    end
-                                end
-                                
-                                if foundPlot then break end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    if not foundPlot then
-        return false, "full base"
-    end
-    
-    local clonedAnimal = animalModel:Clone()
-    clonedAnimal:PivotTo(spawnCFrame)
-    clonedAnimal.Parent = workspace
-    
-    for _, descendant in ipairs(clonedAnimal:GetDescendants()) do
-        if descendant:IsA("BasePart") then
-            descendant.Anchored = true
-        end
-    end
-    
-    local animController = clonedAnimal:FindFirstChildOfClass("AnimationController")
-    local idleAnim = ReplicatedStorage.Animations.Animals:FindFirstChild(animalName)
-    if idleAnim then
-        idleAnim = idleAnim:FindFirstChild("Idle")
-    end
-    
-    if animController and idleAnim then
-        local track = animController:LoadAnimation(idleAnim)
-        track:Play()
-    end
-    
-    local animalSoundsFolder = ReplicatedStorage.Sounds:FindFirstChild("Animals")
-    if animalSoundsFolder then
-        local animalSound = animalSoundsFolder:FindFirstChild(animalName)
-        if animalSound and animalSound:IsA("Sound") then
-            local soundClone = animalSound:Clone()
-            soundClone.Parent = clonedAnimal.PrimaryPart or clonedAnimal:FindFirstChildWhichIsA("BasePart")
-            soundClone:Play()
-            soundClone.Ended:Connect(function()
-                soundClone:Destroy()
-            end)
-        end
-    end
-    
-    if selectedMutation and selectedMutation ~= "None" then
-        applyMutationVisuals(clonedAnimal, selectedMutation)
-    end
-    
-    if selectedTraits and clonedAnimal.PrimaryPart then
-        local traitsModelsFolder = ReplicatedStorage.Models:FindFirstChild("Traits")
-        local traitsVfxFolder = ReplicatedStorage.Vfx:FindFirstChild("Traits")
-        local traitsPerAnimalFolder = ReplicatedStorage.Models:FindFirstChild("TraitsPerAnimal")
-        
-        for _, traitName in ipairs(selectedTraits) do
-            local customPlacement = nil
-            if traitsPerAnimalFolder then
-                local animalTraitsFolder = traitsPerAnimalFolder:FindFirstChild(animalName)
-                if animalTraitsFolder then
-                    customPlacement = animalTraitsFolder:FindFirstChild(traitName)
-                end
-            end
-            
-            if traitsVfxFolder then
-                local traitVfx = traitsVfxFolder:FindFirstChild(traitName)
-                if traitVfx then
-                    for _, vfxItem in ipairs(traitVfx:GetChildren()) do
-                        local vfxClone = vfxItem:Clone()
-                        
-                        if customPlacement and customPlacement:IsA("Attachment") then
-                            vfxClone.Parent = customPlacement
-                        else
-                            if vfxClone:IsA("ParticleEmitter") or vfxClone:IsA("Beam") or vfxClone:IsA("Trail") then
-                                local attachment = clonedAnimal.PrimaryPart:FindFirstChildOfClass("Attachment")
-                                if not attachment then
-                                    attachment = Instance.new("Attachment")
-                                    attachment.Parent = clonedAnimal.PrimaryPart
-                                end
-                                vfxClone.Parent = attachment
-                            else
-                                vfxClone.Parent = clonedAnimal.PrimaryPart
-                            end
-                        end
-                        
-                        -- Enable the effect
-                        if vfxClone:IsA("ParticleEmitter") or vfxClone:IsA("Trail") or vfxClone:IsA("Beam") then
-                            vfxClone.Enabled = true
-                        end
-                    end
-                end
-            end
-            
-            if traitsModelsFolder then
-                local traitModel = traitsModelsFolder:FindFirstChild(traitName)
-                
-                if traitModel then
-                    local traitClone = traitModel:Clone()
-                    traitClone.Parent = clonedAnimal
-                    
-                    if traitClone:IsA("Model") then
-                        if customPlacement then
-                            if customPlacement:IsA("Attachment") then
-                                traitClone:PivotTo(customPlacement.WorldCFrame)
-                            elseif customPlacement:IsA("BasePart") then
-                                traitClone:PivotTo(customPlacement.CFrame)
-                            end
-                        elseif traitClone.PrimaryPart then
-                            traitClone:PivotTo(clonedAnimal.PrimaryPart.CFrame)
-                        else
-                            local mainPart = traitClone:FindFirstChildWhichIsA("BasePart")
-                            if mainPart then
-                                mainPart.CFrame = clonedAnimal.PrimaryPart.CFrame
-                            end
-                        end
-                        
-                        for _, part in ipairs(traitClone:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                part.Anchored = false
-                                part.CanCollide = false
-                                part.CanQuery = false
-                                
-                                local weld = Instance.new("WeldConstraint")
-                                weld.Part0 = clonedAnimal.PrimaryPart
-                                weld.Part1 = part
-                                weld.Parent = part
-                                
-                                for _, desc in ipairs(part:GetDescendants()) do
-                                    if desc:IsA("ParticleEmitter") or desc:IsA("Trail") or desc:IsA("Beam") then
-                                        desc.Enabled = true
-                                    end
-                                end
-                            end
-                        end
-                    elseif traitClone:IsA("BasePart") then
-                        if customPlacement and customPlacement:IsA("BasePart") then
-                            traitClone.CFrame = customPlacement.CFrame
-                        else
-                            traitClone.CFrame = clonedAnimal.PrimaryPart.CFrame
-                        end
-                        traitClone.Anchored = false
-                        traitClone.CanCollide = false
-                        traitClone.CanQuery = false
-                        
-                        local weld = Instance.new("WeldConstraint")
-                        weld.Part0 = clonedAnimal.PrimaryPart
-                        weld.Part1 = traitClone
-                        weld.Parent = traitClone
-                        
-                        for _, desc in ipairs(traitClone:GetDescendants()) do
-                            if desc:IsA("ParticleEmitter") or desc:IsA("Trail") or desc:IsA("Beam") then
-                                desc.Enabled = true
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    local totalGeneration = 0
-    local connection = nil
-    local attachmentMarker = nil
-    local lastCollectTime = 0
-    
-    local marker = Instance.new("Attachment")
-    marker.Name = "Attachment"
-    marker.Parent = spawnAttachment
-    attachmentMarker = marker
-    
-    if claimFrame and claimFrame:FindFirstChild("Offline") then
-        local offline = claimFrame.Offline
-        if offline:IsA("GuiObject") then
-            offline.Visible = false
-        end
-    end
-    
-    if clonedAnimal.PrimaryPart then
-        local proximityPrompt = Instance.new("ProximityPrompt")
-        proximityPrompt.ObjectText = animalData.DisplayName
-        proximityPrompt.ActionText = "Sell: $" .. formatNumber(animalData.Price / 2)
-        proximityPrompt.KeyboardKeyCode = Enum.KeyCode.E
-        proximityPrompt.HoldDuration = 1.5
-        proximityPrompt.MaxActivationDistance = 10
-        proximityPrompt.Parent = clonedAnimal.PrimaryPart
-        
-        proximityPrompt.Triggered:Connect(function(player)
-            if player ~= LocalPlayer then return end
-            
-            local sellPrice = animalData.Price / 2
-            
-            local currencyLabel = PlayerGui.LeftBottom.LeftBottom:FindFirstChild("Currency")
-            if currencyLabel and currencyLabel:IsA("TextLabel") then
-                local currentMoney = parseCurrency(currencyLabel.Text)
-                currencyLabel.Text = "$" .. formatNumber(currentMoney + sellPrice)
-            end
-            
-            local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-            local cash = leaderstats and leaderstats:FindFirstChild("Cash")
-            if cash and (cash:IsA("NumberValue") or cash:IsA("IntValue")) then
-                cash.Value = cash.Value + sellPrice
-            end
-            
-            showCashout("+$" .. formatNumber(sellPrice), true, true)
-            
-            totalGeneration = 0
-            if connection then
-                connection:Disconnect()
-                connection = nil
-            end
-            if claimFrame then
-                claimFrame.Enabled = false
-                local collectLabel = claimFrame:FindFirstChild("Collect")
-                if collectLabel then
-                    collectLabel.Text = "Collect<br/><font color=\"#73ff00\">$0</font>"
-                end
-            end
-            clonedAnimal:Destroy()
-            if attachmentMarker and attachmentMarker.Parent then
-                attachmentMarker:Destroy()
-                attachmentMarker = nil
-            end
-        end)
-    end
-    
-    local generationRate = animalData.Generation or 0
-    local traitBonus = 0
-    
-    if selectedTraits then
-        for _, traitName in ipairs(selectedTraits) do
-            for assetId, data in pairs(traitMap) do
-                if data.name == traitName then
-                    traitBonus = traitBonus + (generationRate * data.mult)
-                    break
-                end
-            end
-        end
-    end
-    
-    local mutationBonus = 0
-    if selectedMutation and selectedMutation ~= "None" and mutationMap[selectedMutation] then
-        mutationBonus = generationRate * mutationMap[selectedMutation].mult
-    end
-    
-    local totalGenRate = generationRate + traitBonus + mutationBonus
-    
-    if claimFrame and hitbox then
-        local collectLabel = claimFrame:FindFirstChild("Collect")
-        if collectLabel and collectLabel:IsA("TextLabel") then
-            claimFrame.Enabled = true
-            collectLabel.Text = "Collect<br/><font color=\"#73ff00\">$0</font>"
-            
-            if hitbox:IsA("BasePart") then
-                hitbox.CanCollide = false
-                hitbox.CanQuery = true
-            end
-            
-            hitbox.Touched:Connect(function(hit)
-                local player = Players:GetPlayerFromCharacter(hit.Parent)
-                if player == LocalPlayer and clonedAnimal and clonedAnimal.Parent then
-                    local currentTime = os.time()
-                    if currentTime - lastCollectTime >= 1 and totalGeneration > 0 then
-                        lastCollectTime = currentTime
-                        
-                        local currencyLabel = PlayerGui.LeftBottom.LeftBottom:FindFirstChild("Currency")
-                        if currencyLabel and currencyLabel:IsA("TextLabel") then
-                            local currentMoney = parseCurrency(currencyLabel.Text)
-                            currencyLabel.Text = "$" .. formatNumber(currentMoney + totalGeneration)
-                        end
-                        
-                        local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-                        local cash = leaderstats and leaderstats:FindFirstChild("Cash")
-                        if cash and (cash:IsA("NumberValue") or cash:IsA("IntValue")) then
-                            cash.Value = cash.Value + totalGeneration
-                        end
-                        
-                        showCashout("+$" .. formatNumber(totalGeneration), true, true)
-                        totalGeneration = 0
-                        collectLabel.Text = "Collect<br/><font color=\"#73ff00\">$0</font>"
-                    end
-                end
-            end)
-            
-            claimFrame.Changed:Connect(function(property)
-                if property == "Enabled" and claimFrame.Enabled == false then
-                    claimFrame.Enabled = true
-                end
-            end)
-            
-            task.spawn(function()
-                while claimFrame and claimFrame.Parent and claimFrame.Enabled and 
-                      clonedAnimal and clonedAnimal.Parent do
-                    task.wait(1)
-                    totalGeneration = totalGeneration + totalGenRate
-                    collectLabel.Text = "Collect<br/><font color=\"#73ff00\">$" .. 
-                                       formatNumber(totalGeneration) .. "</font>"
-                end
-            end)
-        end
-    end
-    
-    local overheadTemplate = ReplicatedStorage.Overheads:FindFirstChild("AnimalOverhead")
-    local head = clonedAnimal:FindFirstChild("Head") or clonedAnimal.PrimaryPart
-    
-    if overheadTemplate and head then
-        local overhead = overheadTemplate:Clone()
-        overhead.StudsOffset = Vector3.new(0, 7, 0)
-        overhead.Adornee = head
-        overhead.Parent = head
-        overhead.AlwaysOnTop = true
-        overhead.MaxDistance = 200
-        
-        local mutation = overhead:FindFirstChild("Mutation", true)
-        if mutation and mutation:IsA("GuiObject") then
-            if selectedMutation and selectedMutation ~= "None" then
-                local mutationInfo = mutationMap[selectedMutation]
-                if mutationInfo then
-                    -- Use rich text formatting with proper handling
-                    if mutationInfo.useRichText == true and mutationInfo.richText then
-                        mutation.Text = mutationInfo.richText
-                        mutation.RichText = true
-                    elseif mutationInfo.richText then
-                        mutation.Text = mutationInfo.richText
-                        mutation.RichText = true
-                    else
-                        mutation.Text = mutationInfo.displayText or selectedMutation
-                        mutation.TextColor3 = mutationInfo.color or Color3.new(1, 1, 1)
-                    end
-                else
-                    mutation.Text = selectedMutation
-                end
-                mutation.Visible = true
-                
-                if selectedMutation == "Rainbow" then
-                    local rainbowColorSeq = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 4)),
-                        ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 0, 242)),
-                        ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 132, 255)),
-                        ColorSequenceKeypoint.new(0.6, Color3.fromRGB(17, 255, 0)),
-                        ColorSequenceKeypoint.new(0.8, Color3.fromRGB(251, 255, 0)),
-                        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 255))
-                    })
-                    local transparency = NumberSequence.new(0)
-                    local rainbowGradient = Gradient.new(mutation, rainbowColorSeq, transparency)
-                    rainbowGradient:SetOffsetSpeed(0.5, 0.5)
-                end
-            else
-                mutation.Visible = false
-            end
-        end
-        
-        local function updateOverheadText(fieldName, value)
-            local field = overhead:FindFirstChild(fieldName, true)
-            if field then
-                field.Text = value
-            end
-        end
-        
-        updateOverheadText("DisplayName", animalData.DisplayName)
-        updateOverheadText("Rarity", animalData.Rarity)
-        updateOverheadText("Price", "$" .. formatNumber(animalData.Price))
-        updateOverheadText("Generation", "$" .. formatNumber(totalGenRate) .. "/s")
-        
-        local rarityConfig = Rarities[animalData.Rarity]
-        if rarityConfig then
-            local rarityLabel = overhead:FindFirstChild("Rarity", true)
-            if rarityLabel then
-                if animalData.Rarity == "Brainrot God" then
-                    rarityLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.ExtraBold, Enum.FontStyle.Normal)
-                    rarityLabel.TextColor3 = Color3.fromRGB(255, 0, 221)
-                    rarityLabel.TextStrokeTransparency = 0
-                    rarityLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-                    
-                    local uiStroke = rarityLabel:FindFirstChild("UIStroke")
-                    if uiStroke then
-                        local gradient = uiStroke:FindFirstChild("UIGradient")
-                        if gradient then
-                            gradient.Enabled = true
-                        end
-                    end
-                    
-                elseif animalData.Rarity == "Secret" then
-                    rarityLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.ExtraBold, Enum.FontStyle.Normal)
-                    rarityLabel.TextColor3 = Color3.new(1, 1, 1)
-                    rarityLabel.TextStrokeTransparency = 0
-                    rarityLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-                    
-                    local uiStroke = rarityLabel:FindFirstChild("UIStroke")
-                    if uiStroke then
-                        local gradient = uiStroke:FindFirstChild("UIGradient")
-                        if gradient then
-                            gradient.Enabled = true
-                        end
-                    end
-                    
-                    if EasyVisuals then
-                        EasyVisuals.new(rarityLabel, rarityConfig.EasyVisualsPresset, 0.6, nil, true, Color3.new(0, 0, 0))
-                    end
-                    
-                elseif rarityConfig.EasyVisualsPresset and EasyVisuals then
-                    EasyVisuals.new(rarityLabel, rarityConfig.EasyVisualsPresset, nil, nil, true, rarityConfig.Color)
-                else
-                    rarityLabel.TextColor3 = rarityConfig.Color
-                end
-            end
-        end
-        
-        local traitsContainer = overhead:FindFirstChild("Traits")
-        if traitsContainer then
-            traitsContainer.Visible = true
-            local template = traitsContainer:FindFirstChild("Template")
-            
-            if selectedTraits and #selectedTraits > 0 then
-                for _, traitName in ipairs(selectedTraits) do
-                    local iconId = getTraitIconByName(traitName)
-                    if iconId and template then
-                        local icon = template:Clone()
-                        icon.Image = iconId
-                        icon.Visible = true
-                        icon.Parent = traitsContainer
-                        icon.Name = traitName .. "_Icon"
-                    end
-                end
-            end
-        end
-    end
-    
-    return true, clonedAnimal
-end
-
-local Library = loadstring(game:HttpGet("https://pastefy.app/LdojNZj9/raw"))()
-
-local Window = Library:CreateWindow({
-    Name = "Brainrot Spawner",
-    Theme = "Green"
-})
-
-local excludedAnimals = {
-    ["Secret Lucky Block"] = true,
-    ["Chimpanzini Spiderini"] = true,
-    ["Mythic Lucky Block"] = true,
-    ["Brainrot God Lucky Block"] = true
-}
-
-local animalList = {}
-for name in pairs(Animals) do
-    if not excludedAnimals[name] then
-        table.insert(animalList, name)
-    end
-end
-
-local animalsByRarity = {}
-for _, name in ipairs(animalList) do
-    local rarity = Animals[name].Rarity or "Unknown"
-    animalsByRarity[rarity] = animalsByRarity[rarity] or {}
-    table.insert(animalsByRarity[rarity], name)
-end
-
-local rarityOrder = {"Secret", "Brainrot God", "Mythic", "Legendary", "Epic", "Rare", "Common", "Unknown"}
-local sortedList = {}
-for _, rarity in ipairs(rarityOrder) do
-    for _, name in ipairs(animalsByRarity[rarity] or {}) do
-        table.insert(sortedList, name)
-    end
-end
-animalList = sortedList
-
-local mutationList = {"None"}
-for mutName in pairs(mutationMap) do
-    table.insert(mutationList, mutName)
-end
-table.sort(mutationList)
-
-local SpawnerTab = Window:CreateTab("SPAWNER", "rbxassetid://10723425615")
-local SpawnerSection = SpawnerTab:CreateSection("Brainrot Spawner")
-
-local selectedAnimal = animalList[1] or "None"
-local selectedTraits = {}
-local selectedMutation = "None"
-local traitToggles = {}
-
-SpawnerSection:CreateDropdown("Select Brainrot", animalList, animalList[1], function(choice)
-    selectedAnimal = choice
-end)
-
-SpawnerSection:CreateDropdown("Select Mutation", mutationList, "None", function(choice)
-    selectedMutation = choice
-end)
-
-local traitSelectionSection = SpawnerTab:CreateSection("Trait Selection (Infinite)")
-
-for _, traitName in ipairs(traitList) do
-    local toggle = traitSelectionSection:CreateToggle(traitName, false, function(state)
-        if state then
-            if not table.find(selectedTraits, traitName) then
-                table.insert(selectedTraits, traitName)
-            end
-        else
-            local index = table.find(selectedTraits, traitName)
-            if index then
-                table.remove(selectedTraits, index)
-            end
-        end
-    end)
-    traitToggles[traitName] = toggle
-end
-
-local ActionsSection = SpawnerTab:CreateSection("Actions")
-
-ActionsSection:CreateButton("Spawn Brainrot", function()
-    if not selectedAnimal or selectedAnimal == "None" or selectedAnimal == "" then
-        return
+    if CoreGui:FindFirstChild("BuyItemGUI") then
+        CoreGui.BuyItemGUI:Destroy()
     end
 
-    local traitsToApply = {}
-    for _, trait in ipairs(selectedTraits) do
-        table.insert(traitsToApply, trait)
-    end
-    
-    local mutationToApply = (selectedMutation == "None") and nil or selectedMutation
-
-    local success, result = spawnAnimal(selectedAnimal, traitsToApply, mutationToApply)
-    if not success then
-        warn("Failed to spawn: " .. tostring(result))
-    end
-end)
-
-ActionsSection:CreateButton("Clear All Traits", function()
-    selectedTraits = {}
-    for traitName, toggle in pairs(traitToggles) do
-        if toggle and toggle.Set then
-            toggle:Set(false)
-        end
-    end
-end)
-
-local function createNotification(title, description, duration, iconId)
-    duration = duration or 5
-    iconId = iconId or "rbxassetid://10747359646"  -- Default Discord-like icon, change if needed
-    
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "CustomNotificationGui"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = game:GetService("CoreGui")
-    
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 80)
-    frame.Position = UDim2.new(1, -320, 0, 20)  -- Start off-screen
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    frame.BorderSizePixel = 0
-    frame.BackgroundTransparency = 0.1
-    frame.Parent = screenGui
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = frame
-    
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(80, 80, 80)
-    stroke.Thickness = 1
-    stroke.Parent = frame
-    
-    local icon = Instance.new("ImageLabel")
-    icon.Size = UDim2.new(0, 50, 0, 50)
-    icon.Position = UDim2.new(0, 15, 0.5, -25)
-    icon.BackgroundTransparency = 1
-    icon.Image = iconId
-    icon.Parent = frame
-    
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, -80, 0, 25)
-    titleLabel.Position = UDim2.new(0, 75, 0, 10)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Color3.new(1, 1, 1)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 18
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = frame
-    
-    local descLabel = Instance.new("TextLabel")
-    descLabel.Size = UDim2.new(1, -80, 0, 30)
-    descLabel.Position = UDim2.new(0, 75, 0, 35)
-    descLabel.BackgroundTransparency = 1
-    descLabel.Text = description
-    descLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    descLabel.Font = Enum.Font.Gotham
-    descLabel.TextSize = 14
-    descLabel.TextWrapped = true
-    descLabel.TextXAlignment = Enum.TextXAlignment.Left
-    descLabel.Parent = frame
-    
-    -- Animate in
-    frame:TweenPosition(UDim2.new(1, -320, 0, 20), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
-    
-    -- Auto destroy after duration
-    task.delay(duration, function()
-        frame:TweenPosition(UDim2.new(1, 20, 0, 20), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.5, true, function()
-            screenGui:Destroy()
+    screenGui.Name            = "BuyItemGUI"
+    screenGui.ResetOnSpawn    = false
+    screenGui.ZIndexBehavior  = Enum.ZIndexBehavior.Sibling
+    screenGui.IgnoreGuiInset  = true
+    screenGui.DisplayOrder    = 999
+    screenGui.Parent          = CoreGui
+
+    local overlay = Instance.new("Frame", screenGui)
+    overlay.Size                   = UDim2.new(1,0,1,0)
+    overlay.BackgroundColor3       = Color3.fromRGB(0,0,0)
+    overlay.BackgroundTransparency = 0.55
+    overlay.BorderSizePixel        = 0
+    overlay.ZIndex                 = 10
+
+    local card = Instance.new("Frame", screenGui)
+    card.Name             = "Card"
+    card.Size             = UDim2.new(0,380,0,315)
+    card.AnchorPoint      = Vector2.new(0.5,0.5)
+    card.Position         = UDim2.new(0.5,0,-0.3,0)
+    card.BackgroundColor3 = Color3.fromRGB(34,34,40)
+    card.BorderSizePixel  = 0
+    card.ZIndex           = 11
+    Instance.new("UICorner", card).CornerRadius = UDim.new(0,14)
+
+    local title = Instance.new("TextLabel", card)
+    title.Size = UDim2.new(1,0,0,54); title.Position = UDim2.new(0,0,0,0)
+    title.BackgroundTransparency = 1; title.Text = "Buy Item"
+    title.TextColor3 = Color3.fromRGB(255,255,255); title.Font = Enum.Font.GothamBold
+    title.TextSize = 20; title.TextXAlignment = Enum.TextXAlignment.Center; title.ZIndex = 12
+
+    local divider = Instance.new("Frame", card)
+    divider.Size = UDim2.new(1,0,0,1); divider.Position = UDim2.new(0,0,0,54)
+    divider.BackgroundColor3 = Color3.fromRGB(52,52,62); divider.BorderSizePixel = 0; divider.ZIndex = 12
+
+    local imgHolder = Instance.new("Frame", card)
+    imgHolder.Size = UDim2.new(0,88,0,88); imgHolder.AnchorPoint = Vector2.new(0.5,0)
+    imgHolder.Position = UDim2.new(0.5,0,0,68); imgHolder.BackgroundTransparency = 1; imgHolder.ZIndex = 12
+
+    local itemImg = Instance.new("ImageLabel", imgHolder)
+    itemImg.Size = UDim2.new(1,0,1,0); itemImg.BackgroundTransparency = 1
+    itemImg.Image = itemImageId or ""; itemImg.ScaleType = Enum.ScaleType.Fit; itemImg.ZIndex = 13
+
+    local question = Instance.new("TextLabel", card)
+    question.Size = UDim2.new(1,-50,0,46); question.AnchorPoint = Vector2.new(0.5,0)
+    question.Position = UDim2.new(0.5,0,0,168); question.BackgroundTransparency = 1
+    question.Text = 'Would you like to buy "'..itemName..'"?'
+    question.TextColor3 = Color3.fromRGB(208,208,214); question.Font = Enum.Font.GothamMedium
+    question.TextSize = 14; question.TextWrapped = true
+    question.TextXAlignment = Enum.TextXAlignment.Center; question.ZIndex = 12
+
+    local BTN_W = 160; local BTN_H = 46; local BTN_Y = 226
+    local GAP = 12; local LEFT_X = math.floor((380-(BTN_W*2+GAP))/2)
+
+    local cancelBtn = Instance.new("TextButton", card)
+    cancelBtn.Name = "CancelButton"; cancelBtn.Size = UDim2.new(0,BTN_W,0,BTN_H)
+    cancelBtn.Position = UDim2.new(0,LEFT_X,0,BTN_Y)
+    cancelBtn.BackgroundColor3 = Color3.fromRGB(42,42,52); cancelBtn.AutoButtonColor = false
+    cancelBtn.BorderSizePixel = 0; cancelBtn.Text = "Cancel"
+    cancelBtn.TextColor3 = Color3.fromRGB(205,205,212); cancelBtn.Font = Enum.Font.GothamMedium
+    cancelBtn.TextSize = 15; cancelBtn.ZIndex = 15
+    Instance.new("UICorner", cancelBtn).CornerRadius = UDim.new(0,9)
+    local cStr = Instance.new("UIStroke", cancelBtn)
+    cStr.Color = Color3.fromRGB(68,68,82); cStr.Thickness = 1.2
+
+    local buyBtn = Instance.new("TextButton", card)
+    buyBtn.Name = "BuyButton"; buyBtn.Size = UDim2.new(0,BTN_W,0,BTN_H)
+    buyBtn.Position = UDim2.new(0,LEFT_X+BTN_W+GAP,0,BTN_Y)
+    buyBtn.BackgroundColor3 = Color3.fromRGB(242,242,242); buyBtn.AutoButtonColor = false
+    buyBtn.BorderSizePixel = 0; buyBtn.Text = ""; buyBtn.ZIndex = 15; buyBtn.ClipsDescendants = true
+    Instance.new("UICorner", buyBtn).CornerRadius = UDim.new(0,9)
+
+    local fillBar = Instance.new("Frame", buyBtn)
+    fillBar.Size = UDim2.new(0,0,1,0); fillBar.Position = UDim2.new(0,0,0,0)
+    fillBar.BackgroundColor3 = Color3.fromRGB(18,18,18); fillBar.BorderSizePixel = 0; fillBar.ZIndex = 16
+
+    local buyRow = Instance.new("Frame", buyBtn)
+    buyRow.Size = UDim2.new(1,0,1,0); buyRow.BackgroundTransparency = 1; buyRow.ZIndex = 17
+
+    local brl = Instance.new("UIListLayout", buyRow)
+    brl.FillDirection = Enum.FillDirection.Horizontal
+    brl.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    brl.VerticalAlignment = Enum.VerticalAlignment.Center
+    brl.Padding = UDim.new(0,4)
+
+    local robuxIco = Instance.new("TextLabel", buyRow)
+    robuxIco.Size = UDim2.new(0,26,1,0); robuxIco.BackgroundTransparency = 1
+    robuxIco.Text = ROBUX_CHAR; robuxIco.TextColor3 = Color3.fromRGB(18,18,18)
+    robuxIco.Font = Enum.Font.GothamBold; robuxIco.TextSize = 24
+    robuxIco.TextXAlignment = Enum.TextXAlignment.Center; robuxIco.ZIndex = 18
+
+    local buyPriceLabel = Instance.new("TextLabel", buyRow)
+    buyPriceLabel.Size = UDim2.new(0,55,1,0); buyPriceLabel.BackgroundTransparency = 1
+    buyPriceLabel.Text = tostring(price); buyPriceLabel.TextColor3 = Color3.fromRGB(18,18,18)
+    buyPriceLabel.Font = Enum.Font.GothamBold; buyPriceLabel.TextSize = 16
+    buyPriceLabel.TextXAlignment = Enum.TextXAlignment.Left; buyPriceLabel.ZIndex = 18
+
+    local balLabel = Instance.new("TextLabel", card)
+    balLabel.Size = UDim2.new(1,-30,0,22); balLabel.AnchorPoint = Vector2.new(0.5,0)
+    balLabel.Position = UDim2.new(0.5,0,0,284); balLabel.BackgroundTransparency = 1
+    balLabel.Text = "Your balance after this transaction will be  "..ROBUX_CHAR.."  "..tostring(balanceAfter)
+    balLabel.TextColor3 = Color3.fromRGB(112,112,126); balLabel.Font = Enum.Font.GothamMedium
+    balLabel.TextSize = 11; balLabel.TextXAlignment = Enum.TextXAlignment.Center; balLabel.ZIndex = 12
+
+    local sCard = Instance.new("Frame", screenGui)
+    sCard.Name = "SuccessCard"; sCard.Size = UDim2.new(0,380,0,200)
+    sCard.AnchorPoint = Vector2.new(0.5,0.5); sCard.Position = UDim2.new(0.5,0,-0.4,0)
+    sCard.BackgroundColor3 = Color3.fromRGB(34,34,40); sCard.BorderSizePixel = 0
+    sCard.ZIndex = 20; sCard.Visible = false
+    Instance.new("UICorner", sCard).CornerRadius = UDim.new(0,14)
+
+    local sTitle = Instance.new("TextLabel", sCard)
+    sTitle.Size = UDim2.new(1,0,0,54); sTitle.Position = UDim2.new(0,0,0,0)
+    sTitle.BackgroundTransparency = 1; sTitle.Text = "Buy Item"
+    sTitle.TextColor3 = Color3.fromRGB(255,255,255); sTitle.Font = Enum.Font.GothamBold
+    sTitle.TextSize = 20; sTitle.TextXAlignment = Enum.TextXAlignment.Center; sTitle.ZIndex = 21
+
+    local sDivider = Instance.new("Frame", sCard)
+    sDivider.Size = UDim2.new(1,0,0,1); sDivider.Position = UDim2.new(0,0,0,54)
+    sDivider.BackgroundColor3 = Color3.fromRGB(52,52,62); sDivider.BorderSizePixel = 0; sDivider.ZIndex = 21
+
+    local successMsg = Instance.new("TextLabel", sCard)
+    successMsg.Size = UDim2.new(1,-50,0,52); successMsg.AnchorPoint = Vector2.new(0.5,0)
+    successMsg.Position = UDim2.new(0.5,0,0,68); successMsg.BackgroundTransparency = 1
+    if giftedTo and giftedTo ~= "" then
+        successMsg.Text = "Successfully Gifted \""..itemName.."\" to "..giftedTo.."!"
+    else
+        successMsg.Text = "Successfully Purchased \""..itemName.."\"!"
+    end
+    successMsg.TextColor3 = Color3.fromRGB(208,208,214); successMsg.Font = Enum.Font.GothamMedium
+    successMsg.TextSize = 15; successMsg.TextWrapped = true
+    successMsg.TextXAlignment = Enum.TextXAlignment.Center; successMsg.ZIndex = 21
+
+    local okBtn = Instance.new("TextButton", sCard)
+    okBtn.Size = UDim2.new(1,-32,0,50); okBtn.AnchorPoint = Vector2.new(0.5,0)
+    okBtn.Position = UDim2.new(0.5,0,0,132); okBtn.BackgroundColor3 = Color3.fromRGB(240,240,240)
+    okBtn.AutoButtonColor = false; okBtn.BorderSizePixel = 0; okBtn.Text = "OK"
+    okBtn.TextColor3 = Color3.fromRGB(18,18,18); okBtn.Font = Enum.Font.GothamBold
+    okBtn.TextSize = 17; okBtn.ZIndex = 22
+    Instance.new("UICorner", okBtn).CornerRadius = UDim.new(0,10)
+
+    cancelBtn.MouseEnter:Connect(function() TweenService:Create(cancelBtn,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(58,58,70)}):Play() end)
+    cancelBtn.MouseLeave:Connect(function() TweenService:Create(cancelBtn,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(42,42,52)}):Play() end)
+    okBtn.MouseEnter:Connect(function() TweenService:Create(okBtn,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(215,215,215)}):Play() end)
+    okBtn.MouseLeave:Connect(function() TweenService:Create(okBtn,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(240,240,240)}):Play() end)
+
+    local closing=false; local fillDone=false; local buyDone=false; local fillTween=nil
+
+    local function closeDown()
+        if closing then return end; closing=true
+        if fillTween then fillTween:Cancel() end
+        TweenService:Create(card,TweenInfo.new(0.32,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position=UDim2.new(0.5,0,1.4,0)}):Play()
+        TweenService:Create(overlay,TweenInfo.new(0.30),{BackgroundTransparency=1}):Play()
+        task.delay(0.33,function() screenGui:Destroy() end)
+    end
+    local function closeSuccess()
+        if closing then return end; closing=true
+        TweenService:Create(sCard,TweenInfo.new(0.32,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position=UDim2.new(0.5,0,1.4,0)}):Play()
+        TweenService:Create(overlay,TweenInfo.new(0.30),{BackgroundTransparency=1}):Play()
+        task.delay(0.33,function() screenGui:Destroy() end)
+    end
+    local function showSuccess()
+        card.Visible=false; sCard.Visible=true; sCard.Position=UDim2.new(0.5,0,-0.35,0)
+        TweenService:Create(sCard,TweenInfo.new(0.38,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Position=UDim2.new(0.5,0,0.5,0)}):Play()
+        pcall(function()
+            local successSfx = game:GetService("ReplicatedStorage").Sounds.Sfx.Success
+            successSfx:Play()
         end)
+        if giftedTo and giftedTo ~= "" then
+            if CoreGui:FindFirstChild("GiftLabelGUI") then
+                CoreGui.GiftLabelGUI:Destroy()
+            end
+            local gGui = Instance.new("ScreenGui")
+            gGui.Name           = "GiftLabelGUI"
+            gGui.ResetOnSpawn   = false
+            gGui.IgnoreGuiInset = true
+            gGui.DisplayOrder   = 1000
+            gGui.Parent         = CoreGui
+
+            local gLabel = Instance.new("TextLabel", gGui)
+            gLabel.Size                   = UDim2.new(1,0,0,40)
+            gLabel.AnchorPoint            = Vector2.new(0.5,1)
+            gLabel.Position               = UDim2.new(0.5,0,1,-64)
+            gLabel.BackgroundTransparency = 1
+            gLabel.RichText               = true
+            gLabel.Text                   = '<font color="#92FF67">Successfully Gifted To '..giftedTo..'</font>'
+            gLabel.Font                   = Enum.Font.GothamBold
+            gLabel.TextSize               = 19
+            gLabel.TextXAlignment         = Enum.TextXAlignment.Center
+            gLabel.ZIndex                 = 5
+
+            task.delay(5, function()
+                if not gGui or not gGui.Parent then return end
+                for i = 1, 20 do
+                    task.wait(0.05)
+                    if gLabel and gLabel.Parent then
+                        gLabel.TextTransparency = i / 20
+                    end
+                end
+                pcall(function() gGui:Destroy() end)
+            end)
+
+            screenGui.AncestryChanged:Connect(function()
+                if not screenGui.Parent then
+                    pcall(function() gGui:Destroy() end)
+                end
+            end)
+        end
+    end
+
+    local slideTween=TweenService:Create(card,TweenInfo.new(0.42,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Position=UDim2.new(0.5,0,0.5,0)})
+    slideTween:Play()
+    slideTween.Completed:Connect(function()
+        if closing then return end
+        robuxIco.TextColor3=Color3.fromRGB(255,255,255)
+        buyPriceLabel.TextColor3=Color3.fromRGB(255,255,255)
+        fillTween=TweenService:Create(fillBar,TweenInfo.new(1.5,Enum.EasingStyle.Linear),{Size=UDim2.new(1,0,1,0)})
+        fillTween:Play()
+        fillTween.Completed:Connect(function(state)
+            if state~=Enum.PlaybackState.Completed or closing then return end
+            fillDone=true
+            TweenService:Create(fillBar,TweenInfo.new(0.2),{BackgroundTransparency=1}):Play()
+            TweenService:Create(robuxIco,TweenInfo.new(0.15),{TextColor3=Color3.fromRGB(18,18,18)}):Play()
+            TweenService:Create(buyPriceLabel,TweenInfo.new(0.15),{TextColor3=Color3.fromRGB(18,18,18)}):Play()
+        end)
+    end)
+
+    cancelBtn.MouseButton1Click:Connect(function() closeDown() end)
+    buyBtn.MouseButton1Click:Connect(function()
+        if not fillDone or buyDone or closing then return end
+        buyDone=true; showSuccess()
+    end)
+    okBtn.MouseButton1Click:Connect(function() closeSuccess() end)
+    overlay.InputBegan:Connect(function(inp)
+        if inp.UserInputType==Enum.UserInputType.MouseButton1 then
+            if sCard.Visible then closeSuccess() else closeDown() end
+        end
     end)
 end
 
-local DiscordTab = Window:CreateTab("DISCORD", "rbxassetid://10747359646")
+local function injectItem(item)
+    if item:FindFirstChild("__inj") then return end
 
-local DiscordSection = DiscordTab:CreateSection("Community Hub")
+    local buyObj = item:FindFirstChild("Buy")
+    if not buyObj then return end
 
-local discordInvite = "https://discord.gg/SnXQCYzGjx"  -- Popular active server for Steal a Brainrot (trading, giveaways, updates)
+    local priceLbl    = buyObj:FindFirstChild("Price") or item:FindFirstChild("Price")
+    local nameLbl     = item:FindFirstChild("ItemName") or item:FindFirstChild("Text")
+    local iconObj     = item:FindFirstChild("Icon")
 
-DiscordSection:CreateButton("Copy Discord Invite", function()
-    setclipboard(discordInvite)
-    createNotification("Discord Invite Copied!", "Join the best scripts discord server!\nInstant Steal, de-sync, dupe & more.", 6, "rbxassetid://10747359646")
+    local itemName    = (nameLbl  and nameLbl.Text)  or "Unknown"
+    local itemPrice   = (priceLbl and priceLbl.Text) or "0"
+    local itemImageId = (iconObj  and iconObj.Image) or ""
+
+    local ghost = Instance.new("TextButton", buyObj)
+    ghost.Name                   = "GhostBtn"
+    ghost.Size                   = UDim2.new(1,0,1,0)
+    ghost.Position               = UDim2.new(0,0,0,0)
+    ghost.AnchorPoint            = Vector2.new(0,0)
+    ghost.BackgroundTransparency = 1
+    ghost.Text                   = ""
+    ghost.AutoButtonColor        = false
+    ghost.BorderSizePixel        = 0
+    ghost.ZIndex                 = buyObj.ZIndex + 20
+
+    local tag = Instance.new("BoolValue", item)
+    tag.Name = "__inj"
+
+    ghost.MouseButton1Click:Connect(function()
+        local snd = Instance.new("Sound", game:GetService("SoundService"))
+        snd.SoundId = "rbxassetid://75311202481026"
+        snd.Volume = 1
+        snd:Play()
+        game:GetService("Debris"):AddItem(snd, 5)
+
+        local giftedTo = nil
+        pcall(function()
+            local giftBtn = game:GetService("Players").LocalPlayer.PlayerGui.Shop.Shop.GiftPlayerSelect.Buttons.GiftButton
+            local txt = giftBtn:FindFirstChild("Txt")
+            if txt and txt:IsA("TextLabel") then
+                if string.lower(txt.Text) == "back" then
+                    local playerNameLbl = game:GetService("Players").LocalPlayer.PlayerGui.Shop.Shop.GiftPlayerSelect.PlayerSelected.PlayerName
+                    if playerNameLbl then
+                        local ct = playerNameLbl:FindFirstChild("ContentText") or playerNameLbl
+                        giftedTo = ct.Text
+                    end
+                end
+            end
+        end)
+
+        createBuyUI(itemName, itemPrice, itemImageId, giftedTo)
+    end)
+end
+
+local function injectContainer(container, label)
+    for _, child in ipairs(container:GetChildren()) do
+        if child:IsA("ImageLabel") or child:IsA("Frame") then
+            pcall(injectItem, child)
+        end
+    end
+    container.ChildAdded:Connect(function(child)
+        task.wait(0.1)
+        if child:IsA("ImageLabel") or child:IsA("Frame") then
+            pcall(injectItem, child)
+        end
+    end)
+end
+
+local function injectAll()
+    local shopGui = playerGui:FindFirstChild(player.DisplayName..".Shop")
+                 or playerGui:FindFirstChild(player.Name..".Shop")
+                 or playerGui:FindFirstChild("Shop")
+
+    if not shopGui then return end
+
+    local inner   = shopGui:FindFirstChild("Shop")
+    local content = inner  and inner:FindFirstChild("Content")
+    local list    = content and content:FindFirstChild("List")
+
+    if not list then return end
+
+    local itemsList = list:FindFirstChild("ItemsList")
+    if itemsList then
+        injectContainer(itemsList, "ItemsList")
+    end
+
+    local gamepassList = list:FindFirstChild("GamepassList")
+    if gamepassList then
+        injectContainer(gamepassList, "GamepassList")
+
+        local main = gamepassList:FindFirstChild("Main")
+        if main then
+            injectContainer(main, "GamepassList.Main")
+        end
+    end
+
+    local serverLuck = list:FindFirstChild("ServerLuck")
+    if serverLuck then
+        local slFrame = serverLuck:FindFirstChild("Frame")
+        if slFrame then
+            pcall(injectItem, slFrame)
+        end
+        serverLuck.ChildAdded:Connect(function(child)
+            task.wait(0.1)
+            if child.Name == "Frame" then
+                pcall(injectItem, child)
+            end
+        end)
+    end
+end
+
+pcall(function()
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title    = "BuZzz Was Here 😂",
+        Text     = "Hello",
+        Duration = 5,
+    })
 end)
 
-DiscordSection:CreateLabel("Join the best scripts discord server!\nInstant Steal, de-sync, dupe & more.")
+task.spawn(function()
+    local names a {player.DisplayName..".Shop", player.Name..".Shop", "Shop"}
+    local found, waited = false, 0
+    repeat
+        task.wait(0.5); waited += 0.5
+        for _,n in ipairs(names) do
+            if playerGui:FindFirstChild(n) then found=true; break end
+        end
+    until found or waited >= 20
+    if not found then return end
+    task.wait(0.3)
+    injectAll()
+end)
