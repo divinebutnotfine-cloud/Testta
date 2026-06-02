@@ -3054,7 +3054,7 @@ Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
 local logoImg = New("ImageLabel", {
     Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
     BackgroundTransparency=1,
-    Image="rbxassetid://1780326942542",
+    Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
     Parent=sidebar,
 })
@@ -3083,7 +3083,6 @@ for i, icon in ipairs(NAV_ICONS) do
     navBtns[i] = btn
 end
 
--- Collapse button at bottom of sidebar — Logo Toggle
 -- Collapse button at bottom of sidebar — Logo Toggle
 local _guiToggleBtn = New("ImageButton", {
     Size=UDim2.new(0,56,0,56),
@@ -3117,13 +3116,6 @@ _guiToggleBtn.MouseLeave:Connect(function()
     toggleGlow.BackgroundTransparency = 0.5
 end)
 
--- Header logo also uses loaded asset
-pcall(function()
-    if headerLogo then headerLogo.Image = _loadLogoAsset() end
-end)
-pcall(function()
-    if logoImg then logoImg.Image = _loadLogoAsset() end
-end)
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
@@ -3137,6 +3129,19 @@ local contentPanel = New("Frame", {
 })
 Corner(contentPanel, 18)
 Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
+
+-- Background watermark blended into content panel
+New("ImageLabel", {
+    Size=UDim2.new(0.72,0,0.72,0),
+    Position=UDim2.new(0.14,0,0.14,0),
+    BackgroundTransparency=1,
+    Image=_loadLogoAsset(),
+    ImageTransparency=0.88,
+    ScaleType=Enum.ScaleType.Fit,
+    ZIndex=1,
+    Active=false,
+    Parent=contentPanel,
+})
 
 -- Content panel header bar
 local cpHeader = New("Frame", {
@@ -3162,7 +3167,7 @@ local cpTitle = New("TextLabel", {
 local headerLogo = New("ImageLabel", {
     Size=UDim2.new(0,38,0,38), Position=UDim2.new(1,-46,0,7),
     BackgroundTransparency=1,
-    Image="rbxassetid://1780326942542",
+    Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
     Parent=cpHeader,
 })
@@ -3331,16 +3336,6 @@ local brainrotsPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=true, Parent=mainContent,
 })
--- Full background watermark (behind all content at ZIndex -1)
-New("ImageLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Position=UDim2.new(0,0,0,0),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
-    ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=brainrotsPage,
-})
 do
     local ul = Instance.new("UIListLayout", brainrotsPage)
     ul.FillDirection = Enum.FillDirection.Vertical
@@ -3362,16 +3357,6 @@ local tradingPage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
-})
--- Full background watermark (behind all content at ZIndex -1)
-New("ImageLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Position=UDim2.new(0,0,0,0),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
-    ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=tradingPage,
 })
 do
     local ul = Instance.new("UIListLayout", tradingPage)
@@ -3399,16 +3384,6 @@ local miscPage = New("Frame", {
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
 })
--- Full background watermark (behind all content at ZIndex -1)
-New("ImageLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Position=UDim2.new(0,0,0,0),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
-    ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=miscPage,
-})
 do
     local ul = Instance.new("UIListLayout", miscPage)
     ul.FillDirection = Enum.FillDirection.Vertical
@@ -3434,16 +3409,6 @@ local basePage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
     BackgroundTransparency=1, BorderSizePixel=0,
     LayoutOrder=1, Visible=false, Parent=mainContent,
-})
--- Full background watermark (behind all content at ZIndex -1)
-New("ImageLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Position=UDim2.new(0,0,0,0),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.92,
-    ScaleType=Enum.ScaleType.Fit,
-    ZIndex=-1, Active=false, Parent=basePage,
 })
 do
     local ul = Instance.new("UIListLayout", basePage)
