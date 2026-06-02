@@ -3043,12 +3043,23 @@ local win = New("Frame", {
 local sidebar = New("Frame", {
     Size=UDim2.new(0,SIDEBAR_W,0,340),
     Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(45,10,30),
+    BackgroundColor3=Color3.fromRGB(18,4,14),
     BorderSizePixel=0, Parent=win,
     ClipsDescendants=false,
 })
 Corner(sidebar, 20)
-Stroke(sidebar, Color3.fromRGB(255,105,170), 1.5, 0.2)
+Stroke(sidebar, Color3.fromRGB(255,80,160), 2, 0.15)
+-- Sidebar gradient
+do
+    local sbGrad = Instance.new("UIGradient")
+    sbGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(30,6,22)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18,4,14)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(26,5,18)),
+    })
+    sbGrad.Rotation = 90
+    sbGrad.Parent = sidebar
+end
 
 -- Logo image at top of sidebar (Mikka Hub logo)
 local logoImg = New("ImageLabel", {
@@ -3072,29 +3083,39 @@ local NAV_NAMES = {"Brainrots","Trading","Base","Misc"}
 local navBtns = {}
 for i, icon in ipairs(NAV_ICONS) do
     local btn = New("TextButton", {
-        Size=UDim2.new(0,46,0,46),
-        Position=UDim2.new(0.5,-23,0,68 + (i-1)*54),
-        BackgroundColor3=Color3.fromRGB(65,16,44),
+        Size=UDim2.new(0,48,0,48),
+        Position=UDim2.new(0.5,-24,0,68 + (i-1)*56),
+        BackgroundColor3=Color3.fromRGB(38,8,28),
         Text=icon, TextColor3=Color3.fromRGB(255,175,210),
-        Font=Enum.Font.FredokaOne, TextSize=20,
+        Font=Enum.Font.FredokaOne, TextSize=22,
         AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
     })
-    Corner(btn, 14)
+    Corner(btn, 16)
+    Stroke(btn, Color3.fromRGB(255,80,160), 1.5, 0.4)
     navBtns[i] = btn
 end
 
 -- Collapse button at bottom of sidebar — clearly separate from nav buttons
 local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,46,0,28),
-    Position=UDim2.new(0.5,-23,1,-36),
-    BackgroundColor3=Color3.fromRGB(255,80,150),
+    Size=UDim2.new(0,48,0,30),
+    Position=UDim2.new(0.5,-24,1,-38),
+    BackgroundColor3=Color3.fromRGB(255,60,140),
     Text="◀◀",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.FredokaOne, TextSize=13,
+    Font=Enum.Font.GothamBold, TextSize=12,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 6)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.2)
+Corner(_guiToggleBtn, 8)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.1)
+do
+    local tg = Instance.new("UIGradient")
+    tg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,30,200)),
+    })
+    tg.Rotation = 45
+    tg.Parent = _guiToggleBtn
+end
 
 -- Thin divider above toggle button
 New("Frame", {
@@ -3121,13 +3142,13 @@ MakeDraggable(win, sidebar)
 local contentPanel = New("Frame", {
     Size=UDim2.new(0,CONTENT_W,0,0),
     Position=UDim2.new(0,SIDEBAR_W+8,0,0),
-    BackgroundColor3=Color3.fromRGB(30,8,20),
+    BackgroundColor3=Color3.fromRGB(20,5,15),
     BorderSizePixel=0, Parent=win,
     ClipsDescendants=true,
     AutomaticSize=Enum.AutomaticSize.Y,
 })
 Corner(contentPanel, 18)
-Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
+Stroke(contentPanel, Color3.fromRGB(255,80,160), 2, 0.2)
 
 -- Background image overlay blended into content panel (fills panel, behind all content)
 New("ImageLabel", {
@@ -3142,48 +3163,126 @@ New("ImageLabel", {
     Parent=contentPanel,
 })
 
--- Content panel header bar
+-- ══════════════════════════════════════════════════════
+--  MIKKA HUB  —  Bold redesigned header
+-- ══════════════════════════════════════════════════════
 local cpHeader = New("Frame", {
-    Size=UDim2.new(1,0,0,52),
-    BackgroundColor3=Color3.fromRGB(55,12,36),
+    Size=UDim2.new(1,0,0,72),
+    BackgroundColor3=Color3.fromRGB(28,6,20),
     BorderSizePixel=0, Parent=contentPanel,
 })
 Corner(cpHeader, 18)
--- Cover bottom corners of header
+-- Cover bottom corners so header blends into panel
 New("Frame", {
-    Size=UDim2.new(1,0,0,18), Position=UDim2.new(0,0,1,-18),
-    BackgroundColor3=Color3.fromRGB(55,12,36), BorderSizePixel=0, Parent=cpHeader,
+    Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,1,-20),
+    BackgroundColor3=Color3.fromRGB(28,6,20), BorderSizePixel=0, Parent=cpHeader,
 })
--- Header title label (changes with tab)
-local cpTitle = New("TextLabel", {
-    Size=UDim2.new(1,-70,0,28), Position=UDim2.new(0,16,0,8),
-    Text="🐾  Brainrots",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
-    TextSize=16, BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
+-- Gradient shimmer bar across the top
+local headerAccentBar = New("Frame", {
+    Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=cpHeader,
 })
--- Logo in header top-right
+Corner(headerAccentBar, 3)
+do
+    local grad = Instance.new("UIGradient")
+    grad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,230)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(200,80,255)),
+    })
+    grad.Rotation = 0
+    grad.Parent = headerAccentBar
+end
+
+-- Logo image (left side, circular)
 local headerLogo = New("ImageLabel", {
-    Size=UDim2.new(0,38,0,38), Position=UDim2.new(1,-46,0,7),
-    BackgroundTransparency=1,
+    Size=UDim2.new(0,48,0,48), Position=UDim2.new(0,12,0,12),
+    BackgroundColor3=Color3.fromRGB(60,12,40),
     Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
     Parent=cpHeader,
 })
-Corner(headerLogo, 19)
--- Subtitle
-New("TextLabel", {
-    Size=UDim2.new(1,-16,0,16), Position=UDim2.new(0,16,0,34),
-    Text="Mikka Hub  ✦  Blossom 2026",
-    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.Nunito,
-    TextSize=11, BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=cpHeader,
+Corner(headerLogo, 24)
+Stroke(headerLogo, Color3.fromRGB(255,105,170), 2, 0.1)
+
+-- MIKKA HUB — large, bold, prominent brand name
+local brandLabel = New("TextLabel", {
+    Size=UDim2.new(0,200,0,34), Position=UDim2.new(0,70,0,8),
+    Text="MIKKA HUB",
+    TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold,
+    TextSize=22,
+    BackgroundTransparency=1,
+    TextXAlignment=Enum.TextXAlignment.Left,
+    RichText=false,
+    Parent=cpHeader,
 })
--- Pink glow line under header
-New("Frame", {
-    Size=UDim2.new(0.8,0,0,2), Position=UDim2.new(0.1,0,1,-1),
+do
+    local grad2 = Instance.new("UIGradient")
+    grad2.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,220,240)),
+        ColorSequenceKeypoint.new(0.55,Color3.fromRGB(255,130,200)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(210,100,255)),
+    })
+    grad2.Rotation = 0
+    grad2.Parent = brandLabel
+end
+
+-- Tab-name subtitle below brand
+local cpTitle = New("TextLabel", {
+    Size=UDim2.new(0,200,0,20), Position=UDim2.new(0,72,0,42),
+    Text="🐾  Brainrots",
+    TextColor3=Color3.fromRGB(255,150,200),
+    Font=Enum.Font.Gotham,
+    TextSize=12,
+    BackgroundTransparency=1,
+    TextXAlignment=Enum.TextXAlignment.Left,
+    Parent=cpHeader,
+})
+
+-- Version badge (top-right)
+local versionBadge = New("Frame", {
+    Size=UDim2.new(0,72,0,22), Position=UDim2.new(1,-82,0,10),
+    BackgroundColor3=Color3.fromRGB(255,60,140),
+    BorderSizePixel=0, Parent=cpHeader,
+})
+Corner(versionBadge, 11)
+do
+    local vg = Instance.new("UIGradient")
+    vg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,40,255)),
+    })
+    vg.Rotation = 45
+    vg.Parent = versionBadge
+end
+New("TextLabel", {
+    Size=UDim2.new(1,0,1,0),
+    Text="v2  ✦  2026",
+    TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold,
+    TextSize=11,
+    BackgroundTransparency=1,
+    TextXAlignment=Enum.TextXAlignment.Center,
+    Parent=versionBadge,
+})
+Stroke(versionBadge, Color3.fromRGB(255,200,230), 1, 0.15)
+
+-- Glow divider under header
+local headerDivider = New("Frame", {
+    Size=UDim2.new(0.92,0,0,1), Position=UDim2.new(0.04,0,1,-1),
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=cpHeader,
 })
+do
+    local dg = Instance.new("UIGradient")
+    dg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(30,8,20)),
+        ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,105,170)),
+        ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255,105,170)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(30,8,20)),
+    })
+    dg.Parent = headerDivider
+end
 
 -- ── Save window position ───────────────────────────────
 if savedWindowPos then
@@ -3211,7 +3310,7 @@ end
 -- ── mainContent lives inside contentPanel ─────────────
 local contentVisible = true
 local mainContent = New("Frame", {
-    Size=UDim2.new(1,0,0,0), Position=UDim2.new(0,0,0,52),
+    Size=UDim2.new(1,0,0,0), Position=UDim2.new(0,0,0,72),
     BackgroundTransparency=1, BorderSizePixel=0, Parent=contentPanel,
     AutomaticSize=Enum.AutomaticSize.Y,
 })
@@ -3240,7 +3339,7 @@ end
 
 local function _syncWinHeight(h)
     -- sidebar and contentPanel grow to match content height
-    local total = 52 + h + 16
+    local total = 72 + h + 16
     -- Minimum height: 4 nav btns end at y=276, toggle at bottom-36, need 276+80=356 min, use 380
     local MIN_HEIGHT = 380
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
@@ -3436,8 +3535,11 @@ local function SetTab(tab)
     cpTitle.Text = CP_TITLES[tab] or tab
     for i, btn in ipairs(navBtns) do
         local active = NAV_NAMES[i] == tab
-        btn.BackgroundColor3 = active and Color3.fromRGB(255,105,170) or Color3.fromRGB(65,16,44)
-        btn.TextColor3       = active and Color3.fromRGB(255,255,255)  or Color3.fromRGB(255,175,210)
+        btn.BackgroundColor3 = active and Color3.fromRGB(255,60,140) or Color3.fromRGB(38,8,28)
+        btn.TextColor3       = active and Color3.fromRGB(255,255,255)  or Color3.fromRGB(255,155,200)
+        if active then
+            pcall(function() Stroke(btn, Color3.fromRGB(255,200,230), 2, 0.0) end)
+        end
     end
     -- Recalculate window height for the newly visible tab
     if contentVisible then
@@ -3466,38 +3568,68 @@ navBtns[3].Activated:Connect(function() SetTab("Base")      end)
 navBtns[4].Activated:Connect(function() SetTab("Misc")      end)
 
 local selectedHeader = New("Frame", {
-    Size=UDim2.new(1,0,0,68), BackgroundColor3=Color3.fromRGB(40,10,28),
+    Size=UDim2.new(1,0,0,76), BackgroundColor3=Color3.fromRGB(22,5,16),
     BorderSizePixel=0, LayoutOrder=1, Parent=brainrotsPage,
 })
-Corner(selectedHeader, 14)
-Stroke(selectedHeader, Color3.fromRGB(255,105,170), 1.5, 0.25)
--- Top glow bar
-New("Frame", {
-    Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=selectedHeader,
+Corner(selectedHeader, 16)
+Stroke(selectedHeader, Color3.fromRGB(255,80,160), 2, 0.1)
+-- Top gradient glow bar
+local shTopBar = New("Frame", {
+    Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=selectedHeader,
 })
-Corner(selectedHeader:GetChildren()[2] or selectedHeader, 1)
+Corner(shTopBar, 3)
+do
+    local sg2 = Instance.new("UIGradient")
+    sg2.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,200,230)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(190,60,255)),
+    })
+    sg2.Parent = shTopBar
+end
+-- Background gradient for card
+do
+    local cardGrad = Instance.new("UIGradient")
+    cardGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(38,8,28)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(18,4,14)),
+    })
+    cardGrad.Rotation = 135
+    cardGrad.Parent = selectedHeader
+end
 -- Section label
 local rarityTag = New("TextLabel", {
-    Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,14,0,8),
+    Size=UDim2.new(1,0,0,18), Position=UDim2.new(0,14,0,10),
     BackgroundTransparency=1, Text="✿  BRAINROTS",
-    TextColor3=Color3.fromRGB(255,140,190), Font=Enum.Font.FredokaOne,
-    TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
+    TextColor3=Color3.fromRGB(255,120,190), Font=Enum.Font.GothamBold,
+    TextSize=10, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
 })
 -- Selected animal name
 local selectedName = New("TextLabel", {
-    Size=UDim2.new(0.6,0,0,28), Position=UDim2.new(0,14,0,30),
+    Size=UDim2.new(0.62,0,0,30), Position=UDim2.new(0,14,0,32),
     BackgroundTransparency=1, Text="Select an animal...",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
+    TextColor3=Color3.fromRGB(255,235,245), Font=Enum.Font.GothamBold,
     TextSize=15, TextXAlignment=Enum.TextXAlignment.Left,
     TextTruncate=Enum.TextTruncate.AtEnd, Parent=selectedHeader,
 })
--- Price label (right side)
+-- Price/gen label (right side)
 local selectedPrice = New("TextLabel", {
-    Size=UDim2.new(0.42,-10,0,28), Position=UDim2.new(0.58,0,0,30),
+    Size=UDim2.new(0.4,-10,0,30), Position=UDim2.new(0.6,0,0,32),
     BackgroundTransparency=1, Text="",
-    TextColor3=Color3.fromRGB(60,240,130), Font=Enum.Font.FredokaOne,
-    TextSize=15, TextXAlignment=Enum.TextXAlignment.Right, Parent=selectedHeader,
+    TextColor3=Color3.fromRGB(60,240,130), Font=Enum.Font.GothamBold,
+    TextSize=14, TextXAlignment=Enum.TextXAlignment.Right, Parent=selectedHeader,
+})
+-- Bottom info row
+local shInfoBar = New("Frame", {
+    Size=UDim2.new(1,-28,0,18), Position=UDim2.new(0,14,0,56),
+    BackgroundTransparency=1, Parent=selectedHeader,
+})
+local shInfoLbl = New("TextLabel", {
+    Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
+    Text="No animal selected", TextColor3=Color3.fromRGB(180,100,160),
+    Font=Enum.Font.Gotham, TextSize=10,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=shInfoBar,
 })
 
 local function _fmtCash(n)
