@@ -3244,47 +3244,61 @@ local cpTitle = New("TextLabel", {
     Parent=cpHeader,
 })
 
--- Discord button (top-right corner of header)
+-- Discord button (top-right corner of header) — pink-themed with Discord logo
 local discordBtn = New("TextButton", {
-    Size=UDim2.new(0,92,0,30), Position=UDim2.new(1,-100,0,20),
-    BackgroundColor3=Color3.fromRGB(88,101,242),
+    Size=UDim2.new(0,110,0,34), Position=UDim2.new(1,-118,0,18),
+    BackgroundColor3=Color3.fromRGB(255,80,160),
     BorderSizePixel=0, AutoButtonColor=false, Text="",
     Parent=cpHeader,
 })
-Corner(discordBtn, 9)
-Stroke(discordBtn, Color3.fromRGB(160,170,255), 1.5, 0.1)
+Corner(discordBtn, 10)
+Stroke(discordBtn, Color3.fromRGB(255,200,230), 1.5, 0.05)
 do
     local dg = Instance.new("UIGradient")
     dg.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(110,125,255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(65,80,210)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,180)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(220,60,160)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(180,40,200)),
     })
-    dg.Rotation = 90
+    dg.Rotation = 45
     dg.Parent = discordBtn
 end
+-- Shine bar at top
+New("Frame", {
+    Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,3),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.6,
+    BorderSizePixel=0, Parent=discordBtn,
+})
+-- Discord "clyde" icon (simple speech bubble shape using a frame)
+local discIconFrame = New("Frame", {
+    Size=UDim2.new(0,22,0,22), Position=UDim2.new(0,7,0.5,-11),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.1,
+    BorderSizePixel=0, Parent=discordBtn,
+})
+Corner(discIconFrame, 7)
 New("TextLabel", {
-    Size=UDim2.new(0,24,1,0), Position=UDim2.new(0,4,0,0),
-    BackgroundTransparency=1, Text="🔗",
+    Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text="󰙯",
+    TextColor3=Color3.fromRGB(255,80,160),
     Font=Enum.Font.GothamBold, TextSize=13,
-    TextXAlignment=Enum.TextXAlignment.Center, Parent=discordBtn,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=discIconFrame,
 })
 New("TextLabel", {
-    Size=UDim2.new(1,-28,1,0), Position=UDim2.new(0,26,0,0),
+    Size=UDim2.new(1,-32,1,0), Position=UDim2.new(0,32,0,0),
     BackgroundTransparency=1, Text="Discord",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=12,
-    TextXAlignment=Enum.TextXAlignment.Center, Parent=discordBtn,
+    Font=Enum.Font.GothamBold, TextSize=13,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=discordBtn,
 })
 discordBtn.MouseEnter:Connect(function()
-    discordBtn.BackgroundColor3 = Color3.fromRGB(110,125,255)
+    discordBtn.BackgroundColor3 = Color3.fromRGB(255,110,190)
 end)
 discordBtn.MouseLeave:Connect(function()
-    discordBtn.BackgroundColor3 = Color3.fromRGB(88,101,242)
+    discordBtn.BackgroundColor3 = Color3.fromRGB(255,80,160)
 end)
 discordBtn.Activated:Connect(function()
     pcall(function() setclipboard("https://discord.gg/Rfb9NPuGZv") end)
     pcall(function()
-        SetStatus("✓ Discord link copied!", Color3.fromRGB(100,120,255), 3)
+        SetStatus("✓ Discord link copied!", Color3.fromRGB(255,120,190), 3)
     end)
 end)
 
@@ -4220,10 +4234,12 @@ for _,trait in ipairs(TRAITS) do
             BackgroundTransparency=1, Image=icon, Parent=b,
         })
     else
-        New("Frame", {
-            Size=UDim2.new(0,24,0,24), Position=UDim2.new(0,8,0.5,-12),
-            BackgroundColor3=Color3.fromRGB(180,60,120), BorderSizePixel=0, Parent=b,
+        -- Pink dot instead of a visible box
+        local dot2 = New("Frame", {
+            Size=UDim2.new(0,8,0,8), Position=UDim2.new(0,16,0.5,-4),
+            BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=b,
         })
+        local dc2 = Instance.new("UICorner"); dc2.CornerRadius=UDim.new(1,0); dc2.Parent=dot2
     end
     New("TextLabel", {
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
@@ -4346,10 +4362,12 @@ for _,mut in ipairs(MUTATIONS) do
             BackgroundTransparency=1, Image=icon, Parent=b,
         })
     else
-
-        local xFrame = New("Frame", {Size=UDim2.new(0,20,0,20), Position=UDim2.new(0,10,0.5,-10), BackgroundTransparency=1, Parent=b})
-        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=45, Parent=xFrame})
-        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=-45, Parent=xFrame})
+        -- Subtle pink dot for mutations without an icon (no box/X)
+        local dot = New("Frame", {
+            Size=UDim2.new(0,10,0,10), Position=UDim2.new(0,15,0.5,-5),
+            BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=b,
+        })
+        local dotCorner = Instance.new("UICorner"); dotCorner.CornerRadius=UDim.new(1,0); dotCorner.Parent=dot
     end
     New("TextLabel", {
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
@@ -6507,20 +6525,20 @@ do
 
         -- Ensure section resizes when content visibility changes
         local function updateSectionSize()
-            task.defer(function()
-                if content.Visible then
-                    section.Size = UDim2.new(1,0,0,0)
-                else
-                    section.Size = UDim2.new(1,0,0,hdrBtn.Size.Y.Offset)
-                end
-                -- Trigger page resize
-                if miscPage.Visible and contentVisible then
-                    task.defer(function()
-                        local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
-                        if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
-                    end)
-                end
-            end)
+            if content.Visible then
+                section.AutomaticSize = Enum.AutomaticSize.Y
+                section.Size = UDim2.new(1,0,0,0)
+            else
+                section.AutomaticSize = Enum.AutomaticSize.None
+                section.Size = UDim2.new(1,0,0,hdrBtn.AbsoluteSize.Y > 0 and hdrBtn.AbsoluteSize.Y or 36)
+            end
+            -- Trigger page resize
+            if miscPage.Visible and contentVisible then
+                task.defer(function()
+                    local ul2 = mainContent:FindFirstChildOfClass("UIListLayout")
+                    if ul2 then _syncWinHeight(ul2.AbsoluteContentSize.Y) end
+                end)
+            end
         end
 
         cLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -6534,8 +6552,13 @@ do
             visible = not visible
             content.Visible = visible
             arrowLbl.Text = (visible and "▼  " or "▶  ") .. title
-            updateSectionSize()
+            -- Small delay so AutomaticSize settles before measuring
+            task.defer(function()
+                updateSectionSize()
+            end)
         end)
+        -- Initial size
+        updateSectionSize()
         return content
     end
 
@@ -8582,12 +8605,37 @@ do
 
         local win2 = New("Frame", {
             Size=UDim2.new(1,0,0,220),
-            BackgroundColor3=Color3.fromRGB(65,16,44),
+            BackgroundColor3=Color3.fromRGB(22,5,16),
             BorderSizePixel=0, LayoutOrder=2, Parent=tradingPage,
         })
         fakeTradeWin = win2
-        Corner(win2, 6)
-        Stroke(win2, Color3.fromRGB(180,60,120), 1, 0.2)
+        Corner(win2, 14)
+        Stroke(win2, Color3.fromRGB(255,80,160), 2, 0.1)
+        -- Pink gradient background
+        do
+            local wg = Instance.new("UIGradient")
+            wg.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0,   Color3.fromRGB(38,8,28)),
+                ColorSequenceKeypoint.new(1,   Color3.fromRGB(18,4,14)),
+            })
+            wg.Rotation = 135
+            wg.Parent = win2
+        end
+        -- Accent glow bar at top
+        local win2TopBar = New("Frame", {
+            Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
+            BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=win2,
+        })
+        Corner(win2TopBar, 3)
+        do
+            local tg = Instance.new("UIGradient")
+            tg.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,230)),
+                ColorSequenceKeypoint.new(1,   Color3.fromRGB(200,80,255)),
+            })
+            tg.Parent = win2TopBar
+        end
 
         local popSg = nil
         local poppedOut = false
@@ -8601,31 +8649,33 @@ do
         end
 
         local popBtn = New("TextButton", {
-            Size=UDim2.new(0.6, -pad*1.5, 0, 22), Position=UDim2.new(0, pad, 0, 8),
-            BackgroundColor3=Color3.fromRGB(108,92,231),
-            Text="Pop Out",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
+            Size=UDim2.new(0.6, -pad*1.5, 0, 26), Position=UDim2.new(0, pad, 0, 10),
+            BackgroundColor3=Color3.fromRGB(130,40,90),
+            Text="⎋  Pop Out",
+            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
             TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
-        Corner(popBtn, 5)
-        popBtn.MouseEnter:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(128,112,251) end)
-        popBtn.MouseLeave:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(108,92,231) end)
+        Corner(popBtn, 8)
+        Stroke(popBtn, Color3.fromRGB(255,80,160), 1.5, 0.2)
+        popBtn.MouseEnter:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(160,55,110) end)
+        popBtn.MouseLeave:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(130,40,90) end)
 
         local ignoreBtn = New("TextButton", {
-            Size=UDim2.new(0.4, -pad*1.5, 0, 22),
-            Position=UDim2.new(0.6, pad*0.5, 0, 8),
+            Size=UDim2.new(0.4, -pad*1.5, 0, 26),
+            Position=UDim2.new(0.6, pad*0.5, 0, 10),
             BackgroundColor3 = Color3.fromRGB(40,160,70),
-            Text="Show on Hide: ON",
+            Text="Show: ON",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
-            TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
+            TextSize=12, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
-        Corner(ignoreBtn, 5)
+        Corner(ignoreBtn, 8)
+        Stroke(ignoreBtn, Color3.fromRGB(80,255,150), 1.5, 0.2)
 
         local function refreshPopBtnText()
             popBtn.Text = poppedOut and "Dock" or "Pop Out"
         end
         local function refreshIgnoreBtn()
-            ignoreBtn.Text = ignoreHide and "Show on Hide: ON" or "Show on Hide: OFF"
+            ignoreBtn.Text = ignoreHide and "Show: ON" or "Show: OFF"
             ignoreBtn.BackgroundColor3 = ignoreHide
                 and Color3.fromRGB(40,160,70) or Color3.fromRGB(80,80,90)
         end
@@ -8675,9 +8725,9 @@ do
 
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
-            BackgroundTransparency=1, Text="TARGET USERNAME",
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
-            TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
+            BackgroundTransparency=1, Text="✿  TARGET USERNAME",
+            TextColor3=Color3.fromRGB(255,120,190), Font=Enum.Font.FredokaOne,
+            TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
         local usernameBox = New("TextBox", {
@@ -8689,8 +8739,8 @@ do
             TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.Nunito,
             TextSize=13, ClearTextOnFocus=false, BorderSizePixel=0, Parent=win2,
         })
-        Corner(usernameBox, 5)
-        Stroke(usernameBox, Color3.fromRGB(180,60,120), 1, 0.2)
+        Corner(usernameBox, 8)
+        Stroke(usernameBox, Color3.fromRGB(255,80,160), 1.5, 0.2)
 
         if prefill and type(prefill.username) == "string" and prefill.username ~= "" then
             usernameBox.Text = prefill.username
@@ -8699,9 +8749,9 @@ do
 
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
-            BackgroundTransparency=1, Text="ADD BRAINROTS TO THEIR SIDE",
-            TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
-            TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
+            BackgroundTransparency=1, Text="✿  ADD BRAINROTS TO THEIR SIDE",
+            TextColor3=Color3.fromRGB(255,120,190), Font=Enum.Font.FredokaOne,
+            TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
 
@@ -8883,13 +8933,12 @@ do
                                 ScaleType=Enum.ScaleType.Fit, ZIndex=63, Parent=r,
                             })
                         else
-
-                            local xFrame = New("Frame", {
-                                Size=UDim2.new(0,20,0,20), Position=UDim2.new(0,10,0.5,-10),
-                                BackgroundTransparency=1, ZIndex=63, Parent=r,
+                            local dotF = New("Frame", {
+                                Size=UDim2.new(0,10,0,10), Position=UDim2.new(0,15,0.5,-5),
+                                BackgroundColor3=Color3.fromRGB(255,105,170),
+                                BorderSizePixel=0, ZIndex=63, Parent=r,
                             })
-                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=45, ZIndex=64, Parent=xFrame})
-                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=-45, ZIndex=64, Parent=xFrame})
+                            local dcF = Instance.new("UICorner"); dcF.CornerRadius=UDim.new(1,0); dcF.Parent=dotF
                         end
                         New("TextLabel", {
                             Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
@@ -9098,12 +9147,23 @@ do
         y = y + 38
 
         local addBtn = New("TextButton", {
-            Size=UDim2.new(1,-pad*2,0,28), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(40,160,70), Text="+ ADD",
-            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
-            TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
+            Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
+            BackgroundColor3=Color3.fromRGB(255,60,140), Text="✦  ADD TO TRADE",
+            TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+            TextSize=13, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
-        Corner(addBtn, 5)
+        Corner(addBtn, 10)
+        Stroke(addBtn, Color3.fromRGB(255,200,230), 1.5, 0.1)
+        do
+            local ag = Instance.new("UIGradient")
+            ag.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,170)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(200,40,200)),
+            })
+            ag.Rotation = 45; ag.Parent = addBtn
+        end
+        addBtn.MouseEnter:Connect(function() addBtn.BackgroundColor3=Color3.fromRGB(255,100,180) end)
+        addBtn.MouseLeave:Connect(function() addBtn.BackgroundColor3=Color3.fromRGB(255,60,140) end)
         y = y + 34
 
         local function AddItem(count)
