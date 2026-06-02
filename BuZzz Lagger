@@ -3023,57 +3023,82 @@ pcall(function()
 end)
 
 -- ═══════════════════════════════════════════════════
---  BLOSSOM REDESIGN  —  Sidebar pill + content panel
+--  MIKKA HUB 2026  —  Modern Glassmorphic Layout
 -- ═══════════════════════════════════════════════════
 
-local WIN_W     = 520   -- total width (sidebar + content)
-local SIDEBAR_W = 72    -- narrow left pill
-local CONTENT_W = WIN_W - SIDEBAR_W - 8  -- right content area
+local WIN_W     = 520
+local SIDEBAR_W = 72
+local CONTENT_W = WIN_W - SIDEBAR_W - 10
 
--- ── Outer wrapper (transparent, just holds children) ──
+-- ── Smooth tween helper ──────────────────────────────
+local TweenService = game:GetService("TweenService")
+local function Tween(obj, props, t, style, dir)
+    local info = TweenInfo.new(t or 0.22, style or Enum.EasingStyle.Quint, dir or Enum.EasingDirection.Out)
+    local tw = TweenService:Create(obj, info, props)
+    tw:Play()
+    return tw
+end
+
+-- ── Outer wrapper ─────────────────────────────────────
 local win = New("Frame", {
-    Size=UDim2.new(0,WIN_W,0,340),
+    Size=UDim2.new(0,WIN_W,0,380),
     Position=UDim2.new(0,20,0,180),
     BackgroundTransparency=1,
     BorderSizePixel=0, Active=true, Parent=sg,
     ClipsDescendants=false,
 })
 
--- ── Sidebar pill ──────────────────────────────────────
+-- ── Sidebar pill ─────────────────────────────────────
 local sidebar = New("Frame", {
-    Size=UDim2.new(0,SIDEBAR_W,0,340),
+    Size=UDim2.new(0,SIDEBAR_W,0,380),
     Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(18,4,14),
+    BackgroundColor3=Color3.fromRGB(15,3,12),
     BorderSizePixel=0, Parent=win,
     ClipsDescendants=false,
 })
-Corner(sidebar, 20)
-Stroke(sidebar, Color3.fromRGB(255,80,160), 2, 0.15)
--- Sidebar gradient
+Corner(sidebar, 22)
+Stroke(sidebar, Color3.fromRGB(255,100,175), 1.5, 0.1)
 do
     local sbGrad = Instance.new("UIGradient")
     sbGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0,   Color3.fromRGB(30,6,22)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18,4,14)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(26,5,18)),
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(28,5,20)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(14,3,11)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(22,4,16)),
     })
     sbGrad.Rotation = 90
     sbGrad.Parent = sidebar
 end
+-- Sidebar top glow accent
+local sbTopAccent = New("Frame", {
+    Size=UDim2.new(0,3,0,36), Position=UDim2.new(0.5,-1.5,0,8),
+    BackgroundColor3=Color3.fromRGB(255,100,175), BorderSizePixel=0, Parent=sidebar,
+})
+Corner(sbTopAccent, 2)
+do
+    local accentGrad = Instance.new("UIGradient")
+    accentGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,175)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,40,200)),
+    })
+    accentGrad.Rotation = 90
+    accentGrad.Parent = sbTopAccent
+end
 
--- Logo image at top of sidebar (Mikka Hub logo)
+-- Logo image at top of sidebar
 local logoImg = New("ImageLabel", {
-    Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
-    BackgroundTransparency=1,
+    Size=UDim2.new(0,46,0,46), Position=UDim2.new(0.5,-23,0,10),
+    BackgroundColor3=Color3.fromRGB(30,5,22),
+    BackgroundTransparency=0,
     Image=_loadLogoAsset(),
     ScaleType=Enum.ScaleType.Fit,
     Parent=sidebar,
 })
-Corner(logoImg, 26)
+Corner(logoImg, 23)
+Stroke(logoImg, Color3.fromRGB(255,100,175), 1.5, 0.05)
 
 -- Thin divider under logo
 New("Frame", {
-    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,0,62),
+    Size=UDim2.new(0,36,0,1), Position=UDim2.new(0.5,-18,0,60),
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
 })
 
@@ -3083,217 +3108,237 @@ local NAV_NAMES = {"Brainrots","Trading","Base","Misc"}
 local navBtns = {}
 for i, icon in ipairs(NAV_ICONS) do
     local btn = New("TextButton", {
-        Size=UDim2.new(0,48,0,48),
-        Position=UDim2.new(0.5,-24,0,68 + (i-1)*56),
-        BackgroundColor3=Color3.fromRGB(38,8,28),
-        Text=icon, TextColor3=Color3.fromRGB(255,175,210),
-        Font=Enum.Font.FredokaOne, TextSize=22,
+        Size=UDim2.new(0,46,0,46),
+        Position=UDim2.new(0.5,-23,0,68 + (i-1)*54),
+        BackgroundColor3=Color3.fromRGB(32,6,24),
+        Text=icon, TextColor3=Color3.fromRGB(255,175,215),
+        Font=Enum.Font.FredokaOne, TextSize=21,
         AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
     })
-    Corner(btn, 16)
-    Stroke(btn, Color3.fromRGB(255,80,160), 1.5, 0.4)
+    Corner(btn, 14)
+    Stroke(btn, Color3.fromRGB(255,85,165), 1.5, 0.5)
+    -- Hover glow
+    btn.MouseEnter:Connect(function()
+        Tween(btn, {BackgroundColor3=Color3.fromRGB(60,10,44)}, 0.15)
+        for _, c in btn:GetChildren() do
+            if c:IsA("UIStroke") then Tween(c, {Transparency=0.15}, 0.15) end
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        -- will be overridden by SetTab for active btn
+        Tween(btn, {BackgroundColor3=Color3.fromRGB(32,6,24)}, 0.2)
+        for _, c in btn:GetChildren() do
+            if c:IsA("UIStroke") then Tween(c, {Transparency=0.5}, 0.2) end
+        end
+    end)
     navBtns[i] = btn
 end
 
--- Collapse button at bottom of sidebar — clearly separate from nav buttons
+-- Collapse / expand button at bottom of sidebar
 local _guiToggleBtn = New("TextButton", {
-    Size=UDim2.new(0,48,0,30),
-    Position=UDim2.new(0.5,-24,1,-38),
-    BackgroundColor3=Color3.fromRGB(255,60,140),
-    Text="◀◀",
+    Size=UDim2.new(0,46,0,28),
+    Position=UDim2.new(0.5,-23,1,-36),
+    BackgroundColor3=Color3.fromRGB(255,65,145),
+    Text="‹‹",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=12,
+    Font=Enum.Font.GothamBold, TextSize=13,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 8)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.1)
+Corner(_guiToggleBtn, 9)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,200,230), 1.5, 0.08)
 do
     local tg = Instance.new("UIGradient")
     tg.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,30,200)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,90,165)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(210,35,210)),
     })
     tg.Rotation = 45
     tg.Parent = _guiToggleBtn
 end
-
--- Thin divider above toggle button
 New("Frame", {
-    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,1,-42),
+    Size=UDim2.new(0,36,0,1), Position=UDim2.new(0.5,-18,1,-40),
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
 })
-
-local toggleGlow = New("Frame", {
-    Size=UDim2.new(0,0,0,0), BackgroundTransparency=1,
-    BorderSizePixel=0, Parent=_guiToggleBtn,
-})
-
--- Hover effects for toggle
 _guiToggleBtn.MouseEnter:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = contentVisible
-        and Color3.fromRGB(255,100,170)
-        or  Color3.fromRGB(70,16,50)
+    Tween(_guiToggleBtn, {BackgroundColor3=Color3.fromRGB(255,110,185)}, 0.15)
 end)
 _guiToggleBtn.MouseLeave:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = contentVisible
-        and Color3.fromRGB(255,60,140)
-        or  Color3.fromRGB(48,10,34)
+    Tween(_guiToggleBtn, {BackgroundColor3=Color3.fromRGB(255,65,145)}, 0.2)
 end)
 
 MakeDraggable(win, sidebar)
 
 -- ── Content panel ─────────────────────────────────────
 local contentPanel = New("Frame", {
-    Size=UDim2.new(0,CONTENT_W,0,0),
-    Position=UDim2.new(0,SIDEBAR_W+8,0,0),
-    BackgroundColor3=Color3.fromRGB(20,5,15),
+    Size=UDim2.new(0,CONTENT_W,0,380),
+    Position=UDim2.new(0,SIDEBAR_W+10,0,0),
+    BackgroundColor3=Color3.fromRGB(16,4,12),
     BorderSizePixel=0, Parent=win,
     ClipsDescendants=true,
-    AutomaticSize=Enum.AutomaticSize.Y,
 })
-Corner(contentPanel, 18)
-Stroke(contentPanel, Color3.fromRGB(255,80,160), 2, 0.2)
+Corner(contentPanel, 20)
+Stroke(contentPanel, Color3.fromRGB(255,85,165), 1.5, 0.18)
+-- Subtle inner glow gradient
+do
+    local cpGrad = Instance.new("UIGradient")
+    cpGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(26,5,20)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(16,4,12)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(20,4,15)),
+    })
+    cpGrad.Rotation = 135
+    cpGrad.Parent = contentPanel
+end
 
--- Background image overlay blended into content panel (fills panel, behind all content)
+-- Subtle logo watermark
 New("ImageLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Position=UDim2.new(0,0,0,0),
-    BackgroundTransparency=1,
-    Image=_loadLogoAsset(),
-    ImageTransparency=0.45,
-    ScaleType=Enum.ScaleType.Crop,
-    ZIndex=1,
-    Active=false,
-    Parent=contentPanel,
+    Size=UDim2.new(1,0,1,0), Position=UDim2.new(0,0,0,0),
+    BackgroundTransparency=1, Image=_loadLogoAsset(),
+    ImageTransparency=0.88, ScaleType=Enum.ScaleType.Crop,
+    ZIndex=1, Active=false, Parent=contentPanel,
 })
 
 -- ══════════════════════════════════════════════════════
---  MIKKA HUB  —  Bold redesigned header
+--  MIKKA HUB  —  Redesigned 2026 Header
 -- ══════════════════════════════════════════════════════
 local cpHeader = New("Frame", {
     Size=UDim2.new(1,0,0,72),
-    BackgroundColor3=Color3.fromRGB(28,6,20),
+    BackgroundColor3=Color3.fromRGB(22,4,17),
     BorderSizePixel=0, Parent=contentPanel,
+    ZIndex=2,
 })
-Corner(cpHeader, 18)
--- Cover bottom corners so header blends into panel
+Corner(cpHeader, 20)
 New("Frame", {
-    Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,1,-20),
-    BackgroundColor3=Color3.fromRGB(28,6,20), BorderSizePixel=0, Parent=cpHeader,
+    Size=UDim2.new(1,0,0,22), Position=UDim2.new(0,0,1,-22),
+    BackgroundColor3=Color3.fromRGB(22,4,17), BorderSizePixel=0, Parent=cpHeader, ZIndex=2,
 })
--- Gradient shimmer bar across the top
+-- Top shimmer bar (animated gradient)
 local headerAccentBar = New("Frame", {
-    Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=cpHeader,
+    Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0,0),
+    BackgroundColor3=Color3.fromRGB(255,90,165), BorderSizePixel=0, Parent=cpHeader, ZIndex=3,
 })
-Corner(headerAccentBar, 3)
+Corner(headerAccentBar, 2)
 do
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,230)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(200,80,255)),
+        ColorSequenceKeypoint.new(0.35,Color3.fromRGB(255,190,230)),
+        ColorSequenceKeypoint.new(0.65,Color3.fromRGB(230,90,255)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(255,60,160)),
     })
     grad.Rotation = 0
     grad.Parent = headerAccentBar
+    -- Animate the shimmer
+    task.spawn(function()
+        local t = 0
+        while headerAccentBar.Parent do
+            t = t + task.wait(0.05)
+            grad.Offset = Vector2.new(math.sin(t*0.5)*0.3, 0)
+        end
+    end)
 end
 
--- Logo image (left side, circular)
+-- Logo (left side, circular with glow ring)
 local headerLogo = New("ImageLabel", {
-    Size=UDim2.new(0,48,0,48), Position=UDim2.new(0,12,0,12),
-    BackgroundColor3=Color3.fromRGB(60,12,40),
-    Image=_loadLogoAsset(),
-    ScaleType=Enum.ScaleType.Fit,
-    Parent=cpHeader,
+    Size=UDim2.new(0,46,0,46), Position=UDim2.new(0,12,0,13),
+    BackgroundColor3=Color3.fromRGB(40,8,30),
+    Image=_loadLogoAsset(), ScaleType=Enum.ScaleType.Fit,
+    Parent=cpHeader, ZIndex=3,
 })
-Corner(headerLogo, 24)
-Stroke(headerLogo, Color3.fromRGB(255,105,170), 2, 0.1)
+Corner(headerLogo, 23)
+Stroke(headerLogo, Color3.fromRGB(255,110,180), 2, 0.05)
 
--- MIKKA HUB — large, bold, prominent brand name
+-- MIKKA HUB brand label
 local brandLabel = New("TextLabel", {
-    Size=UDim2.new(0,200,0,34), Position=UDim2.new(0,70,0,8),
+    Size=UDim2.new(0,200,0,32), Position=UDim2.new(0,68,0,9),
     Text="MIKKA HUB",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold,
-    TextSize=22,
-    BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left,
-    RichText=false,
-    Parent=cpHeader,
+    Font=Enum.Font.GothamBold, TextSize=21,
+    BackgroundTransparency=1, TextXAlignment=Enum.TextXAlignment.Left,
+    RichText=false, Parent=cpHeader, ZIndex=3,
 })
 do
     local grad2 = Instance.new("UIGradient")
     grad2.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,220,240)),
-        ColorSequenceKeypoint.new(0.55,Color3.fromRGB(255,130,200)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(210,100,255)),
+        ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,225,242)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,135,205)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(220,100,255)),
     })
     grad2.Rotation = 0
     grad2.Parent = brandLabel
 end
 
--- Tab-name subtitle below brand
-local cpTitle = New("TextLabel", {
-    Size=UDim2.new(0,200,0,20), Position=UDim2.new(0,72,0,42),
-    Text="🐾  Brainrots",
-    TextColor3=Color3.fromRGB(255,150,200),
-    Font=Enum.Font.Gotham,
-    TextSize=12,
-    BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Left,
-    Parent=cpHeader,
+-- Animated version badge
+local versionBadge = New("Frame", {
+    Size=UDim2.new(0,46,0,16), Position=UDim2.new(0,68,0,42),
+    BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=cpHeader, ZIndex=3,
+})
+Corner(versionBadge, 8)
+do
+    local vbg = Instance.new("UIGradient")
+    vbg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,175)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,40,210)),
+    })
+    vbg.Rotation = 45
+    vbg.Parent = versionBadge
+end
+New("TextLabel", {
+    Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text="v2.0",
+    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
+    TextSize=10, TextXAlignment=Enum.TextXAlignment.Center, Parent=versionBadge, ZIndex=4,
 })
 
--- Discord button (top-right corner of header) — pink-themed with Discord logo
+-- Tab subtitle
+local cpTitle = New("TextLabel", {
+    Size=UDim2.new(0,200,0,18), Position=UDim2.new(0,120,0,43),
+    Text="🐾  Brainrots", TextColor3=Color3.fromRGB(200,120,180),
+    Font=Enum.Font.Gotham, TextSize=11,
+    BackgroundTransparency=1, TextXAlignment=Enum.TextXAlignment.Left,
+    Parent=cpHeader, ZIndex=3,
+})
+
+-- Discord button (top-right, modernised pill)
 local discordBtn = New("TextButton", {
-    Size=UDim2.new(0,110,0,34), Position=UDim2.new(1,-118,0,18),
+    Size=UDim2.new(0,106,0,32), Position=UDim2.new(1,-114,0,20),
     BackgroundColor3=Color3.fromRGB(255,80,160),
     BorderSizePixel=0, AutoButtonColor=false, Text="",
-    Parent=cpHeader,
+    Parent=cpHeader, ZIndex=3,
 })
-Corner(discordBtn, 10)
-Stroke(discordBtn, Color3.fromRGB(255,200,230), 1.5, 0.05)
+Corner(discordBtn, 16)
+Stroke(discordBtn, Color3.fromRGB(255,210,235), 1, 0.1)
 do
     local dg = Instance.new("UIGradient")
     dg.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,180)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(220,60,160)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(180,40,200)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,105,185)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(185,40,210)),
     })
     dg.Rotation = 45
     dg.Parent = discordBtn
 end
--- Shine bar at top
 New("Frame", {
-    Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,3),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.6,
-    BorderSizePixel=0, Parent=discordBtn,
+    Size=UDim2.new(0.85,0,0,1), Position=UDim2.new(0.075,0,0,3),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.7,
+    BorderSizePixel=0, Parent=discordBtn, ZIndex=4,
 })
--- Discord "clyde" icon (simple speech bubble shape using a frame)
-local discIconFrame = New("Frame", {
+New("TextLabel", {
     Size=UDim2.new(0,22,0,22), Position=UDim2.new(0,7,0.5,-11),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.1,
-    BorderSizePixel=0, Parent=discordBtn,
-})
-Corner(discIconFrame, 7)
-New("TextLabel", {
-    Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text="󰙯",
-    TextColor3=Color3.fromRGB(255,80,160),
+    BackgroundTransparency=1, Text="💬",
     Font=Enum.Font.GothamBold, TextSize=13,
-    TextXAlignment=Enum.TextXAlignment.Center, Parent=discIconFrame,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=discordBtn, ZIndex=4,
 })
 New("TextLabel", {
-    Size=UDim2.new(1,-32,1,0), Position=UDim2.new(0,32,0,0),
+    Size=UDim2.new(1,-32,1,0), Position=UDim2.new(0,30,0,0),
     BackgroundTransparency=1, Text="Discord",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=13,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=discordBtn,
+    Font=Enum.Font.GothamBold, TextSize=12,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=discordBtn, ZIndex=4,
 })
 discordBtn.MouseEnter:Connect(function()
-    discordBtn.BackgroundColor3 = Color3.fromRGB(255,110,190)
+    Tween(discordBtn, {BackgroundColor3=Color3.fromRGB(255,120,195)}, 0.15)
 end)
 discordBtn.MouseLeave:Connect(function()
-    discordBtn.BackgroundColor3 = Color3.fromRGB(255,80,160)
+    Tween(discordBtn, {BackgroundColor3=Color3.fromRGB(255,80,160)}, 0.2)
 end)
 discordBtn.Activated:Connect(function()
     pcall(function() setclipboard("https://discord.gg/Rfb9NPuGZv") end)
@@ -3327,6 +3372,14 @@ if savedWindowPos then
         win.Position = UDim2.new(0, px, 0, py)
     end)
 end
+-- ── Entry animation: slide in + fade ──────────────────
+task.defer(function()
+    local entryPos = win.Position
+    win.Position = UDim2.new(entryPos.X.Scale, entryPos.X.Offset - 50, entryPos.Y.Scale, entryPos.Y.Offset)
+    pcall(function() sg.GroupTransparency = 1 end)
+    Tween(win, {Position = entryPos}, 0.4, Enum.EasingStyle.Quint)
+    pcall(function() Tween(sg, {GroupTransparency = 0}, 0.35, Enum.EasingStyle.Quint) end)
+end)
 do
     local _winPosDebounce = nil
     win:GetPropertyChangedSignal("Position"):Connect(function()
@@ -3372,23 +3425,24 @@ for _, page in ipairs({brainrotsPage, tradingPage, miscPage, basePage}) do
 end
 
 local function _syncWinHeight(h)
-    -- sidebar and contentPanel grow to match content height
     local total = 72 + h + 16
-    -- Minimum height: 4 nav btns end at y=276, toggle at bottom-36, need 276+80=356 min, use 380
     local MIN_HEIGHT = 380
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
-    -- Cap max height to 80% of screen so it doesn't go off-screen
     local screenH = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.Y or 800
     local MAX_HEIGHT = math.floor(screenH * 0.82)
     if total > MAX_HEIGHT then total = MAX_HEIGHT end
-    contentPanel.Size = UDim2.new(0,CONTENT_W,0,total)
-    sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
-    win.Size          = UDim2.new(0,WIN_W,0,total)
-    -- reposition collapse button (logo button)
+
+    sidebar.Size = UDim2.new(0,SIDEBAR_W,0,total)
     _guiToggleBtn.Position = UDim2.new(0.5,-23,1,-36)
-    -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
         btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
+    end
+
+    if contentVisible then
+        Tween(contentPanel, {Size=UDim2.new(0,CONTENT_W,0,total)}, 0.2, Enum.EasingStyle.Quint)
+        Tween(win, {Size=UDim2.new(0,WIN_W,0,total)}, 0.2, Enum.EasingStyle.Quint)
+    else
+        win.Size = UDim2.new(0,SIDEBAR_W,0,total)
     end
 end
 
@@ -3411,53 +3465,71 @@ do
     end
 end
 
--- Collapse toggle
-_guiToggleBtn.Activated:Connect(function()
-    contentVisible = not contentVisible
-    contentPanel.Visible = contentVisible
+-- ── Animated open / close toggle ──────────────────────
+-- contentPanel is hidden by sliding its size to 0 width, not by Visible toggle,
+-- so it can animate smoothly and the sidebar always stays on screen.
+local _toggleBusy = false
 
-    if contentVisible then
-        -- OPEN state
-        _guiToggleBtn.Text = "◀◀"
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,60,140)
-        pcall(function()
-            local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
-            if tg then
-                tg.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(200,30,200)),
-                })
-            end
-        end)
+local function _openContent()
+    if _toggleBusy then return end
+    _toggleBusy = true
+    contentVisible = true
+    contentPanel.Visible = true
+    _guiToggleBtn.Text = "‹‹"
+    pcall(function()
+        local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
+        if tg then
+            tg.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255,90,165)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(210,35,210)),
+            })
+        end
+    end)
+    -- Slide content panel in from 0 width
+    Tween(contentPanel, {Size=UDim2.new(0,CONTENT_W,0,contentPanel.AbsoluteSize.Y > 10 and contentPanel.AbsoluteSize.Y or 380)}, 0.28, Enum.EasingStyle.Quint)
+    -- Slide win out to full width
+    Tween(win, {Size=UDim2.new(0,WIN_W,0,win.AbsoluteSize.Y)}, 0.28, Enum.EasingStyle.Quint)
+    task.delay(0.28, function()
+        _toggleBusy = false
         task.defer(function()
             task.wait(0.05)
             _forceResize()
         end)
-    else
-        -- CLOSED state
-        _guiToggleBtn.Text = "▶▶"
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(48,10,34)
-        pcall(function()
-            local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
-            if tg then
-                tg.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(55,12,40)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(35,8,26)),
-                })
-            end
-        end)
-        local MIN_HEIGHT = 380
-        contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
-        sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
-        win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-24,1,-38)
-        for i, btn in ipairs(navBtns) do
-            btn.Position = UDim2.new(0.5,-24,0,68+(i-1)*56)
+    end)
+end
+
+local function _closeContent()
+    if _toggleBusy then return end
+    _toggleBusy = true
+    contentVisible = false
+    _guiToggleBtn.Text = "››"
+    pcall(function()
+        local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
+        if tg then
+            tg.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50,10,38)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(30,6,22)),
+            })
         end
+    end)
+    -- Slide content panel out (collapse to 0 width)
+    local curH = contentPanel.AbsoluteSize.Y
+    Tween(contentPanel, {Size=UDim2.new(0,0,0,curH)}, 0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    Tween(win, {Size=UDim2.new(0,SIDEBAR_W,0,curH)}, 0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    task.delay(0.25, function()
+        contentPanel.Visible = false
+        _toggleBusy = false
+    end)
+end
+
+_guiToggleBtn.Activated:Connect(function()
+    if contentVisible then
+        _closeContent()
+    else
+        _openContent()
     end
 end)
 
--- ── Tab switching with sidebar buttons ────────────────
 local CP_TITLES = {
     Brainrots="🐾  Brainrots",
     Trading  ="💸  Trading",
@@ -3465,7 +3537,6 @@ local CP_TITLES = {
     Misc     ="⚙️  Settings",
 }
 -- tabBar is a dummy invisible frame — pages use it as parent via LayoutOrder
--- We keep the variable so all downstream code that references tabBar still works
 local tabBar = New("Frame", {
     Size=UDim2.new(0,0,0,0), BackgroundTransparency=1,
     BorderSizePixel=0, LayoutOrder=0, Visible=false, Parent=mainContent,
@@ -3475,6 +3546,18 @@ local tabBrainrots = navBtns[1]
 local tabTrading   = navBtns[2]
 local tabBase      = navBtns[3]
 local tabMisc      = navBtns[4]
+
+-- Active indicator bar on the left edge of each nav button
+local navActiveIndicators = {}
+for i, btn in ipairs(navBtns) do
+    local ind = New("Frame", {
+        Size=UDim2.new(0,3,0,22), Position=UDim2.new(0,-1,0.5,-11),
+        BackgroundColor3=Color3.fromRGB(255,100,175), BorderSizePixel=0,
+        BackgroundTransparency=1, Parent=btn,
+    })
+    Corner(ind, 2)
+    navActiveIndicators[i] = ind
+end
 
 local brainrotsPage = New("Frame", {
     Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y,
@@ -3584,31 +3667,36 @@ local function SetTab(tab)
     cpTitle.Text = CP_TITLES[tab] or tab
     for i, btn in ipairs(navBtns) do
         local active = NAV_NAMES[i] == tab
-        btn.BackgroundColor3 = active and Color3.fromRGB(255,60,140) or Color3.fromRGB(38,8,28)
-        btn.TextColor3       = active and Color3.fromRGB(255,255,255)  or Color3.fromRGB(255,155,200)
-        if active then
-            pcall(function() Stroke(btn, Color3.fromRGB(255,200,230), 2, 0.0) end)
+        Tween(btn, {
+            BackgroundColor3 = active and Color3.fromRGB(50,10,38) or Color3.fromRGB(32,6,24),
+            TextColor3       = active and Color3.fromRGB(255,215,235) or Color3.fromRGB(200,120,175),
+        }, 0.18)
+        -- Animate the active side indicator
+        if navActiveIndicators[i] then
+            Tween(navActiveIndicators[i], {BackgroundTransparency = active and 0 or 1}, 0.2)
+        end
+        -- Update stroke
+        for _, c in btn:GetChildren() do
+            if c:IsA("UIStroke") then
+                Tween(c, {Transparency = active and 0.1 or 0.5}, 0.18)
+            end
         end
     end
     -- Recalculate window height for the newly visible tab
     if contentVisible then
         task.defer(function()
-            task.wait(0.08) -- Let layout update fully
-            _forceResize()
-        end)
-    else
-        -- If switching tabs while collapsed, auto-expand
-        contentVisible = true
-        contentPanel.Visible = true
-        _guiToggleBtn.Text = "◀◀"
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
-        task.defer(function()
             task.wait(0.08)
             _forceResize()
         end)
+    else
+        -- If switching tabs while collapsed, auto-expand with animation
+        _openContent()
+        task.defer(function()
+            task.wait(0.35)
+            _forceResize()
+        end)
     end
-    -- Force toggle button to stay at bottom of sidebar
-    _guiToggleBtn.Position = UDim2.new(0.5, -24, 1, -38)
+    _guiToggleBtn.Position = UDim2.new(0.5, -23, 1, -36)
 end
 SetTab("Brainrots")
 navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
