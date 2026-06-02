@@ -1,3 +1,10 @@
+-- ═══════════════════════════════════════════════════
+--  SAFE LOAD GUARD — prevents "nil value called" on line 1
+-- ═══════════════════════════════════════════════════
+local game = game or (workspace and workspace.Parent)
+if not game or typeof(game) ~= "Instance" then
+    repeat task.wait() until game and typeof(game) == "Instance"
+end
 if not game:IsLoaded() then
     repeat task.wait() until game:IsLoaded()
 end
