@@ -3130,10 +3130,14 @@ local toggleGlow = New("Frame", {
 
 -- Hover effects for toggle
 _guiToggleBtn.MouseEnter:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,120,180)
+    _guiToggleBtn.BackgroundColor3 = contentVisible
+        and Color3.fromRGB(255,100,170)
+        or  Color3.fromRGB(70,16,50)
 end)
 _guiToggleBtn.MouseLeave:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
+    _guiToggleBtn.BackgroundColor3 = contentVisible
+        and Color3.fromRGB(255,60,140)
+        or  Color3.fromRGB(48,10,34)
 end)
 
 MakeDraggable(win, sidebar)
@@ -3240,33 +3244,49 @@ local cpTitle = New("TextLabel", {
     Parent=cpHeader,
 })
 
--- Version badge (top-right)
-local versionBadge = New("Frame", {
-    Size=UDim2.new(0,72,0,22), Position=UDim2.new(1,-82,0,10),
-    BackgroundColor3=Color3.fromRGB(255,60,140),
-    BorderSizePixel=0, Parent=cpHeader,
+-- Discord button (top-right corner of header)
+local discordBtn = New("TextButton", {
+    Size=UDim2.new(0,92,0,30), Position=UDim2.new(1,-100,0,20),
+    BackgroundColor3=Color3.fromRGB(88,101,242),
+    BorderSizePixel=0, AutoButtonColor=false, Text="",
+    Parent=cpHeader,
 })
-Corner(versionBadge, 11)
+Corner(discordBtn, 9)
+Stroke(discordBtn, Color3.fromRGB(160,170,255), 1.5, 0.1)
 do
-    local vg = Instance.new("UIGradient")
-    vg.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200,40,255)),
+    local dg = Instance.new("UIGradient")
+    dg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(110,125,255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(65,80,210)),
     })
-    vg.Rotation = 45
-    vg.Parent = versionBadge
+    dg.Rotation = 90
+    dg.Parent = discordBtn
 end
 New("TextLabel", {
-    Size=UDim2.new(1,0,1,0),
-    Text="v2  ✦  2026",
-    TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold,
-    TextSize=11,
-    BackgroundTransparency=1,
-    TextXAlignment=Enum.TextXAlignment.Center,
-    Parent=versionBadge,
+    Size=UDim2.new(0,24,1,0), Position=UDim2.new(0,4,0,0),
+    BackgroundTransparency=1, Text="🔗",
+    Font=Enum.Font.GothamBold, TextSize=13,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=discordBtn,
 })
-Stroke(versionBadge, Color3.fromRGB(255,200,230), 1, 0.15)
+New("TextLabel", {
+    Size=UDim2.new(1,-28,1,0), Position=UDim2.new(0,26,0,0),
+    BackgroundTransparency=1, Text="Discord",
+    TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold, TextSize=12,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=discordBtn,
+})
+discordBtn.MouseEnter:Connect(function()
+    discordBtn.BackgroundColor3 = Color3.fromRGB(110,125,255)
+end)
+discordBtn.MouseLeave:Connect(function()
+    discordBtn.BackgroundColor3 = Color3.fromRGB(88,101,242)
+end)
+discordBtn.Activated:Connect(function()
+    pcall(function() setclipboard("https://discord.gg/Rfb9NPuGZv") end)
+    pcall(function()
+        SetStatus("✓ Discord link copied!", Color3.fromRGB(100,120,255), 3)
+    end)
+end)
 
 -- Glow divider under header
 local headerDivider = New("Frame", {
@@ -3382,28 +3402,43 @@ _guiToggleBtn.Activated:Connect(function()
     contentVisible = not contentVisible
     contentPanel.Visible = contentVisible
 
-    -- Update toggle appearance based on state
     if contentVisible then
-        -- OPEN state: bright pink
+        -- OPEN state
         _guiToggleBtn.Text = "◀◀"
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
-        -- Resize to fit content
+        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,60,140)
+        pcall(function()
+            local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
+            if tg then
+                tg.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
+                    ColorSequenceKeypoint.new(1, Color3.fromRGB(200,30,200)),
+                })
+            end
+        end)
         task.defer(function()
             task.wait(0.05)
             _forceResize()
         end)
     else
-        -- CLOSED state: dark muted
+        -- CLOSED state
         _guiToggleBtn.Text = "▶▶"
-        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(90,18,55)
-        -- Collapsed: fixed minimum height
+        _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(48,10,34)
+        pcall(function()
+            local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
+            if tg then
+                tg.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Color3.fromRGB(55,12,40)),
+                    ColorSequenceKeypoint.new(1, Color3.fromRGB(35,8,26)),
+                })
+            end
+        end)
         local MIN_HEIGHT = 380
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-23,1,-36)
+        _guiToggleBtn.Position = UDim2.new(0.5,-24,1,-38)
         for i, btn in ipairs(navBtns) do
-            btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
+            btn.Position = UDim2.new(0.5,-24,0,68+(i-1)*56)
         end
     end
 end)
@@ -3559,7 +3594,7 @@ local function SetTab(tab)
         end)
     end
     -- Force toggle button to stay at bottom of sidebar
-    _guiToggleBtn.Position = UDim2.new(0.5, -28, 1, -62)
+    _guiToggleBtn.Position = UDim2.new(0.5, -24, 1, -38)
 end
 SetTab("Brainrots")
 navBtns[1].Activated:Connect(function() SetTab("Brainrots") end)
@@ -3662,27 +3697,36 @@ local _triggerTradeNotif
 
 local listVisible = false
 local animalToggleBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(55,14,38),
+    Size=UDim2.new(1,0,0,44), BackgroundColor3=Color3.fromRGB(38,8,28),
     BorderSizePixel=0, Text="",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
-    TextSize=14, AutoButtonColor=false, LayoutOrder=2, Parent=brainrotsPage,
+    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.GothamBold,
+    TextSize=13, AutoButtonColor=false, LayoutOrder=2, Parent=brainrotsPage,
 })
-Corner(animalToggleBtn, 12)
-Stroke(animalToggleBtn, Color3.fromRGB(255,105,170), 1.5, 0.35)
+Corner(animalToggleBtn, 14)
+Stroke(animalToggleBtn, Color3.fromRGB(255,80,160), 2, 0.2)
+do
+    local atGrad = Instance.new("UIGradient")
+    atGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(55,12,40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(28,6,20)),
+    })
+    atGrad.Rotation = 90
+    atGrad.Parent = animalToggleBtn
+end
 New("TextLabel", {
-    Size=UDim2.new(0,30,1,0), Position=UDim2.new(0,0,0,0),
+    Size=UDim2.new(0,36,1,0), Position=UDim2.new(0,6,0,0),
     BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.FredokaOne, TextSize=18,
+    Font=Enum.Font.GothamBold, TextSize=20,
     TextXAlignment=Enum.TextXAlignment.Center, Parent=animalToggleBtn,
 })
 local _animalToggleLbl = New("TextLabel", {
-    Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,30,0,0),
+    Size=UDim2.new(1,-46,1,0), Position=UDim2.new(0,40,0,0),
     BackgroundTransparency=1, Text="▾  Select Animal",
-    TextColor3=Color3.fromRGB(255,220,240), Font=Enum.Font.FredokaOne,
+    TextColor3=Color3.fromRGB(255,210,235), Font=Enum.Font.GothamBold,
     TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=animalToggleBtn,
 })
-animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(75,18,52) end)
-animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(55,14,38) end)
+animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(65,14,48) end)
+animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(38,8,28) end)
 
 local listContainer = New("Frame", {
     Size=UDim2.new(1,0,0,320),
@@ -3927,92 +3971,133 @@ end)
 _refreshMultiToggle()
 
 local traitsBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(48,12,32),
-    BorderSizePixel=0, Text="▼  Traits",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
-    TextSize=14, AutoButtonColor=false, LayoutOrder=4, Parent=brainrotsPage,
+    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(30,8,22),
+    BorderSizePixel=0, Text="",
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextSize=13, AutoButtonColor=false, LayoutOrder=4, Parent=brainrotsPage,
 })
-Corner(traitsBtn, 6)
-Stroke(traitsBtn, Color3.fromRGB(80,20,55), 1, 0.2)
-traitsBtn.MouseEnter:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(65,16,44) end)
-traitsBtn.MouseLeave:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
+Corner(traitsBtn, 12)
+Stroke(traitsBtn, Color3.fromRGB(180,50,120), 1.5, 0.2)
+do
+    local tbGrad = Instance.new("UIGradient")
+    tbGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(50,12,36)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(24,6,18)),
+    })
+    tbGrad.Rotation = 90
+    tbGrad.Parent = traitsBtn
+end
+New("TextLabel", {
+    Size=UDim2.new(0,32,1,0), Position=UDim2.new(0,8,0,0),
+    BackgroundTransparency=1, Text="✨",
+    Font=Enum.Font.GothamBold, TextSize=16,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=traitsBtn,
+})
+local _traitsBtnLbl = New("TextLabel", {
+    Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
+    BackgroundTransparency=1, Text="▾  Traits",
+    TextColor3=Color3.fromRGB(255,200,235), Font=Enum.Font.GothamBold,
+    TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=traitsBtn,
+})
+traitsBtn.MouseEnter:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(60,14,44) end)
+traitsBtn.MouseLeave:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(30,8,22) end)
 local tmBtn = traitsBtn
 
 local spawnCount = 1
 local qtyRow = New("Frame", {
-    Size=UDim2.new(1,0,0,38), BackgroundColor3=Color3.fromRGB(40,10,28),
+    Size=UDim2.new(1,0,0,44), BackgroundColor3=Color3.fromRGB(22,5,16),
     BorderSizePixel=0, LayoutOrder=8, Parent=brainrotsPage,
 })
-Corner(qtyRow, 10)
-Stroke(qtyRow, Color3.fromRGB(180,60,120), 1.5, 0.3)
-
-local minusBtn = New("TextButton", {
-    Size=UDim2.new(0,44,1,-6), Position=UDim2.new(0,3,0,3),
-    BackgroundColor3=Color3.fromRGB(90,20,55),
-    BorderSizePixel=0, Text="−", TextColor3=Color3.fromRGB(255,180,215),
-    Font=Enum.Font.FredokaOne, TextSize=20,
-    AutoButtonColor=false, Parent=qtyRow,
-})
-Corner(minusBtn, 8)
-
+Corner(qtyRow, 14)
+Stroke(qtyRow, Color3.fromRGB(255,80,160), 1.5, 0.2)
+do
+    local qg = Instance.new("UIGradient")
+    qg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(38,8,28)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(18,4,14)),
+    })
+    qg.Rotation = 90
+    qg.Parent = qtyRow
+end
+-- Quantity label center
 local qtyLbl = New("TextLabel", {
-    Size=UDim2.new(1,-100,1,0), Position=UDim2.new(0,50,0,0),
+    Size=UDim2.new(1,-110,1,0), Position=UDim2.new(0,55,0,0),
     BackgroundTransparency=1, Text="× 1",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
-    TextSize=14, Parent=qtyRow,
+    TextColor3=Color3.fromRGB(255,235,245), Font=Enum.Font.GothamBold,
+    TextSize=15, Parent=qtyRow,
 })
-
-local plusBtn = New("TextButton", {
-    Size=UDim2.new(0,44,1,-6), Position=UDim2.new(1,-47,0,3),
-    BackgroundColor3=Color3.fromRGB(90,20,55),
-    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(255,180,215),
-    Font=Enum.Font.FredokaOne, TextSize=20,
+local minusBtn = New("TextButton", {
+    Size=UDim2.new(0,48,0,34), Position=UDim2.new(0,4,0.5,-17),
+    BackgroundColor3=Color3.fromRGB(180,30,80),
+    BorderSizePixel=0, Text="−", TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold, TextSize=22,
     AutoButtonColor=false, Parent=qtyRow,
 })
-Corner(plusBtn, 8)
-
+Corner(minusBtn, 10)
+Stroke(minusBtn, Color3.fromRGB(255,100,160), 1.5, 0.2)
+local plusBtn = New("TextButton", {
+    Size=UDim2.new(0,48,0,34), Position=UDim2.new(1,-52,0.5,-17),
+    BackgroundColor3=Color3.fromRGB(20,180,80),
+    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.GothamBold, TextSize=22,
+    AutoButtonColor=false, Parent=qtyRow,
+})
+Corner(plusBtn, 10)
+Stroke(plusBtn, Color3.fromRGB(80,255,150), 1.5, 0.2)
 minusBtn.MouseButton1Click:Connect(function()
     spawnCount = math.max(1, spawnCount - 1); qtyLbl.Text = "× "..spawnCount
 end)
 plusBtn.MouseButton1Click:Connect(function()
     spawnCount = math.min(10, spawnCount + 1); qtyLbl.Text = "× "..spawnCount
 end)
-minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(130,30,75) end)
-minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(90,20,55) end)
-plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(130,30,75) end)
-plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(90,20,55) end)
+minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(220,40,100) end)
+minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(180,30,80) end)
+plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(30,210,100) end)
+plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(20,180,80) end)
 
 local spawnBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,46), BackgroundColor3=Color3.fromRGB(30,160,80),
+    Size=UDim2.new(1,0,0,52), BackgroundColor3=Color3.fromRGB(20,190,90),
     BorderSizePixel=0, Text="",
-    TextColor3=Color3.new(1,1,1), Font=Enum.Font.FredokaOne,
+    TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold,
     TextSize=15, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
 })
-Corner(spawnBtn, 10)
-Stroke(spawnBtn, Color3.fromRGB(100,255,160), 1.5, 0.3)
--- Gradient shine overlay
+Corner(spawnBtn, 14)
+Stroke(spawnBtn, Color3.fromRGB(80,255,150), 2, 0.15)
+do
+    local spGrad = Instance.new("UIGradient")
+    spGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30,220,100)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(10,160,70)),
+    })
+    spGrad.Rotation = 90
+    spGrad.Parent = spawnBtn
+end
+-- Top shine
 New("Frame", {
-    Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.88,
+    Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,6),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.7,
     BorderSizePixel=0, Parent=spawnBtn,
 })
 -- Icon
 New("TextLabel", {
-    Size=UDim2.new(0,36,1,0), Position=UDim2.new(0,0,0,0),
+    Size=UDim2.new(0,44,1,0), Position=UDim2.new(0,6,0,0),
     BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.FredokaOne, TextSize=20,
+    Font=Enum.Font.GothamBold, TextSize=22,
     TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
 -- Label
 New("TextLabel", {
-    Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
+    Size=UDim2.new(1,-54,1,0), Position=UDim2.new(0,50,0,0),
     BackgroundTransparency=1, Text="SPAWN ONTO PODIUM",
-    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.FredokaOne,
+    TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
     TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
-
-spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(40,190,100) end)
-spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(30,160,80) end)
+spawnBtn.MouseEnter:Connect(function()
+    spawnBtn.BackgroundColor3=Color3.fromRGB(40,230,110)
+end)
+spawnBtn.MouseLeave:Connect(function()
+    spawnBtn.BackgroundColor3=Color3.fromRGB(20,190,90)
+end)
 
 -- ── Status label (pill card style) ──────────────────────
 local statusCard = New("Frame", {
@@ -4110,11 +4195,11 @@ local function _updateTraitsBtnText()
     end
     local arrow = traitsVisible and "▲" or "▼"
     if #sel == 0 then
-        traitsBtn.Text = arrow .. "  Traits"
+        if _traitsBtnLbl then _traitsBtnLbl.Text = arrow .. "  Traits" end
     else
         local listed = table.concat(sel, ", ")
         if #listed > 24 then listed = #sel .. " selected" end
-        traitsBtn.Text = arrow .. "  Traits  •  " .. listed
+        if _traitsBtnLbl then _traitsBtnLbl.Text = arrow .. "  Traits  •  " .. listed end
     end
 end
 
@@ -4165,15 +4250,36 @@ for _,trait in ipairs(TRAITS) do
 end
 
 local mutationsBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(48,12,32),
-    BorderSizePixel=0, Text="▼  Mutation",
-    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
-    TextSize=14, AutoButtonColor=false, LayoutOrder=6, Parent=brainrotsPage,
+    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(30,8,22),
+    BorderSizePixel=0, Text="",
+    TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.GothamBold,
+    TextSize=13, AutoButtonColor=false, LayoutOrder=6, Parent=brainrotsPage,
 })
-Corner(mutationsBtn, 6)
-Stroke(mutationsBtn, Color3.fromRGB(80,20,55), 1, 0.2)
-mutationsBtn.MouseEnter:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(65,16,44) end)
-mutationsBtn.MouseLeave:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(48,12,32) end)
+Corner(mutationsBtn, 12)
+Stroke(mutationsBtn, Color3.fromRGB(160,40,200), 1.5, 0.2)
+do
+    local mbGrad = Instance.new("UIGradient")
+    mbGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(50,12,36)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(24,6,18)),
+    })
+    mbGrad.Rotation = 90
+    mbGrad.Parent = mutationsBtn
+end
+New("TextLabel", {
+    Size=UDim2.new(0,32,1,0), Position=UDim2.new(0,8,0,0),
+    BackgroundTransparency=1, Text="💎",
+    Font=Enum.Font.GothamBold, TextSize=16,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=mutationsBtn,
+})
+local _mutBtnLbl = New("TextLabel", {
+    Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
+    BackgroundTransparency=1, Text="▾  Mutation",
+    TextColor3=Color3.fromRGB(220,160,255), Font=Enum.Font.GothamBold,
+    TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=mutationsBtn,
+})
+mutationsBtn.MouseEnter:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(55,12,45) end)
+mutationsBtn.MouseLeave:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(30,8,22) end)
 
 local mutationsVisible = false
 local mutPopup = New("Frame", {
@@ -4188,9 +4294,9 @@ Stroke(mutPopup, Color3.fromRGB(180,60,120), 1, 0.2)
 local function _updateMutationsBtnText()
     local arrow = mutationsVisible and "▲" or "▼"
     if not selectedMutation or selectedMutation == "None" then
-        mutationsBtn.Text = arrow .. "  Mutation"
+        if _mutBtnLbl then _mutBtnLbl.Text = arrow .. "  Mutation" end
     else
-        mutationsBtn.Text = arrow .. "  Mutation  •  " .. selectedMutation
+        if _mutBtnLbl then _mutBtnLbl.Text = arrow .. "  Mutation  •  " .. selectedMutation end
     end
 end
 
@@ -4977,24 +5083,54 @@ do
     Stroke(skinListPanel, Color3.fromRGB(180,60,120), 1, 0.2)
 
     local skinApplyBtn = New("TextButton", {
-        Size=UDim2.new(1,0,0,32), BackgroundColor3=BTNGRN,
-        Text="Apply Skin", TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.FredokaOne, TextSize=14, AutoButtonColor=false,
+        Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(20,180,80),
+        Text="", TextColor3=Color3.fromRGB(255,255,255),
+        Font=Enum.Font.GothamBold, TextSize=14, AutoButtonColor=false,
         BorderSizePixel=0, LayoutOrder=4, Parent=basePage,
     })
-    Corner(skinApplyBtn, 5)
-    skinApplyBtn.MouseEnter:Connect(function() skinApplyBtn.BackgroundColor3=Color3.fromRGB(60,200,100) end)
-    skinApplyBtn.MouseLeave:Connect(function() skinApplyBtn.BackgroundColor3=BTNGRN end)
+    Corner(skinApplyBtn, 12)
+    Stroke(skinApplyBtn, Color3.fromRGB(80,255,150), 1.5, 0.2)
+    do
+        local ag = Instance.new("UIGradient")
+        ag.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(30,210,95)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(10,150,60)),
+        })
+        ag.Rotation = 90; ag.Parent = skinApplyBtn
+    end
+    New("TextLabel", {
+        Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
+        Text="✓  Apply Skin", TextColor3=Color3.fromRGB(255,255,255),
+        Font=Enum.Font.GothamBold, TextSize=14,
+        TextXAlignment=Enum.TextXAlignment.Center, Parent=skinApplyBtn,
+    })
+    skinApplyBtn.MouseEnter:Connect(function() skinApplyBtn.BackgroundColor3=Color3.fromRGB(35,225,105) end)
+    skinApplyBtn.MouseLeave:Connect(function() skinApplyBtn.BackgroundColor3=Color3.fromRGB(20,180,80) end)
 
     local skinRemoveBtn = New("TextButton", {
-        Size=UDim2.new(1,0,0,32), BackgroundColor3=BTNRED,
-        Text="Reset Base", TextColor3=Color3.fromRGB(255,255,255),
-        Font=Enum.Font.FredokaOne, TextSize=14, AutoButtonColor=false,
+        Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(210,40,70),
+        Text="", TextColor3=Color3.fromRGB(255,255,255),
+        Font=Enum.Font.GothamBold, TextSize=14, AutoButtonColor=false,
         BorderSizePixel=0, LayoutOrder=5, Parent=basePage,
     })
-    Corner(skinRemoveBtn, 5)
-    skinRemoveBtn.MouseEnter:Connect(function() skinRemoveBtn.BackgroundColor3=Color3.fromRGB(220,60,60) end)
-    skinRemoveBtn.MouseLeave:Connect(function() skinRemoveBtn.BackgroundColor3=BTNRED end)
+    Corner(skinRemoveBtn, 12)
+    Stroke(skinRemoveBtn, Color3.fromRGB(255,120,150), 1.5, 0.2)
+    do
+        local rg = Instance.new("UIGradient")
+        rg.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(240,50,80)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(175,25,50)),
+        })
+        rg.Rotation = 90; rg.Parent = skinRemoveBtn
+    end
+    New("TextLabel", {
+        Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
+        Text="✕  Reset Base", TextColor3=Color3.fromRGB(255,255,255),
+        Font=Enum.Font.GothamBold, TextSize=14,
+        TextXAlignment=Enum.TextXAlignment.Center, Parent=skinRemoveBtn,
+    })
+    skinRemoveBtn.MouseEnter:Connect(function() skinRemoveBtn.BackgroundColor3=Color3.fromRGB(240,55,90) end)
+    skinRemoveBtn.MouseLeave:Connect(function() skinRemoveBtn.BackgroundColor3=Color3.fromRGB(210,40,70) end)
 
     local skinListFrame = New("ScrollingFrame", {
         Size=UDim2.new(1,0,1,0), Position=UDim2.new(0,0,0,0),
