@@ -3083,37 +3083,36 @@ for i, icon in ipairs(NAV_ICONS) do
     navBtns[i] = btn
 end
 
--- Collapse button at bottom of sidebar — Logo Toggle
-local _guiToggleBtn = New("ImageButton", {
-    Size=UDim2.new(0,56,0,56),
-    Position=UDim2.new(0.5,-28,1,-62),
+-- Collapse button at bottom of sidebar — clearly separate from nav buttons
+local _guiToggleBtn = New("TextButton", {
+    Size=UDim2.new(0,46,0,28),
+    Position=UDim2.new(0.5,-23,1,-36),
     BackgroundColor3=Color3.fromRGB(255,80,150),
-    Image=_loadLogoAsset(),
-    ScaleType=Enum.ScaleType.Fit,
+    Text="◀◀",
+    TextColor3=Color3.fromRGB(255,255,255),
+    Font=Enum.Font.FredokaOne, TextSize=13,
     AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
 })
-Corner(_guiToggleBtn, 28)
-Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 2, 0.15)
+Corner(_guiToggleBtn, 6)
+Stroke(_guiToggleBtn, Color3.fromRGB(255,200,225), 1.5, 0.2)
 
--- Glow effect behind logo
+-- Thin divider above toggle button
+New("Frame", {
+    Size=UDim2.new(0,40,0,1), Position=UDim2.new(0.5,-20,1,-42),
+    BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
+})
+
 local toggleGlow = New("Frame", {
-    Size=UDim2.new(1,6,1,6),
-    Position=UDim2.new(0,-3,0,-3),
-    BackgroundColor3=Color3.fromRGB(255,105,170),
-    BackgroundTransparency=0.5,
+    Size=UDim2.new(0,0,0,0), BackgroundTransparency=1,
     BorderSizePixel=0, Parent=_guiToggleBtn,
 })
-Corner(toggleGlow, 30)
-toggleGlow.ZIndex = _guiToggleBtn.ZIndex - 1
 
 -- Hover effects for toggle
 _guiToggleBtn.MouseEnter:Connect(function()
     _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,120,180)
-    toggleGlow.BackgroundTransparency = 0.2
 end)
 _guiToggleBtn.MouseLeave:Connect(function()
     _guiToggleBtn.BackgroundColor3 = contentVisible and Color3.fromRGB(255,80,150) or Color3.fromRGB(90,18,55)
-    toggleGlow.BackgroundTransparency = 0.5
 end)
 
 MakeDraggable(win, sidebar)
@@ -3124,20 +3123,20 @@ local contentPanel = New("Frame", {
     Position=UDim2.new(0,SIDEBAR_W+8,0,0),
     BackgroundColor3=Color3.fromRGB(30,8,20),
     BorderSizePixel=0, Parent=win,
-    ClipsDescendants=false,
+    ClipsDescendants=true,
     AutomaticSize=Enum.AutomaticSize.Y,
 })
 Corner(contentPanel, 18)
 Stroke(contentPanel, Color3.fromRGB(255,105,170), 1.5, 0.25)
 
--- Background watermark blended into content panel
+-- Background image overlay blended into content panel (fills panel, behind all content)
 New("ImageLabel", {
-    Size=UDim2.new(0.72,0,0.72,0),
-    Position=UDim2.new(0.14,0,0.14,0),
+    Size=UDim2.new(1,0,1,0),
+    Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
     Image=_loadLogoAsset(),
-    ImageTransparency=0.88,
-    ScaleType=Enum.ScaleType.Fit,
+    ImageTransparency=0.45,
+    ScaleType=Enum.ScaleType.Crop,
     ZIndex=1,
     Active=false,
     Parent=contentPanel,
@@ -3242,8 +3241,8 @@ end
 local function _syncWinHeight(h)
     -- sidebar and contentPanel grow to match content height
     local total = 52 + h + 16
-    -- Minimum height must fit all nav buttons (navBtn[4] at y=230 + height 46 = 276, plus toggle btn)
-    local MIN_HEIGHT = 400
+    -- Minimum height: 4 nav btns end at y=276, toggle at bottom-36, need 276+80=356 min, use 380
+    local MIN_HEIGHT = 380
     if total < MIN_HEIGHT then total = MIN_HEIGHT end
     -- Cap max height to 80% of screen so it doesn't go off-screen
     local screenH = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.Y or 800
@@ -3253,7 +3252,7 @@ local function _syncWinHeight(h)
     sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,total)
     win.Size          = UDim2.new(0,WIN_W,0,total)
     -- reposition collapse button (logo button)
-    _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
+    _guiToggleBtn.Position = UDim2.new(0.5,-23,1,-36)
     -- reposition nav buttons
     for i, btn in ipairs(navBtns) do
         btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
@@ -3286,26 +3285,24 @@ _guiToggleBtn.Activated:Connect(function()
 
     -- Update toggle appearance based on state
     if contentVisible then
-        -- OPEN state: bright pink with glow
+        -- OPEN state: bright pink
+        _guiToggleBtn.Text = "◀◀"
         _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
-        toggleGlow.BackgroundColor3 = Color3.fromRGB(255,105,170)
-        toggleGlow.BackgroundTransparency = 0.5
         -- Resize to fit content
         task.defer(function()
             task.wait(0.05)
             _forceResize()
         end)
     else
-        -- CLOSED state: dark muted with dim glow
+        -- CLOSED state: dark muted
+        _guiToggleBtn.Text = "▶▶"
         _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(90,18,55)
-        toggleGlow.BackgroundColor3 = Color3.fromRGB(60,12,35)
-        toggleGlow.BackgroundTransparency = 0.8
         -- Collapsed: fixed minimum height
-        local MIN_HEIGHT = 400
+        local MIN_HEIGHT = 380
         contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
         sidebar.Size      = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
         win.Size          = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        _guiToggleBtn.Position = UDim2.new(0.5,-28,1,-62)
+        _guiToggleBtn.Position = UDim2.new(0.5,-23,1,-36)
         for i, btn in ipairs(navBtns) do
             btn.Position = UDim2.new(0.5,-23,0,68+(i-1)*54)
         end
@@ -3452,6 +3449,7 @@ local function SetTab(tab)
         -- If switching tabs while collapsed, auto-expand
         contentVisible = true
         contentPanel.Visible = true
+        _guiToggleBtn.Text = "◀◀"
         _guiToggleBtn.BackgroundColor3 = Color3.fromRGB(255,80,150)
         task.defer(function()
             task.wait(0.08)
