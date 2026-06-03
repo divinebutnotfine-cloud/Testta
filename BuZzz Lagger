@@ -1,1157 +1,914 @@
+-- deob by massive 
+
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
-local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
--- WebSocket Check
-local WebSocket = nil
-if syn and syn.websocket then
-    WebSocket = syn.websocket.connect
-elseif WebSocket and WebSocket.connect then
-    WebSocket = WebSocket.connect
+local player = Players.LocalPlayer
+
+-- ========== UTILITIES ==========
+local function getPlayerAvatar(userId)
+    return "rbxthumb://type=AvatarHeadShot&id=" .. userId .. "&w=150&h=150"
 end
-if not WebSocket and not getgenv().WebSocket then
-    if typeof(WebSocket) ~= "function" then
-        warn("WebSocket not supported.")
+
+local function formatValue(val)
+    -- Convert number to short string (e.g., 1.3B, 500M)
+    if val >= 1e9 then return string.format("%.1fB", val / 1e9)
+    elseif val >= 1e6 then return string.format("%.1fM", val / 1e6)
+    elseif val >= 1e3 then return string.format("%.1fK", val / 1e3)
+    else return tostring(val) end
+end
+
+-- ========== CREATE MAIN GUI ==========
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "VyseDuels"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- Toggle button (main menu opener)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 164, 0, 36)
+toggleButton.Position = UDim2.new(0.5, -82, 0, 12)
+toggleButton.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+toggleButton.Text = ""
+toggleButton.AutoButtonColor = false
+toggleButton.Visible = true
+toggleButton.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 18)
+toggleCorner.Parent = toggleButton
+
+local toggleStroke = Instance.new("UIStroke")
+toggleStroke.Color = Color3.fromRGB(38, 38, 38)
+toggleStroke.Thickness = 1
+toggleStroke.Parent = toggleButton
+
+local toggleIcon = Instance.new("ImageLabel")
+toggleIcon.Image = "rbxassetid://120042443836261"
+toggleIcon.Size = UDim2.new(0, 22, 0, 22)
+toggleIcon.Position = UDim2.new(0, 9, 0.5, -11)
+toggleIcon.BackgroundTransparency = 1
+toggleIcon.ScaleType = Enum.ScaleType.Fit
+toggleIcon.Parent = toggleButton
+
+local toggleText = Instance.new("TextLabel")
+toggleText.Text = "Vyse Duels"
+toggleText.Font = Enum.Font.GothamBold
+toggleText.TextSize = 11
+toggleText.TextColor3 = Color3.fromRGB(160, 160, 160)
+toggleText.Size = UDim2.new(1, -38, 1, 0)
+toggleText.Position = UDim2.new(0, 36, 0, 0)
+toggleText.BackgroundTransparency = 1
+toggleText.TextXAlignment = Enum.TextXAlignment.Left
+toggleText.Parent = toggleButton
+
+-- Main frame (hidden initially)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "Main"
+mainFrame.Size = UDim2.new(0, 860, 0, 560)
+mainFrame.Position = UDim2.new(0.5, -430, 0.5, -280)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 14)
+mainCorner.Parent = mainFrame
+
+-- Left sidebar
+local sideBar = Instance.new("Frame")
+sideBar.Size = UDim2.new(0, 82, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+sideBar.Parent = mainFrame
+
+local logoFrame = Instance.new("Frame")
+logoFrame.Size = UDim2.new(0, 46, 0, 46)
+logoFrame.Position = UDim2.new(0.5, -23, 0, 16)
+logoFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+logoFrame.Parent = sideBar
+local logoCorner = Instance.new("UICorner")
+logoCorner.CornerRadius = UDim.new(0, 12)
+logoCorner.Parent = logoFrame
+local logoStroke = Instance.new("UIStroke")
+logoStroke.Color = Color3.fromRGB(55, 55, 55)
+logoStroke.Thickness = 1.5
+logoStroke.Parent = logoFrame
+
+local logoIcon = Instance.new("ImageLabel")
+logoIcon.Size = UDim2.new(1, -6, 1, -6)
+logoIcon.Position = UDim2.new(0, 3, 0, 3)
+logoIcon.Image = "rbxassetid://120042443836261"
+logoIcon.BackgroundTransparency = 1
+logoIcon.Parent = logoFrame
+
+local separator = Instance.new("Frame")
+separator.Size = UDim2.new(0, 36, 0, 1)
+separator.Position = UDim2.new(0.5, -18, 0, 70)
+separator.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+separator.Parent = sideBar
+
+-- Navigation buttons
+local offersBtn = Instance.new("TextButton")
+offersBtn.Name = "Offers"
+offersBtn.Size = UDim2.new(1, -12, 0, 62)
+offersBtn.Position = UDim2.new(0, 6, 0, 80)
+offersBtn.BackgroundTransparency = 1
+offersBtn.ZIndex = 2
+offersBtn.Parent = sideBar
+local offersCorner = Instance.new("UICorner")
+offersCorner.CornerRadius = UDim.new(0, 9)
+offersCorner.Parent = offersBtn
+local offersBg = Instance.new("Frame")
+offersBg.Name = "Bg"
+offersBg.Size = UDim2.new(1, 0, 1, 0)
+offersBg.BackgroundColor3 = Color3.fromRGB(75, 75, 75)
+offersBg.BackgroundTransparency = 0.7
+offersBg.ZIndex = 1
+offersBg.Visible = false
+offersBg.Parent = offersBtn
+local offersPip = Instance.new("Frame")
+offersPip.Name = "Pip"
+offersPip.Size = UDim2.new(0, 2, 0, 28)
+offersPip.Position = UDim2.new(0, 0, 0.5, -14)
+offersPip.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+offersPip.Visible = false
+offersPip.Parent = offersBtn
+local offersIcon = Instance.new("TextLabel")
+offersIcon.Text = "📋"
+offersIcon.TextSize = 20
+offersIcon.Size = UDim2.new(1, 0, 0, 28)
+offersIcon.Position = UDim2.new(0, 0, 0, 5)
+offersIcon.BackgroundTransparency = 1
+offersIcon.ZIndex = 3
+offersIcon.Parent = offersBtn
+local offersLabel = Instance.new("TextLabel")
+offersLabel.Text = "Offers"
+offersLabel.TextSize = 11
+offersLabel.Size = UDim2.new(1, 0, 0, 14)
+offersLabel.Position = UDim2.new(0, 0, 0, 36)
+offersLabel.BackgroundTransparency = 1
+offersLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+offersLabel.Font = Enum.Font.GothamBold
+offersLabel.Parent = offersBtn
+
+local createBtn = Instance.new("TextButton")
+createBtn.Name = "Create"
+createBtn.Size = UDim2.new(1, -12, 0, 62)
+createBtn.Position = UDim2.new(0, 6, 0, 148)
+createBtn.BackgroundTransparency = 1
+createBtn.ZIndex = 2
+createBtn.Parent = sideBar
+local createCorner = Instance.new("UICorner")
+createCorner.CornerRadius = UDim.new(0, 9)
+createCorner.Parent = createBtn
+local createBg = Instance.new("Frame")
+createBg.Name = "Bg"
+createBg.Size = UDim2.new(1, 0, 1, 0)
+createBg.BackgroundColor3 = Color3.fromRGB(75, 75, 75)
+createBg.BackgroundTransparency = 0.7
+createBg.ZIndex = 1
+createBg.Visible = false
+createBg.Parent = createBtn
+local createPip = Instance.new("Frame")
+createPip.Name = "Pip"
+createPip.Size = UDim2.new(0, 2, 0, 28)
+createPip.Position = UDim2.new(0, 0, 0.5, -14)
+createPip.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+createPip.Visible = false
+createPip.Parent = createBtn
+local createIcon = Instance.new("TextLabel")
+createIcon.Text = "✚"
+createIcon.TextSize = 20
+createIcon.Size = UDim2.new(1, 0, 0, 28)
+createIcon.Position = UDim2.new(0, 0, 0, 5)
+createIcon.BackgroundTransparency = 1
+createIcon.ZIndex = 3
+createIcon.Parent = createBtn
+local createLabel = Instance.new("TextLabel")
+createLabel.Text = "Post"
+createLabel.TextSize = 11
+createLabel.Size = UDim2.new(1, 0, 0, 14)
+createLabel.Position = UDim2.new(0, 0, 0, 36)
+createLabel.BackgroundTransparency = 1
+createLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+createLabel.Font = Enum.Font.GothamBold
+createLabel.Parent = createBtn
+
+local inboxBtn = Instance.new("TextButton")
+inboxBtn.Name = "Incoming"
+inboxBtn.Size = UDim2.new(1, -12, 0, 62)
+inboxBtn.Position = UDim2.new(0, 6, 0, 216)
+inboxBtn.BackgroundTransparency = 1
+inboxBtn.ZIndex = 2
+inboxBtn.Parent = sideBar
+local inboxCorner = Instance.new("UICorner")
+inboxCorner.CornerRadius = UDim.new(0, 9)
+inboxCorner.Parent = inboxBtn
+local inboxBg = Instance.new("Frame")
+inboxBg.Name = "Bg"
+inboxBg.Size = UDim2.new(1, 0, 1, 0)
+inboxBg.BackgroundColor3 = Color3.fromRGB(75, 75, 75)
+inboxBg.BackgroundTransparency = 0.7
+inboxBg.ZIndex = 1
+inboxBg.Visible = false
+inboxBg.Parent = inboxBtn
+local inboxPip = Instance.new("Frame")
+inboxPip.Name = "Pip"
+inboxPip.Size = UDim2.new(0, 2, 0, 28)
+inboxPip.Position = UDim2.new(0, 0, 0.5, -14)
+inboxPip.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+inboxPip.Visible = false
+inboxPip.Parent = inboxBtn
+local inboxIcon = Instance.new("TextLabel")
+inboxIcon.Text = "📩"
+inboxIcon.TextSize = 20
+inboxIcon.Size = UDim2.new(1, 0, 0, 28)
+inboxIcon.Position = UDim2.new(0, 0, 0, 5)
+inboxIcon.BackgroundTransparency = 1
+inboxIcon.ZIndex = 3
+inboxIcon.Parent = inboxBtn
+local inboxLabel = Instance.new("TextLabel")
+inboxLabel.Text = "Inbox"
+inboxLabel.TextSize = 11
+inboxLabel.Size = UDim2.new(1, 0, 0, 14)
+inboxLabel.Position = UDim2.new(0, 0, 0, 36)
+inboxLabel.BackgroundTransparency = 1
+inboxLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+inboxLabel.Font = Enum.Font.GothamBold
+inboxLabel.Parent = inboxBtn
+
+-- Minimize button (bottom)
+local minButton = Instance.new("TextButton")
+minButton.Size = UDim2.new(1, -12, 0, 38)
+minButton.Position = UDim2.new(0, 6, 1, -46)
+minButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+minButton.BackgroundTransparency = 0.4
+minButton.Text = "─"
+minButton.TextColor3 = Color3.fromRGB(85, 85, 85)
+minButton.Font = Enum.Font.GothamBold
+minButton.TextSize = 14
+minButton.Parent = sideBar
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 9)
+minCorner.Parent = minButton
+local minStroke = Instance.new("UIStroke")
+minStroke.Color = Color3.fromRGB(55, 55, 55)
+minStroke.Thickness = 1
+minStroke.Parent = minButton
+
+-- Right content area
+local contentArea = Instance.new("Frame")
+contentArea.Size = UDim2.new(1, -82, 1, 0)
+contentArea.Position = UDim2.new(0, 82, 0, 0)
+contentArea.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+contentArea.Parent = mainFrame
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 60)
+topBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+topBar.Parent = contentArea
+
+local pageTitle = Instance.new("TextLabel")
+pageTitle.Text = "Live Offers"
+pageTitle.TextColor3 = Color3.fromRGB(240, 240, 240)
+pageTitle.Size = UDim2.new(0, 260, 1, 0)
+pageTitle.Position = UDim2.new(0, 20, 0, 0)
+pageTitle.BackgroundTransparency = 1
+pageTitle.Font = Enum.Font.GothamBold
+pageTitle.TextSize = 16
+pageTitle.TextXAlignment = Enum.TextXAlignment.Left
+pageTitle.Parent = topBar
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Text = "Vyse Duels Finder"
+subtitle.TextColor3 = Color3.fromRGB(50, 50, 50)
+subtitle.Font = Enum.Font.GothamMedium
+subtitle.Size = UDim2.new(0, 130, 0, 14)
+subtitle.Position = UDim2.new(0, 20, 1, -16)
+subtitle.BackgroundTransparency = 1
+subtitle.TextSize = 11
+subtitle.Parent = topBar
+
+-- Status blocks
+local statusFrame = Instance.new("Frame")
+statusFrame.Size = UDim2.new(0, 108, 0, 30)
+statusFrame.Position = UDim2.new(1, -306, 0.5, -15)
+statusFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+statusFrame.Parent = topBar
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0, 8)
+statusCorner.Parent = statusFrame
+
+local statusDot = Instance.new("Frame")
+statusDot.Size = UDim2.new(0, 7, 0, 7)
+statusDot.Position = UDim2.new(0, 10, 0.5, -3)
+statusDot.BackgroundColor3 = Color3.fromRGB(210, 80, 80)
+statusDot.Parent = statusFrame
+local dotCorner = Instance.new("UICorner")
+dotCorner.CornerRadius = UDim.new(1, 0)
+dotCorner.Parent = statusDot
+
+local statusText = Instance.new("TextLabel")
+statusText.Text = "Offline"
+statusText.Size = UDim2.new(1, -25, 1, 0)
+statusText.Position = UDim2.new(0, 24, 0, 0)
+statusText.BackgroundTransparency = 1
+statusText.TextColor3 = Color3.fromRGB(200, 200, 200)
+statusText.Font = Enum.Font.GothamBold
+statusText.TextSize = 11
+statusText.TextXAlignment = Enum.TextXAlignment.Left
+statusText.Parent = statusFrame
+
+local pingFrame = Instance.new("Frame")
+pingFrame.Size = UDim2.new(0, 90, 0, 30)
+pingFrame.Position = UDim2.new(1, -188, 0.5, -15)
+pingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+pingFrame.Parent = topBar
+local pingCorner = Instance.new("UICorner")
+pingCorner.CornerRadius = UDim.new(0, 8)
+pingCorner.Parent = pingFrame
+
+local pingIcon = Instance.new("TextLabel")
+pingIcon.Text = "📡"
+pingIcon.Size = UDim2.new(0, 26, 1, 0)
+pingIcon.Position = UDim2.new(0, 5, 0, 0)
+pingIcon.BackgroundTransparency = 1
+pingIcon.Font = Enum.Font.GothamBold
+pingIcon.TextSize = 14
+pingIcon.Parent = pingFrame
+
+local pingText = Instance.new("TextLabel")
+pingText.Text = "-- ms"
+pingText.Size = UDim2.new(1, -30, 1, 0)
+pingText.Position = UDim2.new(0, 28, 0, 0)
+pingText.BackgroundTransparency = 1
+pingText.TextColor3 = Color3.fromRGB(200, 200, 200)
+pingText.Font = Enum.Font.GothamBold
+pingText.TextSize = 11
+pingText.TextXAlignment = Enum.TextXAlignment.Left
+pingText.Parent = pingFrame
+
+local userFrame = Instance.new("Frame")
+userFrame.Size = UDim2.new(0, 88, 0, 30)
+userFrame.Position = UDim2.new(1, -88, 0.5, -15)
+userFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+userFrame.Parent = topBar
+local userCorner = Instance.new("UICorner")
+userCorner.CornerRadius = UDim.new(0, 8)
+userCorner.Parent = userFrame
+
+local userName = Instance.new("TextLabel")
+userName.Text = player.DisplayName
+userName.Size = UDim2.new(1, -8, 1, 0)
+userName.Position = UDim2.new(0, 4, 0, 0)
+userName.BackgroundTransparency = 1
+userName.TextColor3 = Color3.fromRGB(210, 210, 210)
+userName.Font = Enum.Font.GothamBold
+userName.TextSize = 11
+userName.TextXAlignment = Enum.TextXAlignment.Center
+userName.TextTruncate = Enum.TextTruncate.AtEnd
+userName.Parent = userFrame
+
+-- Search/filter bar
+local filterFrame = Instance.new("Frame")
+filterFrame.Size = UDim2.new(1, -28, 0, 36)
+filterFrame.Position = UDim2.new(0, 14, 0, 70)
+filterFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+filterFrame.Parent = contentArea
+local filterCorner = Instance.new("UICorner")
+filterCorner.CornerRadius = UDim.new(0, 10)
+filterCorner.Parent = filterFrame
+
+local searchIcon = Instance.new("TextLabel")
+searchIcon.Text = "🔍"
+searchIcon.Size = UDim2.new(0, 36, 1, 0)
+searchIcon.BackgroundTransparency = 1
+searchIcon.Font = Enum.Font.GothamBold
+searchIcon.TextSize = 13
+searchIcon.Parent = filterFrame
+
+local searchBox = Instance.new("TextBox")
+searchBox.Size = UDim2.new(1, -44, 1, 0)
+searchBox.Position = UDim2.new(0, 38, 0, 0)
+searchBox.PlaceholderText = "Search player or item..."
+searchBox.PlaceholderColor3 = Color3.fromRGB(85, 85, 85)
+searchBox.Text = ""
+searchBox.BackgroundTransparency = 1
+searchBox.TextColor3 = Color3.fromRGB(240, 240, 240)
+searchBox.Font = Enum.Font.GothamMedium
+searchBox.TextSize = 13
+searchBox.TextXAlignment = Enum.TextXAlignment.Left
+searchBox.ClearTextOnFocus = false
+searchBox.Parent = filterFrame
+
+-- Value filters
+local valueFilterFrame = Instance.new("Frame")
+valueFilterFrame.Size = UDim2.new(1, -28, 0, 70)
+valueFilterFrame.Position = UDim2.new(0, 14, 0, 112)
+valueFilterFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+valueFilterFrame.Parent = contentArea
+local valueCorner = Instance.new("UICorner")
+valueCorner.CornerRadius = UDim.new(0, 10)
+valueCorner.Parent = valueFilterFrame
+
+local minLabel = Instance.new("TextLabel")
+minLabel.Text = "Min Value"
+minLabel.Size = UDim2.new(0, 130, 0, 14)
+minLabel.Position = UDim2.new(0, 12, 0, 6)
+minLabel.BackgroundTransparency = 1
+minLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+minLabel.Font = Enum.Font.GothamBold
+minLabel.TextSize = 11
+minLabel.Parent = valueFilterFrame
+
+local minFrame = Instance.new("Frame")
+minFrame.Size = UDim2.new(0, 130, 0, 26)
+minFrame.Position = UDim2.new(0, 12, 0, 22)
+minFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+minFrame.Parent = valueFilterFrame
+local minFrameCorner = Instance.new("UICorner")
+minFrameCorner.CornerRadius = UDim.new(0, 7)
+minFrameCorner.Parent = minFrame
+
+local minBox = Instance.new("TextBox")
+minBox.Size = UDim2.new(1, -10, 1, 0)
+minBox.Position = UDim2.new(0, 6, 0, 0)
+minBox.PlaceholderText = "e.g. 100m"
+minBox.BackgroundTransparency = 1
+minBox.TextColor3 = Color3.fromRGB(240, 240, 240)
+minBox.Font = Enum.Font.GothamMedium
+minBox.TextSize = 11
+minBox.ClearTextOnFocus = false
+minBox.Parent = minFrame
+
+local maxLabel = Instance.new("TextLabel")
+maxLabel.Text = "Max Value"
+maxLabel.Size = UDim2.new(0, 130, 0, 14)
+maxLabel.Position = UDim2.new(0, 158, 0, 6)
+maxLabel.BackgroundTransparency = 1
+maxLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+maxLabel.Font = Enum.Font.GothamBold
+maxLabel.TextSize = 11
+maxLabel.Parent = valueFilterFrame
+
+local maxFrame = Instance.new("Frame")
+maxFrame.Size = UDim2.new(0, 130, 0, 26)
+maxFrame.Position = UDim2.new(0, 158, 0, 22)
+maxFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+maxFrame.Parent = valueFilterFrame
+local maxFrameCorner = Instance.new("UICorner")
+maxFrameCorner.CornerRadius = UDim.new(0, 7)
+maxFrameCorner.Parent = maxFrame
+
+local maxBox = Instance.new("TextBox")
+maxBox.Size = UDim2.new(1, -10, 1, 0)
+maxBox.Position = UDim2.new(0, 6, 0, 0)
+maxBox.PlaceholderText = "e.g. 1b"
+maxBox.BackgroundTransparency = 1
+maxBox.TextColor3 = Color3.fromRGB(240, 240, 240)
+maxBox.Font = Enum.Font.GothamMedium
+maxBox.TextSize = 11
+maxBox.ClearTextOnFocus = false
+maxBox.Parent = maxFrame
+
+-- Offers list (ScrollingFrame)
+local offersScroll = Instance.new("ScrollingFrame")
+offersScroll.Size = UDim2.new(1, -28, 1, -194)
+offersScroll.Position = UDim2.new(0, 14, 0, 190)
+offersScroll.BackgroundTransparency = 1
+offersScroll.ScrollBarThickness = 2
+offersScroll.ScrollBarImageColor3 = Color3.fromRGB(55, 55, 55)
+offersScroll.BorderSizePixel = 0
+offersScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+offersScroll.Visible = true
+offersScroll.Parent = contentArea
+
+local offersList = Instance.new("UIListLayout")
+offersList.Parent = offersScroll
+offersList.Padding = UDim.new(0, 5)
+offersList.SortOrder = Enum.SortOrder.LayoutOrder
+
+offersList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    offersScroll.CanvasSize = UDim2.new(0, 0, 0, offersList.AbsoluteContentSize.Y + 10)
+end)
+
+-- Empty state label
+local emptyState = Instance.new("TextLabel")
+emptyState.Name = "EmptyState"
+emptyState.Text = "No offers yet\nWaiting for duels..."
+emptyState.Size = UDim2.new(1, 0, 0, 80)
+emptyState.LayoutOrder = 999999
+emptyState.BackgroundTransparency = 1
+emptyState.TextColor3 = Color3.fromRGB(100, 100, 100)
+emptyState.Font = Enum.Font.GothamMedium
+emptyState.TextSize = 14
+emptyState.TextXAlignment = Enum.TextXAlignment.Center
+emptyState.TextYAlignment = Enum.TextYAlignment.Center
+emptyState.Visible = true
+emptyState.Parent = offersScroll
+
+-- Create content for each page (Offers, Create, Inbox)
+-- We'll implement dynamic switching
+
+-- Currently selected pet (for posting)
+local selectedPet = nil
+
+-- Pet selection popup
+local petPopup = Instance.new("Frame")
+petPopup.Name = "PetPopup"
+petPopup.Size = UDim2.new(0, 520, 0, 440)
+petPopup.Position = UDim2.new(0.5, -260, 0.5, -220)
+petPopup.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+petPopup.BackgroundTransparency = 0.05
+petPopup.ZIndex = 50
+petPopup.Visible = false
+petPopup.Parent = screenGui
+local popupCorner = Instance.new("UICorner")
+popupCorner.CornerRadius = UDim.new(0, 12)
+popupCorner.Parent = petPopup
+local popupStroke = Instance.new("UIStroke")
+popupStroke.Thickness = 1.5
+popupStroke.Color = Color3.fromRGB(40, 40, 40)
+popupStroke.Parent = petPopup
+
+local popupTitle = Instance.new("TextLabel")
+popupTitle.Text = "Select Pet To Post"
+popupTitle.TextSize = 16
+popupTitle.Size = UDim2.new(1, -120, 0, 48)
+popupTitle.Position = UDim2.new(0, 20, 0, 0)
+popupTitle.BackgroundTransparency = 1
+popupTitle.TextColor3 = Color3.fromRGB(240, 240, 240)
+popupTitle.Font = Enum.Font.GothamBold
+popupTitle.TextXAlignment = Enum.TextXAlignment.Left
+popupTitle.Parent = petPopup
+
+local closePopup = Instance.new("TextButton")
+closePopup.Text = "X"
+closePopup.Size = UDim2.new(0, 32, 0, 32)
+closePopup.Position = UDim2.new(1, -44, 0, 8)
+closePopup.BackgroundTransparency = 1
+closePopup.TextColor3 = Color3.fromRGB(160, 160, 160)
+closePopup.TextSize = 12
+closePopup.Font = Enum.Font.GothamBold
+closePopup.Parent = petPopup
+closePopup.MouseButton1Click:Connect(function()
+    petPopup.Visible = false
+end)
+
+local refreshPets = Instance.new("TextButton")
+refreshPets.Text = "🔄 Refresh"
+refreshPets.Size = UDim2.new(0, 88, 0, 30)
+refreshPets.Position = UDim2.new(1, -148, 0, 10)
+refreshPets.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+refreshPets.TextColor3 = Color3.fromRGB(130, 130, 130)
+refreshPets.Font = Enum.Font.GothamBold
+refreshPets.TextSize = 11
+refreshPets.Parent = petPopup
+local refreshCorner = Instance.new("UICorner")
+refreshCorner.CornerRadius = UDim.new(0, 8)
+refreshCorner.Parent = refreshPets
+
+local petScroll = Instance.new("ScrollingFrame")
+petScroll.Size = UDim2.new(1, -20, 1, -62)
+petScroll.Position = UDim2.new(0, 10, 0, 54)
+petScroll.BackgroundTransparency = 1
+petScroll.ScrollBarThickness = 3
+petScroll.ZIndex = 51
+petScroll.Parent = petPopup
+
+local petList = Instance.new("UIListLayout")
+petList.Parent = petScroll
+petList.Padding = UDim.new(0, 5)
+
+local noPetsLabel = Instance.new("TextLabel")
+noPetsLabel.Text = "No pets found on your plot.\nMake sure you have animals placed!"
+noPetsLabel.Size = UDim2.new(1, 0, 0, 80)
+noPetsLabel.BackgroundTransparency = 1
+noPetsLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+noPetsLabel.Font = Enum.Font.GothamMedium
+noPetsLabel.TextSize = 12
+noPetsLabel.TextXAlignment = Enum.TextXAlignment.Center
+noPetsLabel.TextYAlignment = Enum.TextYAlignment.Center
+noPetsLabel.LayoutOrder = 999
+noPetsLabel.Parent = petScroll
+
+-- Function to load pets from the player's plot (simulate - in real game you'd scan workspace)
+local function loadPets()
+    -- Clear existing pet buttons
+    for _, child in pairs(petScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
     end
-else
-    WebSocket = WebSocket or getgenv().WebSocket.connect
-end
-
---------------------------------------------------------------------------------
--- UTILITIES
---------------------------------------------------------------------------------
-local function FormatNumber(n)
-    n = tonumber(n) or 0
-    if n >= 1e15 then return string.format("$%.0fQa", n / 1e15)
-    elseif n >= 1e12 then return string.format("$%.0fT", n / 1e12)
-    elseif n >= 1e9 then return string.format("$%.0fB", n / 1e9)
-    elseif n >= 1e6 then return string.format("$%.0fM", n / 1e6)
-    elseif n >= 1e3 then return string.format("$%.0fK", n / 1e3)
-    else return "$" .. tostring(math.floor(n))
-    end
-end
-
-local function Tween(obj, props, duration, style, dir)
-    if not obj or not obj.Parent then return nil end
-    local tw = TweenService:Create(obj, TweenInfo.new(
-        duration or 0.3,
-        style or Enum.EasingStyle.Quart,
-        dir or Enum.EasingDirection.Out
-    ), props)
-    tw:Play()
-    return tw
-end
-
-local function RippleEffect(button)
-    if not button or not button.Parent then return end
-    local ripple = Instance.new("Frame", button)
-    ripple.Size = UDim2.new(0, 0, 0, 0)
-    ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-    ripple.BackgroundColor3 = Color3.fromRGB(255, 220, 100)
-    ripple.BackgroundTransparency = 0.7
-    ripple.BorderSizePixel = 0
-    ripple.ZIndex = button.ZIndex + 1
-    Instance.new("UICorner", ripple).CornerRadius = UDim.new(1, 0)
-    local maxSize = math.max(button.AbsoluteSize.X, button.AbsoluteSize.Y) * 2.5
-    Tween(ripple, {Size = UDim2.new(0, maxSize, 0, maxSize), BackgroundTransparency = 1}, 0.5)
-    task.delay(0.55, function() if ripple and ripple.Parent then ripple:Destroy() end end)
-end
-
-local function HoverBind(btn, normalColor, hoverColor, clickColor)
-    if not btn then return end
-    btn.MouseEnter:Connect(function() Tween(btn, {BackgroundColor3 = hoverColor}, 0.2) end)
-    btn.MouseLeave:Connect(function() Tween(btn, {BackgroundColor3 = normalColor}, 0.2) end)
-    btn.MouseButton1Down:Connect(function() Tween(btn, {BackgroundColor3 = clickColor}, 0.1) end)
-    btn.MouseButton1Up:Connect(function() Tween(btn, {BackgroundColor3 = hoverColor}, 0.1) end)
-end
-
-local function CopyToClipboard(text)
-    if setclipboard then setclipboard(text)
-    elseif toclipboard then toclipboard(text) end
-end
-
-local function IsMyOffer(offer)
-    if not offer then return false end
-    local name = offer.host or offer.username or ""
-    local name2 = offer.from or ""
-    local odisplayName = offer.displayName or ""
-    
-    local isMe = (name == LocalPlayer.Name)
-        or (name == LocalPlayer.DisplayName)
-        or (name2 == LocalPlayer.Name)
-        or (name2 == LocalPlayer.DisplayName)
-        or (odisplayName == LocalPlayer.Name)
-        or (odisplayName == LocalPlayer.DisplayName)
-        or (offer.userId and offer.userId == LocalPlayer.UserId)
-        or (offer.clientId and offer.clientId == my_client_id)
-    
-    return isMe
-end
-
---------------------------------------------------------------------------------
--- COLOR THEME (Yellow & Black)
---------------------------------------------------------------------------------
-local Colors = {
-    Background = Color3.fromRGB(8, 8, 8),
-    Header = Color3.fromRGB(12, 12, 10),
-    Card = Color3.fromRGB(14, 14, 12),
-    CardHover = Color3.fromRGB(20, 20, 16),
-    Accent = Color3.fromRGB(255, 200, 50),
-    AccentDark = Color3.fromRGB(200, 150, 30),
-    AccentBright = Color3.fromRGB(255, 220, 80),
-    TextPrimary = Color3.fromRGB(255, 245, 200),
-    TextSecondary = Color3.fromRGB(150, 140, 100),
-    TextMuted = Color3.fromRGB(80, 75, 55),
-    Border = Color3.fromRGB(40, 38, 25),
-    Success = Color3.fromRGB(120, 200, 80),
-    Danger = Color3.fromRGB(200, 60, 60),
-    InputBg = Color3.fromRGB(16, 16, 12),
-    InputBorder = Color3.fromRGB(35, 33, 22),
-}
-
---------------------------------------------------------------------------------
--- CLEAN OLD GUI
---------------------------------------------------------------------------------
-if CoreGui:FindFirstChild("DuelFinderUI") then
-    CoreGui.DuelFinderUI:Destroy()
-end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DuelFinderUI"
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = CoreGui
-
---------------------------------------------------------------------------------
--- STATE VARIABLES
---------------------------------------------------------------------------------
-local ws = nil
-local my_client_id = HttpService:GenerateGUID(false)
-local my_current_room_id = nil
-local isConnected = false
-local pingTimestamp = 0
-
-local offerOrderCounter = 1000000
-local hostOrderCounter = 1000000
-local renderedOfferIds = {}
-local renderedHostOfferIds = {}
-local allOffers = {}
-local allHostOffers = {}
-
---------------------------------------------------------------------------------
--- MINIMIZED STATE
---------------------------------------------------------------------------------
-local isMinimized = false
-
-local MinimizedButton = Instance.new("TextButton")
-MinimizedButton.Name = "MinimizedButton"
-MinimizedButton.Size = UDim2.new(0, 140, 0, 36)
-MinimizedButton.Position = UDim2.new(0.5, -70, 0, 10)
-MinimizedButton.BackgroundColor3 = Colors.Background
-MinimizedButton.Text = "⚔ DUEL FINDER"
-MinimizedButton.TextColor3 = Colors.Accent
-MinimizedButton.Font = Enum.Font.GothamBold
-MinimizedButton.TextSize = 12
-MinimizedButton.AutoButtonColor = false
-MinimizedButton.Visible = false
-MinimizedButton.Parent = ScreenGui
-Instance.new("UICorner", MinimizedButton).CornerRadius = UDim.new(0, 8)
-local minStroke = Instance.new("UIStroke", MinimizedButton)
-minStroke.Color = Colors.Accent
-minStroke.Thickness = 1.5
-
-HoverBind(MinimizedButton, Colors.Background, Color3.fromRGB(18, 18, 14), Color3.fromRGB(25, 25, 20))
-
---------------------------------------------------------------------------------
--- MAIN FRAME
---------------------------------------------------------------------------------
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "Main"
-MainFrame.Size = UDim2.new(0, 750, 0, 500)
-MainFrame.Position = UDim2.new(0.5, -375, 0.5, -250)
-MainFrame.BackgroundColor3 = Colors.Background
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.ClipsDescendants = true
-MainFrame.Parent = ScreenGui
-
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
-
-local Stroke = Instance.new("UIStroke", MainFrame)
-Stroke.Color = Colors.Accent
-Stroke.Thickness = 1.5
-Stroke.Transparency = 0.3
-
--- Dragging
-local dragging, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+    -- Placeholder: add some dummy pets for demonstration
+    local pets = {"Capitano Moby", "Nuclearo Dinossauro", "Ketupat Kepat", "Garama and Madundung", "Tang Tang Keletang"}
+    for _, petName in ipairs(pets) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 40)
+        btn.Position = UDim2.new(0, 5, 0, 0)
+        btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        btn.Text = petName
+        btn.TextColor3 = Color3.fromRGB(220, 220, 220)
+        btn.Font = Enum.Font.GothamMedium
+        btn.TextSize = 12
+        btn.Parent = petScroll
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 6)
+        btnCorner.Parent = btn
+        btn.MouseButton1Click:Connect(function()
+            selectedPet = petName
+            petPopup.Visible = false
+            -- Update UI to show selected pet
+            local petDisplay = contentArea:FindFirstChild("SelectedPetLabel")
+            if petDisplay then petDisplay.Text = "Selected: " .. petName end
         end)
     end
-end)
-MainFrame.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        MainFrame.Position = newPos
+    noPetsLabel.Visible = (#pets == 0)
+end
+
+refreshPets.MouseButton1Click:Connect(loadPets)
+
+-- Create the "Create Listing" page content
+local createPage = nil
+local function showCreatePage()
+    pageTitle.Text = "Create Listing"
+    -- Clear offersScroll and show the creation UI instead
+    for _, child in pairs(offersScroll:GetChildren()) do
+        if child ~= offersList and child ~= emptyState then child:Destroy() end
     end
-end)
-
--- Glow animation (yellow)
-spawn(function()
-    local t = 0
-    while MainFrame and MainFrame.Parent do
-        t = t + 0.015
-        local a = (math.sin(t * 1.5) + 1) / 2
-        Stroke.Transparency = 0.2 + a * 0.4
-        Stroke.Color = Color3.fromRGB(
-            math.floor(200 + a * 55),
-            math.floor(150 + a * 70),
-            math.floor(30 + a * 30)
-        )
-        task.wait(0.03)
-    end
-end)
-
--- Open animation
-MainFrame.Size = UDim2.new(0, 750, 0, 0)
-MainFrame.BackgroundTransparency = 1
-Tween(MainFrame, {Size = UDim2.new(0, 750, 0, 500), BackgroundTransparency = 0}, 0.55, Enum.EasingStyle.Back)
-
---------------------------------------------------------------------------------
--- HEADER
---------------------------------------------------------------------------------
-local Header = Instance.new("Frame", MainFrame)
-Header.Size = UDim2.new(1, 0, 0, 44)
-Header.BackgroundColor3 = Colors.Header
-Header.BorderSizePixel = 0
-Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 14)
-
-local HeaderBottom = Instance.new("Frame", Header)
-HeaderBottom.Size = UDim2.new(1, 0, 0, 14)
-HeaderBottom.Position = UDim2.new(0, 0, 1, -14)
-HeaderBottom.BackgroundColor3 = Colors.Header
-HeaderBottom.BorderSizePixel = 0
-
-local AccentLine = Instance.new("Frame", MainFrame)
-AccentLine.Size = UDim2.new(1, 0, 0, 2)
-AccentLine.Position = UDim2.new(0, 0, 0, 44)
-AccentLine.BorderSizePixel = 0
-
-local AccentGradient = Instance.new("UIGradient", AccentLine)
-AccentGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Colors.AccentDark),
-    ColorSequenceKeypoint.new(0.5, Colors.AccentBright),
-    ColorSequenceKeypoint.new(1, Colors.AccentDark),
-}
-
-spawn(function()
-    local offset = 0
-    while AccentLine and AccentLine.Parent do
-        offset = (offset + 0.005) % 1
-        AccentGradient.Offset = Vector2.new(offset, 0)
-        task.wait(0.03)
-    end
-end)
-
-local Title = Instance.new("TextLabel", Header)
-Title.Text = "⚔  DUEL FINDER"
-Title.TextColor3 = Colors.Accent
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 15
-Title.Size = UDim2.new(0, 200, 1, 0)
-Title.Position = UDim2.new(0, 16, 0, 0)
-Title.BackgroundTransparency = 1
-Title.TextXAlignment = Enum.TextXAlignment.Left
-
-local PlayerInfo = Instance.new("TextLabel", Header)
-PlayerInfo.Text = "👤 " .. LocalPlayer.DisplayName
-PlayerInfo.TextColor3 = Colors.TextSecondary
-PlayerInfo.Font = Enum.Font.Gotham
-PlayerInfo.TextSize = 11
-PlayerInfo.Size = UDim2.new(0, 150, 1, 0)
-PlayerInfo.Position = UDim2.new(0, 180, 0, 0)
-PlayerInfo.BackgroundTransparency = 1
-PlayerInfo.TextXAlignment = Enum.TextXAlignment.Left
-
-local StatusDot = Instance.new("Frame", Header)
-StatusDot.Size = UDim2.new(0, 8, 0, 8)
-StatusDot.Position = UDim2.new(1, -130, 0.5, -4)
-StatusDot.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-StatusDot.BorderSizePixel = 0
-Instance.new("UICorner", StatusDot).CornerRadius = UDim.new(1, 0)
-
-spawn(function()
-    while StatusDot and StatusDot.Parent do
-        Tween(StatusDot, {Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(1, -131, 0.5, -5)}, 0.5)
-        task.wait(0.5)
-        Tween(StatusDot, {Size = UDim2.new(0, 8, 0, 8), Position = UDim2.new(1, -130, 0.5, -4)}, 0.5)
-        task.wait(0.5)
-    end
-end)
-
-local StatusLabel = Instance.new("TextLabel", Header)
-StatusLabel.Text = "OFFLINE"
-StatusLabel.TextColor3 = Colors.TextMuted
-StatusLabel.Font = Enum.Font.GothamBold
-StatusLabel.TextSize = 10
-StatusLabel.Size = UDim2.new(0, 60, 1, 0)
-StatusLabel.Position = UDim2.new(1, -118, 0, 0)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local PingLabel = Instance.new("TextLabel", Header)
-PingLabel.Text = ""
-PingLabel.TextColor3 = Colors.TextMuted
-PingLabel.Font = Enum.Font.Code
-PingLabel.TextSize = 9
-PingLabel.Size = UDim2.new(0, 45, 1, 0)
-PingLabel.Position = UDim2.new(1, -55, 0, 0)
-PingLabel.BackgroundTransparency = 1
-
-local MinimizeBtn = Instance.new("TextButton", Header)
-MinimizeBtn.Text = ""
-MinimizeBtn.Size = UDim2.new(0, 44, 0, 44)
-MinimizeBtn.Position = UDim2.new(1, -44, 0, 0)
-MinimizeBtn.BackgroundTransparency = 1
-
-local MinimizeIcon = Instance.new("TextLabel", MinimizeBtn)
-MinimizeIcon.Text = "─"
-MinimizeIcon.TextColor3 = Colors.TextMuted
-MinimizeIcon.Font = Enum.Font.GothamBold
-MinimizeIcon.TextSize = 18
-MinimizeIcon.Size = UDim2.new(1, 0, 1, 0)
-MinimizeIcon.BackgroundTransparency = 1
-
-MinimizeBtn.MouseEnter:Connect(function() Tween(MinimizeIcon, {TextColor3 = Colors.Accent}, 0.15) end)
-MinimizeBtn.MouseLeave:Connect(function() Tween(MinimizeIcon, {TextColor3 = Colors.TextMuted}, 0.15) end)
-
-local function MinimizeUI()
-    isMinimized = true
-    Tween(MainFrame, {Size = UDim2.new(0, 750, 0, 0), BackgroundTransparency = 1}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In)
-    task.delay(0.35, function()
-        MainFrame.Visible = false
-        MinimizedButton.Visible = true
-        Tween(MinimizedButton, {Position = UDim2.new(0.5, -70, 0, 10)}, 0.3, Enum.EasingStyle.Back)
-    end)
-end
-
-local function RestoreUI()
-    isMinimized = false
-    MinimizedButton.Visible = false
-    MainFrame.Visible = true
-    MainFrame.Size = UDim2.new(0, 750, 0, 0)
-    MainFrame.BackgroundTransparency = 1
-    Tween(MainFrame, {Size = UDim2.new(0, 750, 0, 500), BackgroundTransparency = 0}, 0.45, Enum.EasingStyle.Back)
-end
-
-MinimizeBtn.MouseButton1Click:Connect(function()
-    RippleEffect(MinimizeBtn)
-    MinimizeUI()
-end)
-
-MinimizedButton.MouseButton1Click:Connect(function()
-    RippleEffect(MinimizedButton)
-    RestoreUI()
-end)
-
---------------------------------------------------------------------------------
--- TAB BAR
---------------------------------------------------------------------------------
-local TabBar = Instance.new("Frame", MainFrame)
-TabBar.Size = UDim2.new(1, -30, 0, 36)
-TabBar.Position = UDim2.new(0, 15, 0, 50)
-TabBar.BackgroundTransparency = 1
-
-local TabIndicator = Instance.new("Frame", TabBar)
-TabIndicator.Size = UDim2.new(0, 100, 0, 3)
-TabIndicator.Position = UDim2.new(0, 0, 1, -3)
-TabIndicator.BackgroundColor3 = Colors.Accent
-TabIndicator.BorderSizePixel = 0
-Instance.new("UICorner", TabIndicator).CornerRadius = UDim.new(1, 0)
-
-local IndicatorGlow = Instance.new("Frame", TabBar)
-IndicatorGlow.Size = UDim2.new(0, 100, 0, 8)
-IndicatorGlow.Position = UDim2.new(0, 0, 1, -6)
-IndicatorGlow.BackgroundColor3 = Colors.Accent
-IndicatorGlow.BackgroundTransparency = 0.8
-IndicatorGlow.BorderSizePixel = 0
-Instance.new("UICorner", IndicatorGlow).CornerRadius = UDim.new(1, 0)
-
-local tabButtons = {}
-local tabNames = {"OFFERS", "POST", "HOST"}
-local tabWidth = 100
-
-for i, name in ipairs(tabNames) do
-    local btn = Instance.new("TextButton", TabBar)
-    btn.Name = name
-    btn.Text = name
-    btn.Size = UDim2.new(0, tabWidth, 1, -6)
-    btn.Position = UDim2.new(0, (i - 1) * (tabWidth + 10), 0, 0)
-    btn.BackgroundTransparency = 1
-    btn.TextColor3 = Colors.TextMuted
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 12
-    btn.AutoButtonColor = false
-    tabButtons[name] = btn
-end
-
---------------------------------------------------------------------------------
--- SEARCH BAR
---------------------------------------------------------------------------------
-local SearchContainer = Instance.new("Frame", MainFrame)
-SearchContainer.Size = UDim2.new(0, 250, 0, 32)
-SearchContainer.Position = UDim2.new(1, -265, 0, 52)
-SearchContainer.BackgroundColor3 = Colors.InputBg
-SearchContainer.BorderSizePixel = 0
-Instance.new("UICorner", SearchContainer).CornerRadius = UDim.new(0, 8)
-
-local searchStroke = Instance.new("UIStroke", SearchContainer)
-searchStroke.Color = Colors.InputBorder
-searchStroke.Thickness = 1
-
-local SearchIcon = Instance.new("TextLabel", SearchContainer)
-SearchIcon.Text = "🔍"
-SearchIcon.TextColor3 = Colors.TextMuted
-SearchIcon.Font = Enum.Font.Gotham
-SearchIcon.TextSize = 12
-SearchIcon.Size = UDim2.new(0, 28, 1, 0)
-SearchIcon.Position = UDim2.new(0, 6, 0, 0)
-SearchIcon.BackgroundTransparency = 1
-
-local SearchBox = Instance.new("TextBox", SearchContainer)
-SearchBox.Size = UDim2.new(1, -40, 1, 0)
-SearchBox.Position = UDim2.new(0, 34, 0, 0)
-SearchBox.PlaceholderText = "Search brainrots..."
-SearchBox.PlaceholderColor3 = Colors.TextMuted
-SearchBox.Text = ""
-SearchBox.BackgroundTransparency = 1
-SearchBox.TextColor3 = Colors.TextPrimary
-SearchBox.Font = Enum.Font.Gotham
-SearchBox.TextSize = 12
-SearchBox.TextXAlignment = Enum.TextXAlignment.Left
-SearchBox.ClearTextOnFocus = false
-
-SearchBox.Focused:Connect(function()
-    Tween(searchStroke, {Color = Colors.Accent, Thickness = 1.5}, 0.2)
-    Tween(SearchContainer, {BackgroundColor3 = Color3.fromRGB(20, 20, 16)}, 0.2)
-end)
-SearchBox.FocusLost:Connect(function()
-    Tween(searchStroke, {Color = Colors.InputBorder, Thickness = 1}, 0.2)
-    Tween(SearchContainer, {BackgroundColor3 = Colors.InputBg}, 0.2)
-end)
-
-local currentSearchQuery = ""
-
---------------------------------------------------------------------------------
--- CONTENT AREA
---------------------------------------------------------------------------------
-local ContentArea = Instance.new("Frame", MainFrame)
-ContentArea.Size = UDim2.new(1, -30, 1, -98)
-ContentArea.Position = UDim2.new(0, 15, 0, 92)
-ContentArea.BackgroundTransparency = 1
-ContentArea.ClipsDescendants = true
-
--- PAGE: OFFERS
-local PageOffers = Instance.new("ScrollingFrame", ContentArea)
-PageOffers.Size = UDim2.new(1, 0, 1, 0)
-PageOffers.BackgroundTransparency = 1
-PageOffers.ScrollBarThickness = 3
-PageOffers.ScrollBarImageColor3 = Colors.Accent
-PageOffers.CanvasSize = UDim2.new(0, 0, 0, 0)
-PageOffers.Visible = true
-
-local UIListOffers = Instance.new("UIListLayout", PageOffers)
-UIListOffers.Padding = UDim.new(0, 5)
-UIListOffers.SortOrder = Enum.SortOrder.LayoutOrder
-Instance.new("UIPadding", PageOffers).PaddingTop = UDim.new(0, 2)
-
-local EmptyOffers = Instance.new("TextLabel", PageOffers)
-EmptyOffers.Name = "EmptyState"
-EmptyOffers.Text = "⏳  Waiting for offers..."
-EmptyOffers.TextColor3 = Colors.TextMuted
-EmptyOffers.Font = Enum.Font.GothamSemibold
-EmptyOffers.TextSize = 14
-EmptyOffers.Size = UDim2.new(1, 0, 0, 100)
-EmptyOffers.BackgroundTransparency = 1
-EmptyOffers.LayoutOrder = 999999
-
--- PAGE: POST
-local PagePost = Instance.new("Frame", ContentArea)
-PagePost.Size = UDim2.new(1, 0, 1, 0)
-PagePost.BackgroundTransparency = 1
-PagePost.Visible = false
-
-local function CreateStyledInput(parent, placeholder, icon, yPos)
-    local container = Instance.new("Frame", parent)
-    container.Size = UDim2.new(1, 0, 0, 44)
-    container.Position = UDim2.new(0, 0, 0, yPos)
-    container.BackgroundColor3 = Colors.InputBg
-    container.BorderSizePixel = 0
-    Instance.new("UICorner", container).CornerRadius = UDim.new(0, 10)
-
-    local stroke = Instance.new("UIStroke", container)
-    stroke.Color = Colors.InputBorder
-    stroke.Thickness = 1
-
-    local iconLbl = Instance.new("TextLabel", container)
-    iconLbl.Text = icon
-    iconLbl.TextColor3 = Colors.Accent
-    iconLbl.Font = Enum.Font.GothamBold
-    iconLbl.TextSize = 14
-    iconLbl.Size = UDim2.new(0, 36, 1, 0)
-    iconLbl.Position = UDim2.new(0, 8, 0, 0)
-    iconLbl.BackgroundTransparency = 1
-
-    local box = Instance.new("TextBox", container)
-    box.Size = UDim2.new(1, -52, 1, 0)
-    box.Position = UDim2.new(0, 44, 0, 0)
-    box.PlaceholderText = placeholder
-    box.PlaceholderColor3 = Colors.TextMuted
-    box.Text = ""
-    box.BackgroundTransparency = 1
-    box.TextColor3 = Colors.TextPrimary
-    box.Font = Enum.Font.Gotham
-    box.TextSize = 13
-    box.TextXAlignment = Enum.TextXAlignment.Left
-    box.ClearTextOnFocus = false
-
-    box.Focused:Connect(function()
-        Tween(stroke, {Color = Colors.Accent, Thickness = 1.5}, 0.2)
-        Tween(container, {BackgroundColor3 = Color3.fromRGB(20, 20, 16)}, 0.2)
-    end)
-    box.FocusLost:Connect(function()
-        Tween(stroke, {Color = Colors.InputBorder, Thickness = 1}, 0.2)
-        Tween(container, {BackgroundColor3 = Colors.InputBg}, 0.2)
-    end)
-
-    return box, container
-end
-
-local function CreateFieldLabel(parent, text, yPos)
-    local lbl = Instance.new("TextLabel", parent)
-    lbl.Text = text
-    lbl.TextColor3 = Colors.TextSecondary
-    lbl.Font = Enum.Font.GothamSemibold
-    lbl.TextSize = 11
-    lbl.Size = UDim2.new(1, 0, 0, 16)
-    lbl.Position = UDim2.new(0, 4, 0, yPos)
-    lbl.BackgroundTransparency = 1
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    return lbl
-end
-
-CreateFieldLabel(PagePost, "ITEM NAME", 0)
-local InputItem, InputItemContainer = CreateStyledInput(PagePost, "Enter item name...", "📦", 18)
-
-CreateFieldLabel(PagePost, "VALUE (NUMBER)", 72)
-local InputValue, InputValueContainer = CreateStyledInput(PagePost, "e.g. 195000000", "💰", 90)
-
-CreateFieldLabel(PagePost, "MINIMUM VALUE TO ACCEPT", 144)
-local InputMin, InputMinContainer = CreateStyledInput(PagePost, "e.g. 100000000", "🔒", 162)
-
-local PreviewCard = Instance.new("Frame", PagePost)
-PreviewCard.Size = UDim2.new(1, 0, 0, 60)
-PreviewCard.Position = UDim2.new(0, 0, 0, 224)
-PreviewCard.BackgroundColor3 = Colors.Card
-PreviewCard.BorderSizePixel = 0
-Instance.new("UICorner", PreviewCard).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", PreviewCard).Color = Colors.Border
-
-local PreviewTitle = Instance.new("TextLabel", PreviewCard)
-PreviewTitle.Text = "PREVIEW"
-PreviewTitle.TextColor3 = Colors.TextMuted
-PreviewTitle.Font = Enum.Font.GothamBold
-PreviewTitle.TextSize = 9
-PreviewTitle.Size = UDim2.new(0, 80, 0, 16)
-PreviewTitle.Position = UDim2.new(0, 12, 0, 6)
-PreviewTitle.BackgroundTransparency = 1
-PreviewTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-local PreviewName = Instance.new("TextLabel", PreviewCard)
-PreviewName.Text = LocalPlayer.DisplayName
-PreviewName.TextColor3 = Colors.TextPrimary
-PreviewName.Font = Enum.Font.GothamBold
-PreviewName.TextSize = 12
-PreviewName.Size = UDim2.new(0, 200, 0, 16)
-PreviewName.Position = UDim2.new(0, 12, 0, 22)
-PreviewName.BackgroundTransparency = 1
-PreviewName.TextXAlignment = Enum.TextXAlignment.Left
-
-local PreviewItem = Instance.new("TextLabel", PreviewCard)
-PreviewItem.Text = "Item  ·  $0"
-PreviewItem.TextColor3 = Colors.Accent
-PreviewItem.Font = Enum.Font.Gotham
-PreviewItem.TextSize = 11
-PreviewItem.Size = UDim2.new(0, 300, 0, 16)
-PreviewItem.Position = UDim2.new(0, 12, 0, 38)
-PreviewItem.BackgroundTransparency = 1
-PreviewItem.TextXAlignment = Enum.TextXAlignment.Left
-
-local function UpdatePreview()
-    local item = InputItem.Text ~= "" and InputItem.Text or "Item"
-    local val = tonumber(InputValue.Text) or 0
-    PreviewItem.Text = item .. "  ·  " .. FormatNumber(val) .. "/s"
-end
-
-InputItem:GetPropertyChangedSignal("Text"):Connect(UpdatePreview)
-InputValue:GetPropertyChangedSignal("Text"):Connect(UpdatePreview)
-
-local PostButton = Instance.new("TextButton", PagePost)
-PostButton.Text = "⚔  CREATE OFFER"
-PostButton.Size = UDim2.new(1, 0, 0, 48)
-PostButton.Position = UDim2.new(0, 0, 0, 300)
-PostButton.BackgroundColor3 = Colors.Accent
-PostButton.TextColor3 = Color3.fromRGB(10, 10, 10)
-PostButton.Font = Enum.Font.GothamBold
-PostButton.TextSize = 14
-PostButton.AutoButtonColor = false
-Instance.new("UICorner", PostButton).CornerRadius = UDim.new(0, 10)
-
-HoverBind(PostButton, Colors.Accent, Colors.AccentBright, Colors.AccentDark)
-
--- PAGE: HOST
-local PageHost = Instance.new("ScrollingFrame", ContentArea)
-PageHost.Size = UDim2.new(1, 0, 1, 0)
-PageHost.BackgroundTransparency = 1
-PageHost.ScrollBarThickness = 3
-PageHost.ScrollBarImageColor3 = Colors.Accent
-PageHost.CanvasSize = UDim2.new(0, 0, 0, 0)
-PageHost.Visible = false
-
-local UIListHost = Instance.new("UIListLayout", PageHost)
-UIListHost.Padding = UDim.new(0, 5)
-UIListHost.SortOrder = Enum.SortOrder.LayoutOrder
-Instance.new("UIPadding", PageHost).PaddingTop = UDim.new(0, 2)
-
-local HostEmpty = Instance.new("TextLabel", PageHost)
-HostEmpty.Name = "EmptyState"
-HostEmpty.Text = "📭  No incoming offers\nCreate an offer to start receiving"
-HostEmpty.TextColor3 = Colors.TextMuted
-HostEmpty.Font = Enum.Font.GothamSemibold
-HostEmpty.TextSize = 14
-HostEmpty.Size = UDim2.new(1, 0, 0, 100)
-HostEmpty.BackgroundTransparency = 1
-HostEmpty.LayoutOrder = 999999
-
---------------------------------------------------------------------------------
--- TAB SWITCHING
---------------------------------------------------------------------------------
-local currentTab = "OFFERS"
-local pages = {OFFERS = PageOffers, POST = PagePost, HOST = PageHost}
-
-local function SwitchTab(tab)
-    if currentTab == tab then return end
-
-    pages[currentTab].Visible = false
-    pages[tab].Visible = true
-
-    local btnTarget = tabButtons[tab]
-    if btnTarget then
-        Tween(TabIndicator, {Position = UDim2.new(0, btnTarget.Position.X.Offset, 1, -3), Size = UDim2.new(0, tabWidth, 0, 3)}, 0.3)
-        Tween(IndicatorGlow, {Position = UDim2.new(0, btnTarget.Position.X.Offset, 1, -6), Size = UDim2.new(0, tabWidth, 0, 8)}, 0.3)
-    end
-
-    for name, btn in pairs(tabButtons) do
-        Tween(btn, {TextColor3 = (name == tab) and Colors.TextPrimary or Colors.TextMuted}, 0.25)
-    end
-
-    SearchContainer.Visible = (tab == "OFFERS")
-    currentTab = tab
-end
-
-for name, btn in pairs(tabButtons) do
-    btn.MouseButton1Click:Connect(function()
-        RippleEffect(btn)
-        SwitchTab(name)
-    end)
-end
-
-tabButtons["OFFERS"].TextColor3 = Colors.TextPrimary
-
---------------------------------------------------------------------------------
--- WEBSOCKET FUNCTIONS
---------------------------------------------------------------------------------
-local function WsSend(payload)
-    if not ws then return false end
-    local ok = pcall(function() ws:Send(HttpService:JSONEncode(payload)) end)
-    return ok
-end
-
-local function StartPingLoop()
-    spawn(function()
-        while isConnected and ws do
-            pingTimestamp = tick()
-            local ok = WsSend({type = "ping", timestamp = pingTimestamp, clientId = my_client_id})
-            if not ok then
-                isConnected = false
-                StatusLabel.Text = "LOST"
-                Tween(StatusDot, {BackgroundColor3 = Color3.fromRGB(255, 150, 0)}, 0.3)
-                PingLabel.Text = ""
-                break
-            end
-            task.wait(15)
-        end
-    end)
-end
-
---------------------------------------------------------------------------------
--- OFFER CARD BUILDER
---------------------------------------------------------------------------------
-local function CreateOfferCard(parent, offer, isHostOffer)
-    if not parent or not parent.Parent then return nil end
-    if not offer then return nil end
+    emptyState.Visible = false
     
-    local rid = tostring(offer.roomId or offer.offerId or offer.from or HttpService:GenerateGUID(false))
-    local playerName = isHostOffer and (offer.from or offer.username or "Unknown") or (offer.host or offer.username or "Unknown")
-    local itemName = isHostOffer and (offer.name or offer.item or "Item") or (offer.item or "Item")
-    local valueText = isHostOffer and (offer.generationText or offer.valueText or "") or (offer.valueText or "")
-    local valueNum = tonumber(isHostOffer and (offer.generation or offer.valueNumber or 0) or (offer.valueNumber or 0)) or 0
-
-    if playerName == "Unknown" or playerName == "" then
-        return nil
-    end
-
-    local displayValue = valueText
-    if displayValue == "" or displayValue == "$0" then
-        displayValue = FormatNumber(valueNum) .. "/s"
-    end
-
-    local isMine = IsMyOffer(offer)
-    local cardHeight = isHostOffer and 64 or 56
-
-    local frame = Instance.new("Frame")
-    frame.Name = (isHostOffer and "HostOffer_" or "Offer_") .. rid
-    frame.Size = UDim2.new(1, 0, 0, cardHeight)
-    frame.BackgroundColor3 = isMine and Color3.fromRGB(20, 18, 10) or Colors.Card
-    frame.BorderSizePixel = 0
-    frame.ClipsDescendants = true
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-
-    local frameStroke = Instance.new("UIStroke", frame)
-    frameStroke.Color = isMine and Color3.fromRGB(80, 70, 30) or Colors.Border
-    frameStroke.Thickness = 1
-
-    local accent = Instance.new("Frame", frame)
-    accent.Size = UDim2.new(0, 3, 0, 24)
-    accent.Position = UDim2.new(0, 0, 0.5, -12)
-    accent.BackgroundColor3 = isMine and Colors.Success or Colors.Accent
-    accent.BorderSizePixel = 0
-    Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
-
-    local nameLbl = Instance.new("TextLabel", frame)
-    nameLbl.Text = playerName
-    nameLbl.TextColor3 = Colors.TextPrimary
-    nameLbl.Font = Enum.Font.GothamBold
-    nameLbl.TextSize = 12
-    nameLbl.Position = UDim2.new(0, 14, 0, 8)
-    nameLbl.Size = UDim2.new(0, 200, 0, 18)
-    nameLbl.BackgroundTransparency = 1
-    nameLbl.TextXAlignment = Enum.TextXAlignment.Left
-
-    local copyBtn = Instance.new("TextButton", frame)
-    copyBtn.Text = "📋"
-    copyBtn.Size = UDim2.new(0, 24, 0, 18)
-    copyBtn.BackgroundTransparency = 1
-    copyBtn.TextColor3 = Colors.TextMuted
-    copyBtn.Font = Enum.Font.Gotham
-    copyBtn.TextSize = 11
-    copyBtn.Position = UDim2.new(0, 220, 0, 8)
-
-    copyBtn.MouseEnter:Connect(function() Tween(copyBtn, {TextColor3 = Colors.Accent}, 0.15) end)
-    copyBtn.MouseLeave:Connect(function() Tween(copyBtn, {TextColor3 = Colors.TextMuted}, 0.15) end)
-    copyBtn.MouseButton1Click:Connect(function()
-        CopyToClipboard(playerName)
-        copyBtn.Text = "✓"
-        Tween(copyBtn, {TextColor3 = Colors.Success}, 0.15)
-        task.delay(1.2, function()
-            if copyBtn and copyBtn.Parent then
-                copyBtn.Text = "📋"
-                Tween(copyBtn, {TextColor3 = Colors.TextMuted}, 0.3)
-            end
-        end)
+    -- Create create listing frame
+    local createFrame = Instance.new("Frame")
+    createFrame.Size = UDim2.new(1, 0, 0, 280)
+    createFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+    createFrame.Parent = offersScroll
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 11)
+    frameCorner.Parent = createFrame
+    
+    local selectedPetLabel = Instance.new("TextLabel")
+    selectedPetLabel.Name = "SelectedPetLabel"
+    selectedPetLabel.Text = selectedPet and ("Selected: " .. selectedPet) or "No pet selected"
+    selectedPetLabel.TextSize = 14
+    selectedPetLabel.Size = UDim2.new(0, 340, 0, 24)
+    selectedPetLabel.Position = UDim2.new(0, 16, 0, 8)
+    selectedPetLabel.BackgroundTransparency = 1
+    selectedPetLabel.TextColor3 = Color3.fromRGB(160, 210, 140)
+    selectedPetLabel.Font = Enum.Font.GothamBold
+    selectedPetLabel.TextXAlignment = Enum.TextXAlignment.Left
+    selectedPetLabel.Parent = createFrame
+    
+    local selectPetBtn = Instance.new("TextButton")
+    selectPetBtn.Text = "SELECT PET"
+    selectPetBtn.Size = UDim2.new(0, 110, 0, 32)
+    selectPetBtn.Position = UDim2.new(1, -118, 0.5, -16)
+    selectPetBtn.BackgroundColor3 = Color3.fromRGB(75, 75, 75)
+    selectPetBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    selectPetBtn.Font = Enum.Font.GothamBold
+    selectPetBtn.TextSize = 11
+    selectPetBtn.Parent = createFrame
+    local selectBtnCorner = Instance.new("UICorner")
+    selectBtnCorner.CornerRadius = UDim.new(0, 6)
+    selectBtnCorner.Parent = selectPetBtn
+    selectPetBtn.MouseButton1Click:Connect(function()
+        loadPets()
+        petPopup.Visible = true
     end)
-
-    local infoLbl = Instance.new("TextLabel", frame)
-    infoLbl.Name = "ItemInfo"
-    infoLbl.Text = itemName .. "  ·  " .. displayValue
-    infoLbl.TextColor3 = Colors.Accent
-    infoLbl.Font = Enum.Font.Gotham
-    infoLbl.TextSize = 11
-    infoLbl.Position = UDim2.new(0, 14, 0, 28)
-    infoLbl.Size = UDim2.new(0, 350, 0, 16)
-    infoLbl.BackgroundTransparency = 1
-    infoLbl.TextXAlignment = Enum.TextXAlignment.Left
-
-    if isMine and not isHostOffer then
-        local tag = Instance.new("Frame", frame)
-        tag.Size = UDim2.new(0, 70, 0, 20)
-        tag.Position = UDim2.new(1, -160, 0.5, -10)
-        tag.BackgroundColor3 = Color3.fromRGB(50, 45, 20)
-        tag.BorderSizePixel = 0
-        Instance.new("UICorner", tag).CornerRadius = UDim.new(0, 6)
-
-        local tagLbl = Instance.new("TextLabel", tag)
-        tagLbl.Text = "YOURS"
-        tagLbl.TextColor3 = Colors.Accent
-        tagLbl.Font = Enum.Font.GothamBold
-        tagLbl.TextSize = 9
-        tagLbl.Size = UDim2.new(1, 0, 1, 0)
-        tagLbl.BackgroundTransparency = 1
-    end
-
-    if isHostOffer then
-        local btnAccept = Instance.new("TextButton", frame)
-        btnAccept.Text = "✓ ACCEPT"
-        btnAccept.Size = UDim2.new(0, 80, 0, 28)
-        btnAccept.Position = UDim2.new(1, -172, 0.5, -14)
-        btnAccept.BackgroundColor3 = Colors.Success
-        btnAccept.TextColor3 = Color3.fromRGB(10, 10, 10)
-        btnAccept.Font = Enum.Font.GothamBold
-        btnAccept.TextSize = 10
-        btnAccept.AutoButtonColor = false
-        Instance.new("UICorner", btnAccept).CornerRadius = UDim.new(0, 7)
-        HoverBind(btnAccept, Colors.Success, Color3.fromRGB(140, 220, 100), Color3.fromRGB(100, 180, 60))
-        btnAccept.MouseButton1Click:Connect(function() RippleEffect(btnAccept) end)
-
-        local btnReject = Instance.new("TextButton", frame)
-        btnReject.Text = "✕ REJECT"
-        btnReject.Size = UDim2.new(0, 80, 0, 28)
-        btnReject.Position = UDim2.new(1, -84, 0.5, -14)
-        btnReject.BackgroundColor3 = Colors.Danger
-        btnReject.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btnReject.Font = Enum.Font.GothamBold
-        btnReject.TextSize = 10
-        btnReject.AutoButtonColor = false
-        Instance.new("UICorner", btnReject).CornerRadius = UDim.new(0, 7)
-        HoverBind(btnReject, Colors.Danger, Color3.fromRGB(220, 80, 80), Color3.fromRGB(160, 40, 40))
-        btnReject.MouseButton1Click:Connect(function() RippleEffect(btnReject) end)
-
-        spawn(function()
-            accent.BackgroundColor3 = Colors.Accent
-            for i = 1, 3 do
-                Tween(frameStroke, {Color = Colors.AccentDark}, 0.15)
-                task.wait(0.2)
-                Tween(frameStroke, {Color = Colors.Border}, 0.15)
-                task.wait(0.2)
-            end
-        end)
-    else
-        if not isMine then
-            local offerBtn = Instance.new("TextButton", frame)
-            offerBtn.Text = "OFFER ▶"
-            offerBtn.Size = UDim2.new(0, 76, 0, 28)
-            offerBtn.Position = UDim2.new(1, -84, 0.5, -14)
-            offerBtn.BackgroundColor3 = Colors.Accent
-            offerBtn.TextColor3 = Color3.fromRGB(10, 10, 10)
-            offerBtn.Font = Enum.Font.GothamBold
-            offerBtn.TextSize = 10
-            offerBtn.AutoButtonColor = false
-            Instance.new("UICorner", offerBtn).CornerRadius = UDim.new(0, 7)
-            HoverBind(offerBtn, Colors.Accent, Colors.AccentBright, Colors.AccentDark)
-            offerBtn.MouseButton1Click:Connect(function() RippleEffect(offerBtn) end)
+    
+    local minOfferLabel = Instance.new("TextLabel")
+    minOfferLabel.Text = "Min Offer Value"
+    minOfferLabel.Size = UDim2.new(0.5, 0, 0, 14)
+    minOfferLabel.Position = UDim2.new(0, 0, 0, 78)
+    minOfferLabel.BackgroundTransparency = 1
+    minOfferLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    minOfferLabel.Font = Enum.Font.GothamBold
+    minOfferLabel.TextSize = 11
+    minOfferLabel.Parent = createFrame
+    
+    local minOfferFrame = Instance.new("Frame")
+    minOfferFrame.Size = UDim2.new(0.5, -5, 0, 43)
+    minOfferFrame.Position = UDim2.new(0, 0, 0, 95)
+    minOfferFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    minOfferFrame.Parent = createFrame
+    local minOfferCorner = Instance.new("UICorner")
+    minOfferCorner.CornerRadius = UDim.new(0, 8)
+    minOfferCorner.Parent = minOfferFrame
+    
+    local minOfferBox = Instance.new("TextBox")
+    minOfferBox.Size = UDim2.new(1, -20, 1, 0)
+    minOfferBox.Position = UDim2.new(0, 12, 0, 0)
+    minOfferBox.PlaceholderText = "e.g. 10m, 500k, 1b"
+    minOfferBox.BackgroundTransparency = 1
+    minOfferBox.TextColor3 = Color3.fromRGB(240, 240, 240)
+    minOfferBox.Font = Enum.Font.GothamMedium
+    minOfferBox.TextSize = 11
+    minOfferBox.ClearTextOnFocus = false
+    minOfferBox.Parent = minOfferFrame
+    
+    local infoLabel = Instance.new("TextLabel")
+    infoLabel.Text = "ℹ Incoming offers below this value will be hidden in Inbox"
+    infoLabel.Size = UDim2.new(1, 0, 0, 14)
+    infoLabel.Position = UDim2.new(0, 0, 0, 147)
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.TextColor3 = Color3.fromRGB(130, 130, 130)
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.TextSize = 10
+    infoLabel.Parent = createFrame
+    
+    local postBtn = Instance.new("TextButton")
+    postBtn.Text = "📤 POST OFFER"
+    postBtn.Size = UDim2.new(1, 0, 0, 52)
+    postBtn.Position = UDim2.new(0, 0, 0, 180)
+    postBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    postBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    postBtn.Font = Enum.Font.GothamBold
+    postBtn.TextSize = 12
+    postBtn.Parent = createFrame
+    local postCorner = Instance.new("UICorner")
+    postCorner.CornerRadius = UDim.new(0, 8)
+    postCorner.Parent = postBtn
+    postBtn.MouseButton1Click:Connect(function()
+        if not selectedPet then
+            -- show notification: select pet first
+            return
         end
-    end
-
-    frame.BackgroundTransparency = 0.6
-    frame.Parent = parent
-    Tween(frame, {BackgroundTransparency = 0}, 0.35, Enum.EasingStyle.Quart)
-
-    return frame
+        local minVal = minOfferBox.Text
+        -- Here you would send the offer to the server via remote event
+        print("Posting offer:", selectedPet, "min:", minVal)
+    end)
 end
 
---------------------------------------------------------------------------------
--- SEARCH FILTERING
---------------------------------------------------------------------------------
-local function FilterOffers(query)
-    if not PageOffers or not PageOffers.Parent then return end
-    query = string.lower(query or "")
-    
-    local hasVisible = false
-    for _, child in pairs(PageOffers:GetChildren()) do
-        if child:IsA("Frame") and child.Name:match("^Offer_") then
-            local itemLabel = child:FindFirstChild("ItemInfo")
-            if itemLabel then
-                local itemText = string.lower(itemLabel.Text)
-                local shouldShow = (query == "" or string.find(itemText, query, 1, true))
-                
-                child.Visible = shouldShow
-                if shouldShow then hasVisible = true end
-            end
-        end
+-- Inbox page (incoming offers)
+local function showInboxPage()
+    pageTitle.Text = "Inbox"
+    -- Clear and show incoming offers (placeholder)
+    for _, child in pairs(offersScroll:GetChildren()) do
+        if child ~= offersList and child ~= emptyState then child:Destroy() end
     end
+    emptyState.Visible = false
     
-    local empty = PageOffers:FindFirstChild("EmptyState")
-    if empty then
-        if query ~= "" and not hasVisible then
-            empty.Text = "🔍  No results for \"" .. query .. "\""
-            empty.Visible = true
-        elseif #allOffers == 0 then
-            empty.Text = "⏳  Waiting for offers..."
-            empty.Visible = true
-        else
-            empty.Visible = not hasVisible
-        end
-    end
+    local inboxFrame = Instance.new("Frame")
+    inboxFrame.Size = UDim2.new(1, 0, 0, 100)
+    inboxFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+    inboxFrame.Parent = offersScroll
+    local inboxCorner = Instance.new("UICorner")
+    inboxCorner.CornerRadius = UDim.new(0, 11)
+    inboxCorner.Parent = inboxFrame
+    
+    local noIncoming = Instance.new("TextLabel")
+    noIncoming.Text = "No incoming offers\nCreate a listing to start receiving"
+    noIncoming.Size = UDim2.new(1, 0, 1, 0)
+    noIncoming.BackgroundTransparency = 1
+    noIncoming.TextColor3 = Color3.fromRGB(120, 120, 120)
+    noIncoming.Font = Enum.Font.GothamMedium
+    noIncoming.TextSize = 13
+    noIncoming.TextXAlignment = Enum.TextXAlignment.Center
+    noIncoming.TextYAlignment = Enum.TextYAlignment.Center
+    noIncoming.Parent = inboxFrame
 end
 
-SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    currentSearchQuery = SearchBox.Text
-    FilterOffers(currentSearchQuery)
-end)
-
---------------------------------------------------------------------------------
--- UPDATE OFFERS LIST
---------------------------------------------------------------------------------
-local function UpdateOffersList(data)
-    if not data then return end
-    allOffers = data
+-- Live offers page (default)
+local function showOffersPage()
+    pageTitle.Text = "Live Offers"
+    -- Clear and show dummy offers (for demo)
+    for _, child in pairs(offersScroll:GetChildren()) do
+        if child ~= offersList and child ~= emptyState then child:Destroy() end
+    end
+    emptyState.Visible = false
     
-    if not PageOffers or not PageOffers.Parent then return end
-
-    local empty = PageOffers:FindFirstChild("EmptyState")
-    if empty then empty.Visible = (#data == 0) end
-
-    local newIds = {}
-    for _, offer in pairs(data) do
-        if offer.roomId then newIds[tostring(offer.roomId)] = true end
-    end
-
-    for id, _ in pairs(renderedOfferIds) do
-        if not newIds[id] then
-            local existing = PageOffers:FindFirstChild("Offer_" .. id)
-            if existing then
-                Tween(existing, {BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 0)}, 0.25)
-                task.delay(0.3, function() if existing and existing.Parent then existing:Destroy() end end)
-            end
-            renderedOfferIds[id] = nil
-        end
-    end
-
-    for _, offer in pairs(data) do
-        local rid = tostring(offer.roomId or "")
-        if rid ~= "" and not renderedOfferIds[rid] then
-            offerOrderCounter = offerOrderCounter - 1
-            local card = CreateOfferCard(PageOffers, offer, false)
-            if card then
-                card.LayoutOrder = offerOrderCounter
-                renderedOfferIds[rid] = true
-            end
-        end
-    end
-
-    task.defer(function()
-        if UIListOffers and UIListOffers.Parent then
-            local h = UIListOffers.AbsoluteContentSize.Y + 10
-            PageOffers.CanvasSize = UDim2.new(0, 0, 0, h)
-        end
+    -- Sample offers (in real script these would come from network)
+    local sampleOffers = {
+        {player = "arthurfriz", items = "Capitano Moby", value = "1.3B/s", avatar = ""},
+        {player = "1KINGDEMONJUNGKOOK1", items = "Nuclearo Dinossauro", value = "60M/s", avatar = ""},
+        {player = "reo_sprng", items = "Spaghetti Tualetti", value = "60M/s", avatar = ""},
+        {player = "zouzou590002", items = "Cooki and Milki", value = "155M/s", avatar = ""},
+    }
+    
+    for _, off in ipairs(sampleOffers) do
+        local offerFrame = Instance.new("Frame")
+        offerFrame.Size = UDim2.new(1, 0, 0, 78)
+        offerFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+        offerFrame.Parent = offersScroll
+        local frameCorner = Instance.new("UICorner")
+        frameCorner.CornerRadius = UDim.new(0, 10)
+        frameCorner.Parent = offerFrame
         
-        if currentSearchQuery ~= "" then
-            FilterOffers(currentSearchQuery)
-        end
-    end)
+        -- Avatar placeholder
+        local avatarFrame = Instance.new("Frame")
+        avatarFrame.Size = UDim2.new(0, 56, 0, 56)
+        avatarFrame.Position = UDim2.new(0, 10, 0.5, -28)
+        avatarFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        avatarFrame.Parent = offerFrame
+        local avCorner = Instance.new("UICorner")
+        avCorner.CornerRadius = UDim.new(0, 12)
+        avCorner.Parent = avatarFrame
+        
+        local playerName = Instance.new("TextLabel")
+        playerName.Text = off.player
+        playerName.Size = UDim2.new(0, 180, 0, 20)
+        playerName.Position = UDim2.new(0, 76, 0, 11)
+        playerName.BackgroundTransparency = 1
+        playerName.TextColor3 = Color3.fromRGB(240, 240, 240)
+        playerName.Font = Enum.Font.GothamBold
+        playerName.TextSize = 12
+        playerName.TextXAlignment = Enum.TextXAlignment.Left
+        playerName.Parent = offerFrame
+        
+        local itemInfo = Instance.new("TextLabel")
+        itemInfo.Text = off.items .. ";-;" .. off.value
+        itemInfo.Size = UDim2.new(0, 300, 0, 20)
+        itemInfo.Position = UDim2.new(0, 76, 0, 38)
+        itemInfo.BackgroundTransparency = 1
+        itemInfo.TextColor3 = Color3.fromRGB(180, 180, 180)
+        itemInfo.Font = Enum.Font.Gotham
+        itemInfo.TextSize = 11
+        itemInfo.TextXAlignment = Enum.TextXAlignment.Left
+        itemInfo.Parent = offerFrame
+        
+        local makeOffer = Instance.new("TextButton")
+        makeOffer.Text = "Make Offer"
+        makeOffer.Size = UDim2.new(0, 100, 0, 30)
+        makeOffer.Position = UDim2.new(1, -110, 0.5, -15)
+        makeOffer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        makeOffer.TextColor3 = Color3.fromRGB(240, 240, 240)
+        makeOffer.Font = Enum.Font.GothamBold
+        makeOffer.TextSize = 11
+        makeOffer.Parent = offerFrame
+        local moCorner = Instance.new("UICorner")
+        moCorner.CornerRadius = UDim.new(0, 6)
+        moCorner.Parent = makeOffer
+        makeOffer.MouseButton1Click:Connect(function()
+            print("Make offer to", off.player)
+        end)
+    end
 end
 
---------------------------------------------------------------------------------
--- UPDATE HOST OFFERS (Shows ALL offers from others, regardless of roomId)
---------------------------------------------------------------------------------
-local function UpdateHostOffers(offers)
-    if not PageHost or not PageHost.Parent then return end
-    
-    local hostEmpty = PageHost:FindFirstChild("EmptyState")
-    
-    if offers then
-        for _, offer in pairs(offers) do
-            local offerFrom = offer.from or offer.username or offer.host or ""
-            local offerFromDisplay = offer.displayName or ""
-            
-            local isFromMe = (offerFrom == LocalPlayer.Name)
-                or (offerFrom == LocalPlayer.DisplayName)
-                or (offerFromDisplay == LocalPlayer.Name)
-                or (offerFromDisplay == LocalPlayer.DisplayName)
-                or (offer.userId and offer.userId == LocalPlayer.UserId)
-                or (offer.clientId and offer.clientId == my_client_id)
-            
-            local isUnknown = (offerFrom == "" or offerFrom == "Unknown")
-            
-            if not isFromMe and not isUnknown then
-                local oid = tostring(offer.offerId or offer.roomId or offer.from or "") .. "_" .. tostring(offer.generation or offer.valueNumber or 0)
-                
-                local found = false
-                for _, existingOffer in pairs(allHostOffers) do
-                    local existingOid = tostring(existingOffer.offerId or existingOffer.roomId or existingOffer.from or "") .. "_" .. tostring(existingOffer.generation or existingOffer.valueNumber or 0)
-                    if existingOid == oid then
-                        found = true
-                        break
-                    end
-                end
-                
-                if not found then
-                    table.insert(allHostOffers, offer)
-                end
-            end
-        end
-    end
-
-    if #allHostOffers == 0 then
-        if hostEmpty then 
-            hostEmpty.Visible = true 
-            if my_current_room_id then
-                hostEmpty.Text = "⏳  Waiting for offers on your listing..."
-            else
-                hostEmpty.Text = "📭  No incoming offers\nCreate an offer to start receiving"
-            end
-        end
-        return
-    end
-
-    if hostEmpty then hostEmpty.Visible = false end
-
-    for _, offer in pairs(allHostOffers) do
-        local oid = tostring(offer.offerId or offer.roomId or offer.from or "") .. "_" .. tostring(offer.generation or offer.valueNumber or 0)
-        if oid ~= "" and not renderedHostOfferIds[oid] then
-            hostOrderCounter = hostOrderCounter - 1
-            local card = CreateOfferCard(PageHost, offer, true)
-            if card then
-                card.LayoutOrder = hostOrderCounter
-                renderedHostOfferIds[oid] = true
-            end
-        end
-    end
-
-    task.defer(function()
-        if UIListHost and UIListHost.Parent then
-            local h = UIListHost.AbsoluteContentSize.Y + 10
-            PageHost.CanvasSize = UDim2.new(0, 0, 0, h)
-        end
-    end)
-end
-
---------------------------------------------------------------------------------
--- WEBSOCKET CONNECTION
---------------------------------------------------------------------------------
-spawn(function()
-    if not WebSocket then return end
-
-    local ok, result = pcall(function()
-        return WebSocket("ws://chillihub.pro:8080")
-    end)
-
-    if not ok then
-        StatusLabel.Text = "FAIL"
-        return
-    end
-
-    ws = result
-
-    ws.OnMessage:Connect(function(msg)
-        local s, data = pcall(function() return HttpService:JSONDecode(msg) end)
-        if not s or not data then return end
-
-        if data.type == "connect_success" then
-            WsSend({type = "identify", name = LocalPlayer.Name, displayName = LocalPlayer.DisplayName})
-
-        elseif data.type == "identify_ok" then
-            isConnected = true
-            StatusLabel.Text = "ONLINE"
-            Tween(StatusDot, {BackgroundColor3 = Colors.Success}, 0.3)
-            Tween(StatusLabel, {TextColor3 = Colors.Success}, 0.3)
-            StartPingLoop()
-
-        elseif data.type == "pong" then
-            local latency = math.floor((tick() - pingTimestamp) * 1000)
-            PingLabel.Text = latency .. "ms"
-            PingLabel.TextColor3 = latency < 80 and Colors.Success or latency < 200 and Colors.Accent or Colors.Danger
-
-        elseif data.type == "wager_list_update" then
-            if data.data then 
-                UpdateOffersList(data.data)
-            end
-
-        elseif data.type == "host_offers_update" then
-            if data.offers then
-                UpdateHostOffers(data.offers)
-            end
-        end
-    end)
-
-    ws.OnClose:Connect(function()
-        isConnected = false
-        StatusLabel.Text = "CLOSED"
-        Tween(StatusDot, {BackgroundColor3 = Colors.Danger}, 0.3)
-        Tween(StatusLabel, {TextColor3 = Colors.TextMuted}, 0.3)
-        PingLabel.Text = ""
-    end)
+-- Navigation logic
+offersBtn.MouseButton1Click:Connect(function()
+    showOffersPage()
+    -- Visual feedback
+    offersBg.Visible = true
+    createBg.Visible = false
+    inboxBg.Visible = false
+    offersPip.Visible = true
+    createPip.Visible = false
+    inboxPip.Visible = false
 end)
 
---------------------------------------------------------------------------------
--- CREATE OFFER BUTTON
---------------------------------------------------------------------------------
-PostButton.MouseButton1Click:Connect(function()
-    if not ws then return end
+createBtn.MouseButton1Click:Connect(function()
+    showCreatePage()
+    offersBg.Visible = false
+    createBg.Visible = true
+    inboxBg.Visible = false
+    offersPip.Visible = false
+    createPip.Visible = true
+    inboxPip.Visible = false
+end)
 
-    local itemName = InputItem.Text
-    local valNum = tonumber(InputValue.Text) or 0
-    local minVal = tonumber(InputMin.Text) or 0
+inboxBtn.MouseButton1Click:Connect(function()
+    showInboxPage()
+    offersBg.Visible = false
+    createBg.Visible = false
+    inboxBg.Visible = true
+    offersPip.Visible = false
+    createPip.Visible = false
+    inboxPip.Visible = true
+end)
 
-    if itemName == "" then
-        if InputItemContainer then
-            local origPos = InputItemContainer.Position
-            for i = 1, 4 do
-                Tween(InputItemContainer, {Position = UDim2.new(origPos.X.Scale, origPos.X.Offset + 6, origPos.Y.Scale, origPos.Y.Offset)}, 0.05)
-                task.wait(0.05)
-                Tween(InputItemContainer, {Position = UDim2.new(origPos.X.Scale, origPos.X.Offset - 6, origPos.Y.Scale, origPos.Y.Offset)}, 0.05)
-                task.wait(0.05)
-            end
-            Tween(InputItemContainer, {Position = origPos}, 0.05)
-        end
-        return
-    end
+-- Show offers page by default
+showOffersPage()
+offersBg.Visible = true
+offersPip.Visible = true
 
-    local valTxt = FormatNumber(valNum) .. "/s"
+-- Toggle main frame visibility
+local guiVisible = true
+toggleButton.MouseButton1Click:Connect(function()
+    guiVisible = not guiVisible
+    mainFrame.Visible = guiVisible
+end)
 
-    my_current_room_id = HttpService:GenerateGUID(false)
-
-    RippleEffect(PostButton)
-
-    WsSend({
-        type = "host_create",
-        room = {
-            roomId = my_current_room_id,
-            minValue = minVal,
-            clientId = my_client_id,
-            userId = LocalPlayer.UserId,
-            serverType = "public",
-            valueText = valTxt,
-            item = itemName,
-            valueNumber = valNum,
-            mutation = "",
-            username = LocalPlayer.Name,
-            displayName = LocalPlayer.DisplayName
-        }
-    })
-
-    Tween(PostButton, {BackgroundColor3 = Colors.Success}, 0.15)
-    PostButton.Text = "✓  OFFER CREATED!"
-    PostButton.TextColor3 = Color3.fromRGB(10, 10, 10)
-    task.delay(1.5, function()
-        if PostButton and PostButton.Parent then
-            Tween(PostButton, {BackgroundColor3 = Colors.Accent}, 0.3)
-            PostButton.Text = "⚔  CREATE OFFER"
-        end
-    end)
-
-    -- Update empty state text but don't switch tab
-    local hostEmpty = PageHost:FindFirstChild("EmptyState")
-    if hostEmpty and #allHostOffers == 0 then
-        hostEmpty.Text = "⏳  Waiting for offers on your listing..."
-        hostEmpty.Visible = true
+-- End key toggle
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.End then
+        guiVisible = not guiVisible
+        mainFrame.Visible = guiVisible
     end
 end)
+
+-- Minimize button functionality (collapse sidebar? actually just close main frame)
+minButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    guiVisible = false
+end)
+
+-- Load pets when popup opens (first time)
+loadPets()
+
+print("Vyse Duels v2 loaded (deobfuscated). Press End to toggle GUI.")
