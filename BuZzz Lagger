@@ -3062,7 +3062,7 @@ do
     sbGrad.Parent = sidebar
 end
 
--- Logo image at top of sidebar (Mikka Hub logo)
+-- Logo image at top of sidebar (Mikka Hub logo) — subtle breathing animation
 local logoImg = New("ImageLabel", {
     Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
     BackgroundTransparency=1,
@@ -3071,6 +3071,19 @@ local logoImg = New("ImageLabel", {
     Parent=sidebar,
 })
 Corner(logoImg, 26)
+-- Gentle breathing scale on the logo
+task.spawn(function()
+    while logoImg and logoImg.Parent do
+        TweenService:Create(logoImg, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+            Size=UDim2.new(0,56,0,56), Position=UDim2.new(0.5,-28,0,4),
+        }):Play()
+        task.wait(1.8)
+        TweenService:Create(logoImg, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+            Size=UDim2.new(0,52,0,52), Position=UDim2.new(0.5,-26,0,6),
+        }):Play()
+        task.wait(1.8)
+    end
+end)
 
 -- Thin divider under logo
 New("Frame", {
@@ -3078,39 +3091,41 @@ New("Frame", {
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=sidebar,
 })
 
--- Nav icon buttons (vertical stack) with animated hover
+-- Nav icon buttons (vertical stack) with hover animations
 local NAV_ICONS = {"🐾","💸","🏡","⚙️"}
 local NAV_NAMES = {"Brainrots","Trading","Base","Misc"}
-local NAV_TOOLTIPS = {"Brainrots","Trading","Base","Settings"}
 local navBtns = {}
 for i, icon in ipairs(NAV_ICONS) do
     local btn = New("TextButton", {
-        Size=UDim2.new(0,50,0,50),
-        Position=UDim2.new(0.5,-25,0,68 + (i-1)*56),
+        Size=UDim2.new(0,48,0,48),
+        Position=UDim2.new(0.5,-24,0,68 + (i-1)*56),
         BackgroundColor3=Color3.fromRGB(38,8,28),
         Text=icon, TextColor3=Color3.fromRGB(255,175,210),
         Font=Enum.Font.FredokaOne, TextSize=22,
         AutoButtonColor=false, BorderSizePixel=0, Parent=sidebar,
     })
     Corner(btn, 16)
-    Stroke(btn, Color3.fromRGB(255,80,160), 1.5, 0.35)
+    Stroke(btn, Color3.fromRGB(255,80,160), 1.5, 0.4)
     navBtns[i] = btn
-    -- Hover animations
+    local basePos = UDim2.new(0.5,-24,0,68+(i-1)*56)
     btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size=UDim2.new(0,54,0,54),
-            Position=UDim2.new(0.5,-27,0,66 + (i-1)*56),
-            BackgroundColor3=Color3.fromRGB(255,50,130),
-            TextColor3=Color3.fromRGB(255,255,255),
+        TweenService:Create(btn, TweenInfo.new(0.13, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size=UDim2.new(0,52,0,52),
+            Position=UDim2.new(0.5,-26,0,66+(i-1)*56),
+            BackgroundColor3=Color3.fromRGB(60,14,44),
         }):Play()
     end)
     btn.MouseLeave:Connect(function()
-        if NAV_NAMES[i] ~= (NAV_NAMES[({brainrotsPage.Visible and 1, tradingPage and 2, basePage and 3, miscPage and 4})[1]] or "") then
-            TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Size=UDim2.new(0,50,0,50),
-                Position=UDim2.new(0.5,-25,0,68 + (i-1)*56),
-            }):Play()
-        end
+        TweenService:Create(btn, TweenInfo.new(0.13, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size=UDim2.new(0,48,0,48),
+            Position=basePos,
+        }):Play()
+    end)
+    btn.MouseButton1Down:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.07), {Size=UDim2.new(0,44,0,44),Position=UDim2.new(0.5,-22,0,70+(i-1)*56)}):Play()
+    end)
+    btn.MouseButton1Up:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size=UDim2.new(0,48,0,48),Position=basePos}):Play()
     end)
 end
 
@@ -3147,16 +3162,16 @@ local toggleGlow = New("Frame", {
     BorderSizePixel=0, Parent=_guiToggleBtn,
 })
 
--- Hover effects for toggle
+-- Hover effects for toggle — smooth tween
 _guiToggleBtn.MouseEnter:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = contentVisible
-        and Color3.fromRGB(255,100,170)
-        or  Color3.fromRGB(70,16,50)
+    TweenService:Create(_guiToggleBtn, TweenInfo.new(0.12), {
+        BackgroundColor3 = contentVisible and Color3.fromRGB(255,100,170) or Color3.fromRGB(70,16,50),
+    }):Play()
 end)
 _guiToggleBtn.MouseLeave:Connect(function()
-    _guiToggleBtn.BackgroundColor3 = contentVisible
-        and Color3.fromRGB(255,60,140)
-        or  Color3.fromRGB(48,10,34)
+    TweenService:Create(_guiToggleBtn, TweenInfo.new(0.12), {
+        BackgroundColor3 = contentVisible and Color3.fromRGB(255,60,140) or Color3.fromRGB(48,10,34),
+    }):Play()
 end)
 
 MakeDraggable(win, sidebar)
@@ -3200,7 +3215,7 @@ New("Frame", {
     Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,1,-20),
     BackgroundColor3=Color3.fromRGB(28,6,20), BorderSizePixel=0, Parent=cpHeader,
 })
--- Gradient shimmer bar across the top
+-- Gradient shimmer bar across the top — animated scrolling
 local headerAccentBar = New("Frame", {
     Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
     BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=cpHeader,
@@ -3210,11 +3225,21 @@ do
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,230)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(200,80,255)),
+        ColorSequenceKeypoint.new(0.33,Color3.fromRGB(255,200,240)),
+        ColorSequenceKeypoint.new(0.66,Color3.fromRGB(160,80,255)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(255,60,160)),
     })
     grad.Rotation = 0
     grad.Parent = headerAccentBar
+    -- Continuously scroll the shimmer
+    task.spawn(function()
+        local t = 0
+        while headerAccentBar and headerAccentBar.Parent do
+            t = t + task.wait(0.025)
+            local offset = (t * 0.35) % 1
+            grad.Offset = Vector2.new(offset, 0)
+        end
+    end)
 end
 
 -- Logo image (left side, circular)
@@ -3263,88 +3288,83 @@ local cpTitle = New("TextLabel", {
     Parent=cpHeader,
 })
 
--- ── Modernized Discord invite button ─────────────────────────────────────────
-local discordBtn = New("Frame", {
+-- Discord button — clean Discord-blue, shows server name + invite link
+local discordCard = New("Frame", {
     Size=UDim2.new(0,148,0,44), Position=UDim2.new(1,-154,0,14),
     BackgroundColor3=Color3.fromRGB(88,101,242),
-    BorderSizePixel=0,
-    Parent=cpHeader,
+    BorderSizePixel=0, Parent=cpHeader,
 })
-Corner(discordBtn, 12)
-Stroke(discordBtn, Color3.fromRGB(180,190,255), 1.5, 0.1)
+Corner(discordCard, 12)
+Stroke(discordCard, Color3.fromRGB(160,170,255), 1.5, 0.15)
 do
     local dg = Instance.new("UIGradient")
     dg.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(100,115,255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(68,85,220)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(114,137,218)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(66,79,194)),
     })
     dg.Rotation = 135
-    dg.Parent = discordBtn
+    dg.Parent = discordCard
 end
--- Subtle shimmer at top of button
+-- Shine line at top
 New("Frame", {
-    Size=UDim2.new(1,-6,0,1), Position=UDim2.new(0,3,0,4),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.55,
-    BorderSizePixel=0, Parent=discordBtn,
+    Size=UDim2.new(0.7,0,0,1), Position=UDim2.new(0.15,0,0,3),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.5,
+    BorderSizePixel=0, Parent=discordCard,
 })
--- Discord logo icon area
-local discLogoFrame = New("Frame", {
-    Size=UDim2.new(0,26,0,26), Position=UDim2.new(0,7,0.5,-13),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.88,
-    BorderSizePixel=0, Parent=discordBtn,
+-- Icon bg bubble
+local discIconBg = New("Frame", {
+    Size=UDim2.new(0,28,0,28), Position=UDim2.new(0,7,0.5,-14),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.85,
+    BorderSizePixel=0, Parent=discordCard,
 })
-Corner(discLogoFrame, 8)
+Corner(discIconBg, 9)
 New("TextLabel", {
     Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text="💬",
-    TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.GothamBold, TextSize=14,
-    TextXAlignment=Enum.TextXAlignment.Center, Parent=discLogoFrame,
+    Font=Enum.Font.GothamBold, TextSize=15,
+    TextXAlignment=Enum.TextXAlignment.Center, Parent=discIconBg,
 })
--- "JOIN" label
+-- "JOIN SERVER" small label
 New("TextLabel", {
-    Size=UDim2.new(1,-40,0,14), Position=UDim2.new(0,37,0,5),
-    BackgroundTransparency=1, Text="JOIN DISCORD",
-    TextColor3=Color3.fromRGB(210,220,255),
+    Size=UDim2.new(1,-40,0,14), Position=UDim2.new(0,38,0,6),
+    BackgroundTransparency=1, Text="JOIN SERVER",
+    TextColor3=Color3.fromRGB(185,200,255),
     Font=Enum.Font.GothamBold, TextSize=9,
-    TextXAlignment=Enum.TextXAlignment.Left, Parent=discordBtn,
+    TextXAlignment=Enum.TextXAlignment.Left, Parent=discordCard,
 })
--- Invite code preview
+-- Invite code — always visible
 New("TextLabel", {
-    Size=UDim2.new(1,-40,0,16), Position=UDim2.new(0,37,0,22),
-    BackgroundTransparency=1, Text="discord.gg/Rfb9NPuGZv",
+    Size=UDim2.new(1,-40,0,15), Position=UDim2.new(0,38,0,22),
+    BackgroundTransparency=1, Text="gg/Rfb9NPuGZv",
     TextColor3=Color3.fromRGB(255,255,255),
-    Font=Enum.Font.Gotham, TextSize=10,
+    Font=Enum.Font.GothamBold, TextSize=11,
     TextXAlignment=Enum.TextXAlignment.Left,
-    TextTruncate=Enum.TextTruncate.AtEnd, Parent=discordBtn,
+    TextTruncate=Enum.TextTruncate.AtEnd, Parent=discordCard,
 })
--- Actual click button overlay
-local discordClickBtn = New("TextButton", {
+local discordBtn = New("TextButton", {
     Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
-    Text="", AutoButtonColor=false, Parent=discordBtn,
+    Text="", AutoButtonColor=false, Parent=discordCard,
 })
-discordClickBtn.MouseEnter:Connect(function()
-    TweenService:Create(discordBtn, TweenInfo.new(0.15), {
-        BackgroundColor3=Color3.fromRGB(110,125,255)
+discordBtn.MouseEnter:Connect(function()
+    TweenService:Create(discordCard, TweenInfo.new(0.14, Enum.EasingStyle.Quad), {
+        BackgroundColor3=Color3.fromRGB(105,120,255),
     }):Play()
 end)
-discordClickBtn.MouseLeave:Connect(function()
-    TweenService:Create(discordBtn, TweenInfo.new(0.15), {
-        BackgroundColor3=Color3.fromRGB(88,101,242)
+discordBtn.MouseLeave:Connect(function()
+    TweenService:Create(discordCard, TweenInfo.new(0.14, Enum.EasingStyle.Quad), {
+        BackgroundColor3=Color3.fromRGB(88,101,242),
     }):Play()
 end)
-discordClickBtn.Activated:Connect(function()
+discordBtn.MouseButton1Down:Connect(function()
+    TweenService:Create(discordCard, TweenInfo.new(0.07), {BackgroundColor3=Color3.fromRGB(60,80,200)}):Play()
+end)
+discordBtn.Activated:Connect(function()
     pcall(function() setclipboard("https://discord.gg/Rfb9NPuGZv") end)
-    -- Flash to green on copy
-    TweenService:Create(discordBtn, TweenInfo.new(0.1), {
-        BackgroundColor3=Color3.fromRGB(40,200,80)
-    }):Play()
-    task.delay(0.5, function()
-        TweenService:Create(discordBtn, TweenInfo.new(0.2), {
-            BackgroundColor3=Color3.fromRGB(88,101,242)
-        }):Play()
+    TweenService:Create(discordCard, TweenInfo.new(0.1), {BackgroundColor3=Color3.fromRGB(40,200,100)}):Play()
+    task.delay(0.7, function()
+        TweenService:Create(discordCard, TweenInfo.new(0.2), {BackgroundColor3=Color3.fromRGB(88,101,242)}):Play()
     end)
     pcall(function()
-        SetStatus("✓ Discord invite copied!", Color3.fromRGB(100,180,255), 3)
+        SetStatus("✓ discord.gg/Rfb9NPuGZv copied!", Color3.fromRGB(100,180,255), 3)
     end)
 end)
 
@@ -3457,69 +3477,77 @@ do
     end
 end
 
--- Collapse toggle with smooth in-place animation
+-- Collapse toggle — smooth in-place animation
+local _isAnimating = false
 _guiToggleBtn.Activated:Connect(function()
+    if _isAnimating then return end
     contentVisible = not contentVisible
 
     if contentVisible then
-        -- OPEN state — fade in then resize
-        contentPanel.Visible = true
-        contentPanel.BackgroundTransparency = 1
-        TweenService:Create(contentPanel, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 0
-        }):Play()
+        -- ── OPEN: reveal content panel with scale+fade ──
+        _isAnimating = true
         _guiToggleBtn.Text = "◀◀"
-        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(255,60,140)
+        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            BackgroundColor3 = Color3.fromRGB(255,60,140),
         }):Play()
         pcall(function()
             local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
-            if tg then
-                tg.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,160)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(200,30,200)),
-                })
-            end
+            if tg then tg.Color = ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(255,80,160)),ColorSequenceKeypoint.new(1,Color3.fromRGB(200,30,200))}) end
         end)
+        -- Show panel, start transparent, tween opacity in
+        contentPanel.Visible = true
+        contentPanel.BackgroundTransparency = 1
+        for _, child in ipairs(contentPanel:GetDescendants()) do
+            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("Frame") then
+                pcall(function()
+                    if child:GetAttribute("_origTrans") ~= nil then
+                        child.BackgroundTransparency = 1
+                    end
+                end)
+            end
+        end
+        TweenService:Create(contentPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0,
+        }):Play()
         task.defer(function()
             task.wait(0.05)
             _forceResize()
+            task.wait(0.25)
+            _isAnimating = false
         end)
     else
-        -- CLOSED state — shrink animate then hide
+        -- ── CLOSE: shrink content panel with tween ──
+        _isAnimating = true
         _guiToggleBtn.Text = "▶▶"
-        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(48,10,34)
+        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundColor3 = Color3.fromRGB(48,10,34),
         }):Play()
         pcall(function()
             local tg = _guiToggleBtn:FindFirstChildOfClass("UIGradient")
-            if tg then
-                tg.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(55,12,40)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(35,8,26)),
-                })
-            end
+            if tg then tg.Color = ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(55,12,40)),ColorSequenceKeypoint.new(1,Color3.fromRGB(35,8,26))}) end
         end)
-        local MIN_HEIGHT = 380
-        -- Animate the collapse
-        TweenService:Create(contentPanel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            BackgroundTransparency = 1
+        -- Fade out first, then collapse height
+        TweenService:Create(contentPanel, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            BackgroundTransparency = 1,
         }):Play()
-        TweenService:Create(sidebar, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-            Size = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT)
-        }):Play()
-        TweenService:Create(win, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-            Size = UDim2.new(0,WIN_W,0,MIN_HEIGHT)
-        }):Play()
-        task.delay(0.22, function()
+        task.delay(0.15, function()
             contentPanel.Visible = false
             contentPanel.BackgroundTransparency = 0
+            local MIN_HEIGHT = 380
             contentPanel.Size = UDim2.new(0,CONTENT_W,0,MIN_HEIGHT)
+            TweenService:Create(sidebar, TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut), {
+                Size = UDim2.new(0,SIDEBAR_W,0,MIN_HEIGHT),
+            }):Play()
+            TweenService:Create(win, TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut), {
+                Size = UDim2.new(0,WIN_W,0,MIN_HEIGHT),
+            }):Play()
+            _guiToggleBtn.Position = UDim2.new(0.5,-24,1,-38)
+            for i, btn in ipairs(navBtns) do
+                btn.Position = UDim2.new(0.5,-24,0,68+(i-1)*56)
+            end
+            task.wait(0.25)
+            _isAnimating = false
         end)
-        _guiToggleBtn.Position = UDim2.new(0.5,-24,1,-38)
-        for i, btn in ipairs(navBtns) do
-            btn.Position = UDim2.new(0.5,-24,0,68+(i-1)*56)
-        end
     end
 end)
 
@@ -3647,11 +3675,16 @@ local function SetTab(tab)
     tradingPage.Visible   = tab == "Trading"
     basePage.Visible      = tab == "Base"
     miscPage.Visible      = tab == "Misc"
+    -- Animate subtitle fade
+    cpTitle.TextTransparency = 1
     cpTitle.Text = CP_TITLES[tab] or tab
+    TweenService:Create(cpTitle, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        TextTransparency = 0
+    }):Play()
     for i, btn in ipairs(navBtns) do
         local active = NAV_NAMES[i] == tab
-        -- Animate nav button color
-        TweenService:Create(btn, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {
+        -- Tween nav button color
+        TweenService:Create(btn, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = active and Color3.fromRGB(255,60,140) or Color3.fromRGB(38,8,28),
             TextColor3       = active and Color3.fromRGB(255,255,255) or Color3.fromRGB(255,155,200),
         }):Play()
@@ -3659,35 +3692,23 @@ local function SetTab(tab)
             pcall(function() Stroke(btn, Color3.fromRGB(255,200,230), 2, 0.0) end)
         end
     end
-    -- Animate tab content fade-in
-    mainContent.BackgroundTransparency = 1
-    TweenService:Create(mainContent, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundTransparency = 0
-    }):Play()
     -- Recalculate window height for the newly visible tab
     if contentVisible then
         task.defer(function()
-            task.wait(0.08) -- Let layout update fully
+            task.wait(0.08)
             _forceResize()
         end)
     else
         -- If switching tabs while collapsed, auto-expand
         contentVisible = true
         contentPanel.Visible = true
-        contentPanel.BackgroundTransparency = 1
-        TweenService:Create(contentPanel, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 0
-        }):Play()
         _guiToggleBtn.Text = "◀◀"
-        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(255,80,150)
-        }):Play()
+        TweenService:Create(_guiToggleBtn, TweenInfo.new(0.15), {BackgroundColor3=Color3.fromRGB(255,80,150)}):Play()
         task.defer(function()
             task.wait(0.08)
             _forceResize()
         end)
     end
-    -- Force toggle button to stay at bottom of sidebar
     _guiToggleBtn.Position = UDim2.new(0.5, -24, 1, -38)
 end
 SetTab("Brainrots")
@@ -3697,45 +3718,25 @@ navBtns[3].Activated:Connect(function() SetTab("Base")      end)
 navBtns[4].Activated:Connect(function() SetTab("Misc")      end)
 
 local selectedHeader = New("Frame", {
-    Size=UDim2.new(1,0,0,82), BackgroundColor3=Color3.fromRGB(22,5,16),
+    Size=UDim2.new(1,0,0,76), BackgroundColor3=Color3.fromRGB(22,5,16),
     BorderSizePixel=0, LayoutOrder=1, Parent=brainrotsPage,
 })
-Corner(selectedHeader, 18)
+Corner(selectedHeader, 16)
 Stroke(selectedHeader, Color3.fromRGB(255,80,160), 2, 0.1)
-do
-    local cardGradSH = Instance.new("UIGradient")
-    cardGradSH.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0,   Color3.fromRGB(40,8,30)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(18,4,14)),
-    })
-    cardGradSH.Rotation = 135
-    cardGradSH.Parent = selectedHeader
-end
--- Animated rainbow glow bar at top
+-- Top gradient glow bar
 local shTopBar = New("Frame", {
-    Size=UDim2.new(1,0,0,4), Position=UDim2.new(0,0,0,0),
+    Size=UDim2.new(1,0,0,3), Position=UDim2.new(0,0,0,0),
     BackgroundColor3=Color3.fromRGB(255,80,160), BorderSizePixel=0, Parent=selectedHeader,
 })
-Corner(shTopBar, 4)
+Corner(shTopBar, 3)
 do
     local sg2 = Instance.new("UIGradient")
     sg2.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0,   Color3.fromRGB(255,60,160)),
-        ColorSequenceKeypoint.new(0.35, Color3.fromRGB(255,200,230)),
-        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(190,60,255)),
-        ColorSequenceKeypoint.new(1,   Color3.fromRGB(255,60,160)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,200,230)),
+        ColorSequenceKeypoint.new(1,   Color3.fromRGB(190,60,255)),
     })
-    sg2.Rotation = 0
     sg2.Parent = shTopBar
-    -- Animate the gradient shimmer
-    task.spawn(function()
-        local offset = 0
-        while true do
-            task.wait(0.03)
-            offset = (offset + 0.012) % 1
-            sg2.Offset = Vector2.new(offset, 0)
-        end
-    end)
 end
 -- Background gradient for card
 do
@@ -4170,18 +4171,17 @@ plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(30
 plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(20,180,80) end)
 
 local spawnBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,56), BackgroundColor3=Color3.fromRGB(20,190,90),
+    Size=UDim2.new(1,0,0,52), BackgroundColor3=Color3.fromRGB(20,190,90),
     BorderSizePixel=0, Text="",
     TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold,
     TextSize=15, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
 })
-Corner(spawnBtn, 16)
-Stroke(spawnBtn, Color3.fromRGB(80,255,150), 2.5, 0.1)
+Corner(spawnBtn, 14)
+Stroke(spawnBtn, Color3.fromRGB(80,255,150), 2, 0.15)
 do
     local spGrad = Instance.new("UIGradient")
     spGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(40,230,110)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20,200,90)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30,220,100)),
         ColorSequenceKeypoint.new(1, Color3.fromRGB(10,160,70)),
     })
     spGrad.Rotation = 90
@@ -4189,133 +4189,99 @@ do
 end
 -- Top shine
 New("Frame", {
-    Size=UDim2.new(0.7,0,0,2), Position=UDim2.new(0.15,0,0,5),
-    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.6,
+    Size=UDim2.new(1,-4,0,1), Position=UDim2.new(0,2,0,6),
+    BackgroundColor3=Color3.fromRGB(255,255,255), BackgroundTransparency=0.7,
     BorderSizePixel=0, Parent=spawnBtn,
 })
-pcall(function()
-    local sc = spawnBtn:FindFirstChildOfClass("Frame")
-    if sc then Corner(sc, 2) end
-end)
 -- Icon
 New("TextLabel", {
     Size=UDim2.new(0,44,1,0), Position=UDim2.new(0,6,0,0),
     BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.GothamBold, TextSize=24,
+    Font=Enum.Font.GothamBold, TextSize=22,
     TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
 -- Label
 New("TextLabel", {
-    Size=UDim2.new(1,-54,1,0), Position=UDim2.new(0,48,0,0),
+    Size=UDim2.new(1,-54,1,0), Position=UDim2.new(0,50,0,0),
     BackgroundTransparency=1, Text="SPAWN ONTO PODIUM",
     TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
-    TextSize=15, TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
+    TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, Parent=spawnBtn,
 })
--- Animated hover + click
 spawnBtn.MouseEnter:Connect(function()
-    TweenService:Create(spawnBtn, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
-        Size=UDim2.new(1,0,0,60),
-        BackgroundColor3=Color3.fromRGB(50,245,125),
+    TweenService:Create(spawnBtn, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3=Color3.fromRGB(45,235,115),
+        Size=UDim2.new(1,0,0,54),
     }):Play()
 end)
 spawnBtn.MouseLeave:Connect(function()
-    TweenService:Create(spawnBtn, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
-        Size=UDim2.new(1,0,0,56),
+    TweenService:Create(spawnBtn, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         BackgroundColor3=Color3.fromRGB(20,190,90),
+        Size=UDim2.new(1,0,0,52),
     }):Play()
 end)
 spawnBtn.MouseButton1Down:Connect(function()
-    TweenService:Create(spawnBtn, TweenInfo.new(0.08), {
-        Size=UDim2.new(1,-4,0,52)
-    }):Play()
+    TweenService:Create(spawnBtn, TweenInfo.new(0.07), {Size=UDim2.new(1,-6,0,48)}):Play()
 end)
 spawnBtn.MouseButton1Up:Connect(function()
-    TweenService:Create(spawnBtn, TweenInfo.new(0.12), {
-        Size=UDim2.new(1,0,0,56)
-    }):Play()
+    TweenService:Create(spawnBtn, TweenInfo.new(0.1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size=UDim2.new(1,0,0,52)}):Play()
 end)
 
--- ── Status label (modernized pill card) ──────────────────────
+-- ── Status label (pill card style) ──────────────────────
 local statusCard = New("Frame", {
-    Size=UDim2.new(1,0,0,36), BackgroundColor3=Color3.fromRGB(30,8,22),
+    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(40,12,28),
     BorderSizePixel=0, LayoutOrder=10, Parent=brainrotsPage,
 })
-Corner(statusCard, 10)
-Stroke(statusCard, Color3.fromRGB(255,105,170), 1.5, 0.25)
-do
-    local scGrad = Instance.new("UIGradient")
-    scGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(48,10,32)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(20,5,15)),
-    })
-    scGrad.Rotation = 90
-    scGrad.Parent = statusCard
-end
+Corner(statusCard, 8)
+Stroke(statusCard, Color3.fromRGB(255,105,170), 1, 0.4)
 -- Accent left bar
 New("Frame", {
-    Size=UDim2.new(0,3,0.65,0), Position=UDim2.new(0,0,0.175,0),
+    Size=UDim2.new(0,3,0.7,0), Position=UDim2.new(0,0,0.15,0),
     BackgroundColor3=Color3.fromRGB(255,105,170), BorderSizePixel=0, Parent=statusCard,
 })
 -- Animated pulse dot indicator
-local statusDot = New("Frame", {
-    Size=UDim2.new(0,8,0,8), Position=UDim2.new(0,10,0.5,-4),
+local _statusDot = New("Frame", {
+    Size=UDim2.new(0,7,0,7), Position=UDim2.new(0,10,0.5,-3.5),
     BackgroundColor3=Color3.fromRGB(50,220,110), BorderSizePixel=0, Parent=statusCard,
 })
-local _statusDotCorner = Instance.new("UICorner"); _statusDotCorner.CornerRadius=UDim.new(1,0); _statusDotCorner.Parent=statusDot
--- Pulse animation for the dot
-task.spawn(function()
-    while true do
-        TweenService:Create(statusDot, TweenInfo.new(0.7, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-            BackgroundTransparency = 0.55
-        }):Play()
-        task.wait(0.7)
-        TweenService:Create(statusDot, TweenInfo.new(0.7, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-            BackgroundTransparency = 0
-        }):Play()
-        task.wait(0.7)
-    end
-end)
+do local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(1,0); c.Parent=_statusDot end
 local statusLbl = New("TextLabel", {
-    Size=UDim2.new(1,-28,1,0), Position=UDim2.new(0,24,0,0),
+    Size=UDim2.new(1,-26,1,0), Position=UDim2.new(0,22,0,0),
     BackgroundTransparency=1, Text="Ready — select an animal to spawn",
     TextColor3=Color3.fromRGB(255,230,242), Font=Enum.Font.FredokaOne,
     TextSize=12, TextXAlignment=Enum.TextXAlignment.Left,
     TextTruncate=Enum.TextTruncate.AtEnd, Parent=statusCard,
 })
+-- Pulse animation
+task.spawn(function()
+    while _statusDot and _statusDot.Parent do
+        TweenService:Create(_statusDot, TweenInfo.new(0.65, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+            BackgroundTransparency=0.6, Size=UDim2.new(0,5,0,5), Position=UDim2.new(0,11,0.5,-2.5),
+        }):Play()
+        task.wait(0.65)
+        TweenService:Create(_statusDot, TweenInfo.new(0.65, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+            BackgroundTransparency=0, Size=UDim2.new(0,7,0,7), Position=UDim2.new(0,10,0.5,-3.5),
+        }):Play()
+        task.wait(0.65)
+    end
+end)
 
--- ── Count label (modernized pill card) ───────────────────────
+-- ── Count label (pill card style) ───────────────────────
 local countCard = New("Frame", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(30,8,22),
+    Size=UDim2.new(1,0,0,28), BackgroundColor3=Color3.fromRGB(36,10,24),
     BorderSizePixel=0, LayoutOrder=11, Parent=brainrotsPage,
 })
-Corner(countCard, 10)
-Stroke(countCard, Color3.fromRGB(130,100,255), 1.5, 0.2)
-do
-    local ccGrad = Instance.new("UIGradient")
-    ccGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(44,10,34)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(20,5,16)),
-    })
-    ccGrad.Rotation = 90
-    ccGrad.Parent = countCard
-end
--- Accent left bar (purple)
+Corner(countCard, 8)
+Stroke(countCard, Color3.fromRGB(255,140,190), 1, 0.45)
+-- Accent left bar
 New("Frame", {
-    Size=UDim2.new(0,3,0.65,0), Position=UDim2.new(0,0,0.175,0),
+    Size=UDim2.new(0,3,0.7,0), Position=UDim2.new(0,0,0.15,0),
     BackgroundColor3=Color3.fromRGB(108,92,231), BorderSizePixel=0, Parent=countCard,
 })
--- Counter icon
-New("TextLabel", {
-    Size=UDim2.new(0,24,1,0), Position=UDim2.new(0,8,0,0),
-    BackgroundTransparency=1, Text="🐾",
-    Font=Enum.Font.GothamBold, TextSize=13,
-    TextXAlignment=Enum.TextXAlignment.Center, Parent=countCard,
-})
 local countLbl = New("TextLabel", {
-    Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,34,0,0),
+    Size=UDim2.new(1,-16,1,0), Position=UDim2.new(0,10,0,0),
     BackgroundTransparency=1, Text="Spawned: 0",
-    TextColor3=Color3.fromRGB(200,175,255), Font=Enum.Font.GothamBold,
-    TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, Parent=countCard,
+    TextColor3=Color3.fromRGB(255,175,210), Font=Enum.Font.Nunito,
+    TextSize=12, TextXAlignment=Enum.TextXAlignment.Center, Parent=countCard,
 })
 
 local traitsVisible = false
